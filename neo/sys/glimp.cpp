@@ -189,7 +189,19 @@ bool GLimp_Init(glimpParms_t parms) {
 							channelcolorbits, tdepthbits, tstencilbits, SDL_GetError());
 			continue;
 		}
+#ifdef USE_GLES2
+		SDL_GL_SetAttribute( SDL_GL_RED_SIZE,  8 );
+		SDL_GL_SetAttribute( SDL_GL_GREEN_SIZE,  8 );
+		SDL_GL_SetAttribute( SDL_GL_BLUE_SIZE,  8 );
+		SDL_GL_SetAttribute( SDL_GL_ALPHA_SIZE,  8 );
+	    SDL_GL_SetAttribute( SDL_GL_DEPTH_SIZE, 16 ); // Defaults to 24 which is not needed and fails on old Tegras
+		SDL_GL_SetAttribute( SDL_GL_STENCIL_SIZE,  8 );
+		SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER,  1 );
 
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+#endif
 		context = SDL_GL_CreateContext(window);
 
 		if (SDL_GL_SetSwapInterval(r_swapInterval.GetInteger()) < 0)

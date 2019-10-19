@@ -42,7 +42,12 @@ If you have questions concerning this license or the applicable additional terms
 	#endif
 #endif
 
+#ifdef USE_GLES2
+#include <GLES2/gl2.h>
+#include <GLES2/gl2ext.h>
+#else
 #include <SDL_opengl.h>
+#endif
 
 #if defined( ID_DEDICATED ) && defined( _WIN32 )
 // restore WINGDIAPI
@@ -64,8 +69,16 @@ GLExtension_t GLimp_ExtensionPointer( const char *name );
 #endif
 
 // declare qgl functions
+#ifdef USE_GLES2
+#define QGLPROC(name, rettype, args) extern rettype (GL_APIENTRYP q##name) args;
+#include "renderer/qgl_proc_gles2.h"
+#else
 #define QGLPROC(name, rettype, args) extern rettype (APIENTRYP q##name) args;
 #include "renderer/qgl_proc.h"
+#endif
+
+
+#ifndef USE_GLES2
 
 // multitexture
 extern	void ( APIENTRY * qglMultiTexCoord2fARB )( GLenum texture, GLfloat s, GLfloat t );
@@ -147,5 +160,7 @@ extern BOOL(WINAPI * qwglRealizeLayerPalette)(HDC, int, BOOL);
 extern BOOL(WINAPI * qwglSwapLayerBuffers)(HDC, UINT);
 
 #endif	// _WIN32 && ID_ALLOW_TOOLS
+
+#endif
 
 #endif

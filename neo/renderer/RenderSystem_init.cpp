@@ -231,7 +231,11 @@ idCVar r_useStencilOpSeparate( "r_useStencilOpSeparate", "1", CVAR_RENDERER | CV
 
 // define qgl functions
 #define QGLPROC(name, rettype, args) rettype (APIENTRYP q##name) args;
+#ifdef USE_GLES2
+#include "renderer/qgl_proc_gles2.h"
+#else
 #include "renderer/qgl_proc.h"
+#endif
 
 void ( APIENTRY * qglMultiTexCoord2fARB )( GLenum texture, GLfloat s, GLfloat t );
 void ( APIENTRY * qglMultiTexCoord2fvARB )( GLenum texture, GLfloat *st );
@@ -684,7 +688,11 @@ void R_InitOpenGL( void ) {
 	if (!q##name) \
 		common->FatalError("Unable to initialize OpenGL (%s)", #name);
 
+#ifdef USE_GLES2
+#include "renderer/qgl_proc_gles2.h"
+#else
 #include "renderer/qgl_proc.h"
+#endif
 
 	// input and sound systems need to be tied to the new window
 	Sys_InitInput();
