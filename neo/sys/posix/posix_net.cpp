@@ -273,6 +273,9 @@ NET_InitNetworking
 */
 void Sys_InitNetworking(void)
 {
+#ifdef __ANDROID__ // FIX ME!!!
+return;
+#endif
 	unsigned int ip, mask;
 	struct ifaddrs *ifap, *ifp;
 

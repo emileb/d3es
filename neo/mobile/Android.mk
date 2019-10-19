@@ -7,10 +7,15 @@ LOCAL_MODULE := doom3
 
 
 LOCAL_C_INCLUDES :=  \
-    $(TOP_DIR)/Doom/d3es/neo/mobile \
- $(SDL_INCLUDE_PATHS) \
- $(TOP_DIR)/AudioLibs_OpenTouch/openal/include/ \
- $(TOP_DIR)/AudioLibs_OpenTouch/liboggvorbis/include \
+$(TOP_DIR) \
+$(TOP_DIR)/Doom/d3es/neo/mobile \
+$(SDL_INCLUDE_PATHS) \
+$(TOP_DIR)/AudioLibs_OpenTouch/openal/include/ \
+$(TOP_DIR)/AudioLibs_OpenTouch/liboggvorbis/include \
+$(TOP_DIR)/MobileTouchControls \
+$(TOP_DIR)/Clibs_OpenTouch \
+$(TOP_DIR)/Clibs_OpenTouch/idtech1 \
+
 
 
 LOCAL_CPPFLAGS :=  -O2 -fno-unsafe-math-optimizations -fno-math-errno -fno-trapping-math -fomit-frame-pointer -fvisibility=hidden
@@ -19,11 +24,19 @@ LOCAL_CPPFLAGS += -std=gnu++11 -D__DOOM_DLL__ -frtti -fexceptions  -Wno-error=fo
 
 
 LOCAL_CPPFLAGS += -Wno-sign-compare \
-                -Wno-switch \
-                -Wno-format-security \
+                  -Wno-switch \
+                  -Wno-format-security \
+
+LOCAL_CPPFLAGS += -DD3ES -DENGINE_NAME=\"d3es\"
+
 
 # Not avaliable in Android untill N
 LOCAL_CFLAGS := -DIOAPI_NO_64
+
+
+SRC_ANDROID = mobile/game_interface.cpp \
+              ../../../Clibs_OpenTouch/idtech1/android_jni.cpp \
+              ../../../Clibs_OpenTouch/idtech1/touch_interface.cpp \
 
 
 src_renderer = \
@@ -283,16 +296,17 @@ src_core = \
         $(src_idlib) \
 
 
-LOCAL_SRC_FILES =   $(src_core) \
-                    $(src_sys_base) \
-                    $(src_sys_core) \
+LOCAL_SRC_FILES = $(SRC_ANDROID) \
+                  $(src_core) \
+                  $(src_sys_base) \
+                  $(src_sys_core) \
 
 
 
 
-LOCAL_SHARED_LIBRARIES := openal touchcontrols SDL2 libvorbis libogg
+LOCAL_SHARED_LIBRARIES := openal touchcontrols core_shared SDL2 libvorbis libogg
 
-LOCAL_STATIC_LIBRARIES := jpeg
+LOCAL_STATIC_LIBRARIES := logwritter jpeg
 
 LOCAL_LDLIBS :=  -llog -lm  -lEGL -lGLESv2
 include $(BUILD_SHARED_LIBRARY)

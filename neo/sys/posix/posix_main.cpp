@@ -897,7 +897,13 @@ void Sys_DebugPrintf( const char *fmt, ... ) {
 
 void Sys_DebugVPrintf( const char *fmt, va_list arg ) {
 	tty_Hide();
+#ifdef __ANDROID__
+    char p[1000];
+    idStr::vsnPrintf(p, sizeof(p), fmt, arg);
+    LOGI("D3: %s",p);
+#else
 	vprintf( fmt, arg );
+#endif
 	tty_Show();
 }
 

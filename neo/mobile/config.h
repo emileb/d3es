@@ -6,8 +6,8 @@
 
 #define BUILD_LIBRARY_SUFFIX	"@CMAKE_SHARED_LIBRARY_SUFFIX@"
 
-#define BUILD_LIBDIR			"@libdir@"
-#define BUILD_DATADIR			"@datadir@"
+#define BUILD_LIBDIR			"./D3"
+#define BUILD_DATADIR			"./D3"
 
 //#cmakedefine HAVE_JPEG_MEM_SRC
 
