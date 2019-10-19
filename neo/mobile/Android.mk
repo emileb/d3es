@@ -18,7 +18,7 @@ $(TOP_DIR)/Clibs_OpenTouch/idtech1 \
 
 
 
-LOCAL_CPPFLAGS :=  -O2 -fno-unsafe-math-optimizations -fno-math-errno -fno-trapping-math -fomit-frame-pointer -fvisibility=hidden
+LOCAL_CPPFLAGS :=  -DUSE_GLES2 -O2 -fno-unsafe-math-optimizations -fno-math-errno -fno-trapping-math -fomit-frame-pointer -fvisibility=hidden
 
 LOCAL_CPPFLAGS += -std=gnu++11 -D__DOOM_DLL__ -frtti -fexceptions  -Wno-error=format-security
 
