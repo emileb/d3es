@@ -284,7 +284,11 @@ void idSysLocal::OpenURL( const char *url, bool quit ) {
 main
 ===============
 */
+#ifdef __ANDROID__
+int main_android(int argc, char **argv) {
+#else
 int main(int argc, char **argv) {
+#endif
 	// fallback path to the binary for systems without /proc
 	// while not 100% reliable, its good enough
 	if (argc > 0) {
