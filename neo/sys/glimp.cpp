@@ -388,8 +388,30 @@ void GLimp_DeactivateContext() {
 GLimp_ExtensionPointer
 ===================
 */
+#ifdef __ANDROID__
+#include <dlfcn.h>
+#endif
 GLExtension_t GLimp_ExtensionPointer(const char *name) {
 	assert(SDL_WasInit(SDL_INIT_VIDEO));
+
+#ifdef __ANDROID__
+	static void *glesLib = NULL;
+
+	if( !glesLib )
+	{
+	    int flags = RTLD_LOCAL | RTLD_NOW;
+		glesLib = dlopen("libGLESv2_CM.so", flags);
+		//glesLib = dlopen("libGLESv3.so", flags);
+		if( !glesLib )
+		{
+			glesLib = dlopen("libGLESv2.so", flags);
+		}
+	}
+
+	GLExtension_t ret =  (GLExtension_t)dlsym(glesLib, name);
+	common->Printf("GLimp_ExtensionPointer %s  %p\n",name,ret);
+	return ret;
+#endif
 
 	return (GLExtension_t)SDL_GL_GetProcAddress(name);
 }

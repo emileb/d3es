@@ -18,7 +18,7 @@ $(TOP_DIR)/Clibs_OpenTouch/idtech1 \
 
 
 
-LOCAL_CPPFLAGS :=  -DUSE_GLES2 -O2 -fno-unsafe-math-optimizations -fno-math-errno -fno-trapping-math -fomit-frame-pointer -fvisibility=hidden
+LOCAL_CPPFLAGS :=  -DUSE_GLES2 -O2 -fsigned-char  -fno-unsafe-math-optimizations -fno-math-errno -fno-trapping-math -fomit-frame-pointer -fvisibility=hidden
 
 LOCAL_CPPFLAGS += -std=gnu++11 -D__DOOM_DLL__ -frtti -fexceptions  -Wno-error=format-security
 
@@ -71,7 +71,7 @@ src_renderer = \
 	renderer/RenderWorld_load.cpp \
 	renderer/RenderWorld_portals.cpp \
 	renderer/VertexCache.cpp \
-	renderer/draw_arb2.cpp \
+	renderer/draw_gles2.cpp \
 	renderer/draw_common.cpp \
 	renderer/tr_backend.cpp \
 	renderer/tr_deform.cpp \
@@ -83,7 +83,6 @@ src_renderer = \
 	renderer/tr_orderIndexes.cpp \
 	renderer/tr_polytope.cpp \
 	renderer/tr_render.cpp \
-	renderer/tr_rendertools.cpp \
 	renderer/tr_shadowbounds.cpp \
 	renderer/tr_stencilshadow.cpp \
 	renderer/tr_subview.cpp \
@@ -280,20 +279,38 @@ src_sys_base = \
 src_sys_core =\
 		sys/glimp.cpp \
 
+src_renderer_glsl = \
+    renderer/glsl/cubeMapShaderFP.cpp \
+    renderer/glsl/diffuseMapShaderVP.cpp \
+    renderer/glsl/diffuseCubeShaderVP.cpp \
+    renderer/glsl/diffuseMapShaderFP.cpp \
+    renderer/glsl/fogShaderFP.cpp \
+    renderer/glsl/fogShaderVP.cpp \
+    renderer/glsl/blendLightShaderVP.cpp \
+    renderer/glsl/interactionPhongShaderFP.cpp \
+    renderer/glsl/interactionPhongShaderVP.cpp \
+    renderer/glsl/interactionShaderFP.cpp \
+    renderer/glsl/interactionShaderVP.cpp \
+    renderer/glsl/reflectionCubeShaderVP.cpp \
+    renderer/glsl/skyboxCubeShaderVP.cpp \
+    renderer/glsl/stencilShadowShaderFP.cpp \
+    renderer/glsl/stencilShadowShaderVP.cpp \
+    renderer/glsl/zfillClipShaderFP.cpp \
+    renderer/glsl/zfillClipShaderVP.cpp \
+    renderer/glsl/zfillShaderFP.cpp \
+    renderer/glsl/zfillShaderVP.cpp \
 
 
 src_core = \
     	${src_renderer} \
     	$(src_framework) \
         ${src_cm} \
-        ${src_dmap} \
         ${src_aas} \
-        ${src_roq} \
-        ${src_renderbump} \
         ${src_snd} \
         ${src_ui} \
         ${src_tools} \
         $(src_idlib) \
+        $(src_renderer_glsl) \
 
 
 LOCAL_SRC_FILES = $(SRC_ANDROID) \

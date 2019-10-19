@@ -26,9 +26,6 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#if defined(__ppc__) && defined(__APPLE__)
-#include <vecLib/vecLib.h>
-#endif
 #if defined(__GNUC__) && defined(__SSE2__)
 #include <xmmintrin.h>
 #endif
@@ -157,11 +154,6 @@ idScreenRect R_ScreenRectFromViewFrustumBounds( const idBounds &bounds ) {
 	screenRect.x2 = idMath::FtoiFast( 0.5f * ( 1.0f - bounds[0].y ) * ( tr.viewDef->viewport.x2 - tr.viewDef->viewport.x1 ) );
 	screenRect.y1 = idMath::FtoiFast( 0.5f * ( 1.0f + bounds[0].z ) * ( tr.viewDef->viewport.y2 - tr.viewDef->viewport.y1 ) );
 	screenRect.y2 = idMath::FtoiFast( 0.5f * ( 1.0f + bounds[1].z ) * ( tr.viewDef->viewport.y2 - tr.viewDef->viewport.y1 ) );
-
-	if ( r_useDepthBoundsTest.GetInteger() ) {
-		R_TransformEyeZToWin( -bounds[0].x, tr.viewDef->projectionMatrix, screenRect.zmin );
-		R_TransformEyeZToWin( -bounds[1].x, tr.viewDef->projectionMatrix, screenRect.zmax );
-	}
 
 	return screenRect;
 }

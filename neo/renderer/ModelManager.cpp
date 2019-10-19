@@ -35,6 +35,10 @@ If you have questions concerning this license or the applicable additional terms
 
 #include "renderer/ModelManager.h"
 
+#ifdef __EMSCRIPTEN__
+#include "emscripten.h"
+#endif
+
 class idRenderModelManagerLocal : public idRenderModelManager {
 public:
 							idRenderModelManagerLocal();
@@ -556,6 +560,9 @@ void idRenderModelManagerLocal::EndLevelLoad() {
 
 			if ( ( loadCount & 15 ) == 0 ) {
 				session->PacifierUpdate();
+#ifdef __EMSCRIPTEN__
+        emscripten_sleep(1);
+#endif
 			}
 		}
 	}

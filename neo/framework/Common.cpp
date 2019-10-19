@@ -2282,7 +2282,7 @@ void idCommonLocal::InitCommands( void ) {
 	cmdSystem->AddCommand( "setMachineSpec", Com_SetMachineSpec_f, CMD_FL_SYSTEM, "detects system capabilities and sets com_machineSpec to appropriate value" );
 	cmdSystem->AddCommand( "execMachineSpec", Com_ExecMachineSpec_f, CMD_FL_SYSTEM, "execs the appropriate config files and sets cvars based on com_machineSpec" );
 
-#if	!defined( ID_DEDICATED )
+#if	!defined( ID_DEDICATED ) && !defined( __ANDROID__ )
 	// compilers
 	cmdSystem->AddCommand( "dmap", Dmap_f, CMD_FL_TOOL, "compiles a map", idCmdSystem::ArgCompletion_MapName );
 	cmdSystem->AddCommand( "renderbump", RenderBump_f, CMD_FL_TOOL, "renders a bump map", idCmdSystem::ArgCompletion_ModelName );
@@ -2562,6 +2562,12 @@ void idCommonLocal::Async( void ) {
 	}
 }
 
+
+#ifdef __ANDROID__
+extern "C" char const * nativeLibsPath;
+#endif
+
+
 /*
 =================
 idCommonLocal::LoadGameDLLbyName
@@ -2588,6 +2594,12 @@ void idCommonLocal::LoadGameDLLbyName( const char *dll, idStr& s ) {
 			s.AppendPath(dll);
 			gameDLL = sys->DLL_Load(s);
 		}
+	#elif defined(__ANDROID__)
+		if (!gameDLL) {
+            s = nativeLibsPath;
+            s.AppendPath(dll);
+            gameDLL = sys->DLL_Load(s);
+        }
 	#elif defined(MACOS_X)
 		// then the binary dir in the bundle on osx
 		if (!gameDLL && Sys_GetPath(PATH_EXE, s)) {
@@ -2635,6 +2647,14 @@ void idCommonLocal::LoadGameDLL( void ) {
 		sys->DLL_GetFileName(BASE_GAMEDIR, dll, sizeof(dll));
 		LoadGameDLLbyName(dll, s);
 	}
+
+#ifdef __ANDROID__
+		common->Warning( "nativeLibsPath = %s", nativeLibsPath );
+
+		sys->DLL_GetFileName("", dll, sizeof(dll));
+		common->Warning( "Android loading.. %s", dll );
+		LoadGameDLLbyName(dll, s);
+#endif
 
 	if ( !gameDLL ) {
 		common->FatalError( "couldn't load game dynamic library" );
