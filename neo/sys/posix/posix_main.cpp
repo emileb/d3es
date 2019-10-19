@@ -268,6 +268,9 @@ TODO: OSX - use the native API instead? NSModule
 =================
 */
 uintptr_t Sys_DLL_Load( const char *path ) {
+#ifdef __ANDROID__
+	Sys_Printf( "Sys_DLL_Load %s\n", path );
+#endif
 	return (uintptr_t)dlopen( path, RTLD_NOW );
 }
 
