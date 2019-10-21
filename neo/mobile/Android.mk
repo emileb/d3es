@@ -18,8 +18,7 @@ $(TOP_DIR)/Clibs_OpenTouch/idtech1 \
 
 
 
-LOCAL_CPPFLAGS :=  -DUSE_GLES2 -O2 -fsigned-char  -fno-unsafe-math-optimizations -fno-math-errno -fno-trapping-math -fomit-frame-pointer -fvisibility=hidden
-
+LOCAL_CPPFLAGS := -DUSE_GLES2
 LOCAL_CPPFLAGS += -std=gnu++11 -D__DOOM_DLL__ -frtti -fexceptions  -Wno-error=format-security
 
 
@@ -32,6 +31,9 @@ LOCAL_CPPFLAGS += -DD3ES -DENGINE_NAME=\"d3es\"
 
 # Not avaliable in Android untill N
 LOCAL_CFLAGS := -DIOAPI_NO_64
+
+LOCAL_CFLAGS += -fno-unsafe-math-optimizations -fno-strict-aliasing -fno-math-errno -fno-trapping-math -fomit-frame-pointer -fvisibility=hidden -fsigned-char
+
 
 
 SRC_ANDROID = mobile/game_interface.cpp \
@@ -325,5 +327,5 @@ LOCAL_SHARED_LIBRARIES := openal touchcontrols core_shared SDL2 libvorbis libogg
 
 LOCAL_STATIC_LIBRARIES := logwritter jpeg
 
-LOCAL_LDLIBS :=  -llog -lm  -lEGL -lGLESv2
+LOCAL_LDLIBS :=  -llog -lm  -lEGL -lGLESv2 -lz
 include $(BUILD_SHARED_LIBRARY)

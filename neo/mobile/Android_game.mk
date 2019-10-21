@@ -13,8 +13,7 @@ $(TOP_DIR)/Doom/d3es/neo/game \
 
 
 
-
-LOCAL_CPPFLAGS :=  -DGAME_DLL -O2 -fsigned-char  -fno-unsafe-math-optimizations -fno-math-errno -fno-trapping-math -fomit-frame-pointer -fvisibility=hidden
+LOCAL_CPPFLAGS :=  -DGAME_DLL -fPIC
 
 LOCAL_CPPFLAGS += -std=gnu++11 -D__DOOM_DLL__ -frtti -fexceptions  -Wno-error=format-security
 
@@ -23,11 +22,11 @@ LOCAL_CPPFLAGS += -Wno-sign-compare \
                   -Wno-switch \
                   -Wno-format-security \
 
-LOCAL_CPPFLAGS += -DD3ES -DENGINE_NAME=\"d3es\"
-
 
 # Not avaliable in Android untill N
 LOCAL_CFLAGS := -DIOAPI_NO_64
+
+LOCAL_CFLAGS += -fno-unsafe-math-optimizations -fno-strict-aliasing -fno-math-errno -fno-trapping-math -fomit-frame-pointer -fvisibility=hidden -fsigned-char
 
 
 SRC_ANDROID = mobile/game_interface.cpp \
