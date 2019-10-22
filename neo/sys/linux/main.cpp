@@ -305,8 +305,9 @@ int main(int argc, char **argv) {
 	// so set $LC_ALL to "C".
 	setenv("LC_ALL", "C", 1);
 
+#ifndef __ANDROID__
 	Posix_InitSignalHandlers();
-
+#endif
 	if ( argc > 1 ) {
 		common->Init( argc-1, &argv[1] );
 	} else {
