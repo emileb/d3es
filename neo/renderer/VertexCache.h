@@ -50,6 +50,8 @@ typedef struct vertCache_s {
 	struct vertCache_s **user;        // will be set to zero when purged
 	struct vertCache_s *next, *prev;  // may be on the static list or one of the frame lists
 	int frameUsed;      // it can't be purged if near the current frame
+	void* frontEndMemory;
+	bool frontEndMemoryDirty;
 } vertCache_t;
 
 
@@ -73,6 +75,8 @@ public:
 	// This will be a real pointer with virtual memory,
 	// but it will be an int offset cast to a pointer of ARB_vertex_buffer_object
 	void *Position(vertCache_t *buffer);
+
+	vertCache_t * CreateTempVbo(int bytes, bool indexBuffer);
 
 	// automatically freed at the end of the next frame
 	// used for specular texture coordinates and gui drawing, which
@@ -121,7 +125,6 @@ private:
 	int currentFrame;      // for purgable block tracking
 	int listNum;        // currentFrame % NUM_VERTEX_FRAMES, determines which tempBuffers to use
 
-	bool allocatingTempBuffer;  // force GL_STREAM_DRAW_ARB
 
 	vertCache_t *tempBuffers[NUM_VERTEX_FRAMES];    // allocated at startup
 	vertCache_t *tempIndexBuffers[NUM_VERTEX_FRAMES];    // allocated at startup (for Index buffers)
