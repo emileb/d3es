@@ -99,6 +99,8 @@ public:
 	// Also prints debugging info when enabled
 	void EndFrame();
 
+	void BeginBackEnd();
+
 	// listVertexCache calls this
 	void List();
 

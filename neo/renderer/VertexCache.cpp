@@ -241,6 +241,8 @@ vertCache_t* idVertexCache::CreateTempVbo(int bytes, bool indexBuffer)
 	block->indexBuffer = indexBuffer;
 	block->frontEndMemoryDirty = false;
 
+	block->frontEndMemory = malloc(bytes + 16 );
+
 	qglGenBuffers(1, &block->vbo);
 
 	if (indexBuffer) {
@@ -488,6 +490,7 @@ vertCache_t* idVertexCache::AllocFrameTemp(void* data, int size, bool indexBuffe
 	block->tag = TAG_TEMP;
 	block->indexBuffer = indexBuffer;
 	if (indexBuffer) {
+
 		block->offset = dynamicAllocThisFrame_Index;
 		dynamicAllocThisFrame_Index += block->size;
 		dynamicCountThisFrame_Index++;
@@ -495,32 +498,38 @@ vertCache_t* idVertexCache::AllocFrameTemp(void* data, int size, bool indexBuffe
 		block->offset = dynamicAllocThisFrame;
 		dynamicAllocThisFrame += block->size;
 		dynamicCountThisFrame++;
-
 	}
+
 	block->user = NULL;
 	block->frameUsed = 0;
 
 	// copy the data
-
 	if (indexBuffer) {
 		block->vbo = tempIndexBuffers[listNum]->vbo;
-
-		if (block->vbo != currentBoundVBO_Index) {
-			qglBindBuffer(GL_ELEMENT_ARRAY_BUFFER, block->vbo);
-			currentBoundVBO_Index = block->vbo;
-		}
-		qglBufferSubData(GL_ELEMENT_ARRAY_BUFFER, block->offset, (GLsizeiptr)size, data);
-	} else {
-		block->vbo = tempBuffers[listNum]->vbo;
-
-		if (block->vbo != currentBoundVBO) {
-			qglBindBuffer(GL_ARRAY_BUFFER, block->vbo);
-			currentBoundVBO = block->vbo;
-		}
-		qglBufferSubData(GL_ARRAY_BUFFER, block->offset, (GLsizeiptr)size, data);
+        memcpy( (char*)tempIndexBuffers[listNum]->frontEndMemory + block->offset, data, size);
+    } else {
+    	block->vbo = tempBuffers[listNum]->vbo;
+        memcpy( (char*)tempBuffers[listNum]->frontEndMemory + block->offset, data, size);
 	}
 
+
 	return block;
+}
+
+void  idVertexCache::BeginBackEnd()
+{
+//LOGI("BeginBackEnd list = %d, size index = %d, size = %d", listNum,dynamicAllocThisFrame_Index,dynamicAllocThisFrame);
+
+	qglBindBuffer(GL_ELEMENT_ARRAY_BUFFER,  tempIndexBuffers[listNum]->vbo);
+	currentBoundVBO_Index =  tempIndexBuffers[listNum]->vbo;
+	qglBufferSubData(GL_ELEMENT_ARRAY_BUFFER,0, dynamicAllocThisFrame_Index, tempIndexBuffers[listNum]->frontEndMemory);
+	//qglBufferData(GL_ELEMENT_ARRAY_BUFFER, dynamicAllocThisFrame_Index, tempIndexBuffers[listNum]->frontEndMemory,GL_STATIC_DRAW);
+
+	qglBindBuffer(GL_ARRAY_BUFFER,  tempBuffers[listNum]->vbo);
+	currentBoundVBO = tempBuffers[listNum]->vbo;
+	qglBufferSubData(GL_ARRAY_BUFFER,0, dynamicAllocThisFrame, tempBuffers[listNum]->frontEndMemory);
+	//qglBufferData(GL_ARRAY_BUFFER,dynamicAllocThisFrame, tempBuffers[listNum]->frontEndMemory,GL_STATIC_DRAW);
+
 }
 
 /*
