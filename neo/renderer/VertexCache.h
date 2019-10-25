@@ -131,7 +131,6 @@ private:
   idBlockAlloc<vertCache_t, 1024> headerAllocator;
 
   vertCache_t freeStaticHeaders;    // head of doubly linked list
-  vertCache_t freeStaticIndexHeaders;    // head of doubly linked list (Index buffers)
 
   vertCache_t freeDynamicHeaders;    // head of doubly linked list
   vertCache_t freeDynamicIndexHeaders;    // head of doubly linked list (Index buffers)
@@ -140,7 +139,6 @@ private:
   vertCache_t dynamicIndexHeaders;      // head of doubly linked list (Index buffers)
 
   vertCache_t staticHeaders;      // head of doubly linked list in MRU order,
-  vertCache_t staticIndexHeaders;      // head of doubly linked list in MRU order (Index buffers)
 
   vertCache_t deferredFreeList;    // head of doubly linked list
 
