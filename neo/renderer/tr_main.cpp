@@ -46,7 +46,8 @@ idScreenRect::Clear
 void idScreenRect::Clear() {
 	x1 = y1 = 32000;
 	x2 = y2 = -32000;
-	zmin = 0.0f; zmax = 1.0f;
+	zmin = 0.0f;
+	zmax = 1.0f;
 }
 
 /*
@@ -393,7 +394,7 @@ void *R_FrameAlloc( int bytes ) {
 	// we could fix this if we needed to...
 	if ( bytes > block->size ) {
 		common->FatalError( "R_FrameAlloc of %i exceeded MEMORY_BLOCK_SIZE",
-			bytes );
+		                    bytes );
 	}
 
 	frame->alloc = block;
@@ -494,23 +495,23 @@ void R_LocalPointToGlobal( const float modelMatrix[16], const idVec3 &in, idVec3
 	_mm_store_ss(&out[2], m2);
 #else
 	out[0] = in[0] * modelMatrix[0] + in[1] * modelMatrix[4]
-		+ in[2] * modelMatrix[8] + modelMatrix[12];
+	         + in[2] * modelMatrix[8] + modelMatrix[12];
 	out[1] = in[0] * modelMatrix[1] + in[1] * modelMatrix[5]
-		+ in[2] * modelMatrix[9] + modelMatrix[13];
+	         + in[2] * modelMatrix[9] + modelMatrix[13];
 	out[2] = in[0] * modelMatrix[2] + in[1] * modelMatrix[6]
-		+ in[2] * modelMatrix[10] + modelMatrix[14];
+	         + in[2] * modelMatrix[10] + modelMatrix[14];
 #endif
 }
 
 void R_PointTimesMatrix( const float modelMatrix[16], const idVec4 &in, idVec4 &out ) {
 	out[0] = in[0] * modelMatrix[0] + in[1] * modelMatrix[4]
-		+ in[2] * modelMatrix[8] + modelMatrix[12];
+	         + in[2] * modelMatrix[8] + modelMatrix[12];
 	out[1] = in[0] * modelMatrix[1] + in[1] * modelMatrix[5]
-		+ in[2] * modelMatrix[9] + modelMatrix[13];
+	         + in[2] * modelMatrix[9] + modelMatrix[13];
 	out[2] = in[0] * modelMatrix[2] + in[1] * modelMatrix[6]
-		+ in[2] * modelMatrix[10] + modelMatrix[14];
+	         + in[2] * modelMatrix[10] + modelMatrix[14];
 	out[3] = in[0] * modelMatrix[3] + in[1] * modelMatrix[7]
-		+ in[2] * modelMatrix[11] + modelMatrix[15];
+	         + in[2] * modelMatrix[11] + modelMatrix[15];
 }
 
 void R_GlobalPointToLocal( const float modelMatrix[16], const idVec3 &in, idVec3 &out ) {
@@ -525,11 +526,11 @@ void R_GlobalPointToLocal( const float modelMatrix[16], const idVec3 &in, idVec3
 
 void R_LocalVectorToGlobal( const float modelMatrix[16], const idVec3 &in, idVec3 &out ) {
 	out[0] = in[0] * modelMatrix[0] + in[1] * modelMatrix[4]
-		+ in[2] * modelMatrix[8];
+	         + in[2] * modelMatrix[8];
 	out[1] = in[0] * modelMatrix[1] + in[1] * modelMatrix[5]
-		+ in[2] * modelMatrix[9];
+	         + in[2] * modelMatrix[9];
 	out[2] = in[0] * modelMatrix[2] + in[1] * modelMatrix[6]
-		+ in[2] * modelMatrix[10];
+	         + in[2] * modelMatrix[10];
 }
 
 void R_GlobalVectorToLocal( const float modelMatrix[16], const idVec3 &in, idVec3 &out ) {
@@ -683,18 +684,18 @@ void R_TransformModelToClip( const idVec3 &src, const float *modelMatrix, const 
 
 	for ( i = 0 ; i < 4 ; i++ ) {
 		eye[i] =
-			src[0] * modelMatrix[ i + 0 * 4 ] +
-			src[1] * modelMatrix[ i + 1 * 4 ] +
-			src[2] * modelMatrix[ i + 2 * 4 ] +
-			1 * modelMatrix[ i + 3 * 4 ];
+		    src[0] * modelMatrix[ i + 0 * 4 ] +
+		    src[1] * modelMatrix[ i + 1 * 4 ] +
+		    src[2] * modelMatrix[ i + 2 * 4 ] +
+		    1 * modelMatrix[ i + 3 * 4 ];
 	}
 
 	for ( i = 0 ; i < 4 ; i++ ) {
 		dst[i] =
-			eye[0] * projectionMatrix[ i + 0 * 4 ] +
-			eye[1] * projectionMatrix[ i + 1 * 4 ] +
-			eye[2] * projectionMatrix[ i + 2 * 4 ] +
-			eye[3] * projectionMatrix[ i + 3 * 4 ];
+		    eye[0] * projectionMatrix[ i + 0 * 4 ] +
+		    eye[1] * projectionMatrix[ i + 1 * 4 ] +
+		    eye[2] * projectionMatrix[ i + 2 * 4 ] +
+		    eye[3] * projectionMatrix[ i + 3 * 4 ];
 	}
 }
 
@@ -715,37 +716,37 @@ void R_GlobalToNormalizedDeviceCoordinates( const idVec3 &global, idVec3 &ndc ) 
 
 		for ( i = 0 ; i < 4 ; i ++ ) {
 			view[i] =
-				global[0] * tr.primaryView->worldSpace.modelViewMatrix[ i + 0 * 4 ] +
-				global[1] * tr.primaryView->worldSpace.modelViewMatrix[ i + 1 * 4 ] +
-				global[2] * tr.primaryView->worldSpace.modelViewMatrix[ i + 2 * 4 ] +
-					tr.primaryView->worldSpace.modelViewMatrix[ i + 3 * 4 ];
+			    global[0] * tr.primaryView->worldSpace.modelViewMatrix[ i + 0 * 4 ] +
+			    global[1] * tr.primaryView->worldSpace.modelViewMatrix[ i + 1 * 4 ] +
+			    global[2] * tr.primaryView->worldSpace.modelViewMatrix[ i + 2 * 4 ] +
+			    tr.primaryView->worldSpace.modelViewMatrix[ i + 3 * 4 ];
 		}
 
 		for ( i = 0 ; i < 4 ; i ++ ) {
 			clip[i] =
-				view[0] * tr.primaryView->projectionMatrix[ i + 0 * 4 ] +
-				view[1] * tr.primaryView->projectionMatrix[ i + 1 * 4 ] +
-				view[2] * tr.primaryView->projectionMatrix[ i + 2 * 4 ] +
-				view[3] * tr.primaryView->projectionMatrix[ i + 3 * 4 ];
+			    view[0] * tr.primaryView->projectionMatrix[ i + 0 * 4 ] +
+			    view[1] * tr.primaryView->projectionMatrix[ i + 1 * 4 ] +
+			    view[2] * tr.primaryView->projectionMatrix[ i + 2 * 4 ] +
+			    view[3] * tr.primaryView->projectionMatrix[ i + 3 * 4 ];
 		}
 
 	} else {
 
 		for ( i = 0 ; i < 4 ; i ++ ) {
 			view[i] =
-				global[0] * tr.viewDef->worldSpace.modelViewMatrix[ i + 0 * 4 ] +
-				global[1] * tr.viewDef->worldSpace.modelViewMatrix[ i + 1 * 4 ] +
-				global[2] * tr.viewDef->worldSpace.modelViewMatrix[ i + 2 * 4 ] +
-				tr.viewDef->worldSpace.modelViewMatrix[ i + 3 * 4 ];
+			    global[0] * tr.viewDef->worldSpace.modelViewMatrix[ i + 0 * 4 ] +
+			    global[1] * tr.viewDef->worldSpace.modelViewMatrix[ i + 1 * 4 ] +
+			    global[2] * tr.viewDef->worldSpace.modelViewMatrix[ i + 2 * 4 ] +
+			    tr.viewDef->worldSpace.modelViewMatrix[ i + 3 * 4 ];
 		}
 
 
 		for ( i = 0 ; i < 4 ; i ++ ) {
 			clip[i] =
-				view[0] * tr.viewDef->projectionMatrix[ i + 0 * 4 ] +
-				view[1] * tr.viewDef->projectionMatrix[ i + 1 * 4 ] +
-				view[2] * tr.viewDef->projectionMatrix[ i + 2 * 4 ] +
-				view[3] * tr.viewDef->projectionMatrix[ i + 3 * 4 ];
+			    view[0] * tr.viewDef->projectionMatrix[ i + 0 * 4 ] +
+			    view[1] * tr.viewDef->projectionMatrix[ i + 1 * 4 ] +
+			    view[2] * tr.viewDef->projectionMatrix[ i + 2 * 4 ] +
+			    view[3] * tr.viewDef->projectionMatrix[ i + 3 * 4 ];
 		}
 
 	}
@@ -781,10 +782,10 @@ void myGlMultMatrix( const float a[16], const float b[16], float out[16] ) {
 	for ( i = 0 ; i < 4 ; i++ ) {
 		for ( j = 0 ; j < 4 ; j++ ) {
 			out[ i * 4 + j ] =
-				a [ i * 4 + 0 ] * b [ 0 * 4 + j ]
-				+ a [ i * 4 + 1 ] * b [ 1 * 4 + j ]
-				+ a [ i * 4 + 2 ] * b [ 2 * 4 + j ]
-				+ a [ i * 4 + 3 ] * b [ 3 * 4 + j ];
+			    a [ i * 4 + 0 ] * b [ 0 * 4 + j ]
+			    + a [ i * 4 + 1 ] * b [ 1 * 4 + j ]
+			    + a [ i * 4 + 2 ] * b [ 2 * 4 + j ]
+			    + a [ i * 4 + 3 ] * b [ 3 * 4 + j ];
 		}
 	}
 #else
@@ -1064,7 +1065,7 @@ R_SortDrawSurfs
 static void R_SortDrawSurfs( void ) {
 	// sort the drawsurfs by sort type, then orientation, then shader
 	qsort( tr.viewDef->drawSurfs, tr.viewDef->numDrawSurfs, sizeof( tr.viewDef->drawSurfs[0] ),
-		R_QsortSurfaces );
+	       R_QsortSurfaces );
 }
 
 

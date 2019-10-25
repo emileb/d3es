@@ -100,8 +100,10 @@ public:
 class idSndWindow : public idCinematic {
 public:
 
-						idSndWindow() { showWaveform = false; }
-						~idSndWindow() {}
+	idSndWindow() {
+		showWaveform = false;
+	}
+	~idSndWindow() {}
 
 	bool				InitFromFile( const char *qpath, bool looping );
 	cinData_t			ImageForTime( int milliseconds );

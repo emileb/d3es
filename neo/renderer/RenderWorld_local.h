@@ -62,7 +62,7 @@ typedef struct doublePortal_s {
 typedef struct portalArea_s {
 	int				areaNum;
 	int				connectedAreaNum[NUM_PORTAL_ATTRIBUTES];	// if two areas have matching connectedAreaNum, they are
-									// not separated by a portal with the apropriate PS_BLOCK_* blockingBits
+	// not separated by a portal with the apropriate PS_BLOCK_* blockingBits
 	int				viewCount;		// set by R_FindViewLightsAndEntities
 	portal_t *		portals;		// never changes after load
 	areaReference_t	entityRefs;		// head/tail of doubly linked list, may change
@@ -76,13 +76,13 @@ typedef struct {
 	idPlane			plane;
 	int				children[2];		// negative numbers are (-1 - areaNumber), 0 = solid
 	int				commonChildrenArea;	// if all children are either solid or a single area,
-										// this is the area number, else CHILDREN_HAVE_MULTIPLE_AREAS
+	// this is the area number, else CHILDREN_HAVE_MULTIPLE_AREAS
 } areaNode_t;
 
 
 class idRenderWorldLocal : public idRenderWorld {
 public:
-							idRenderWorldLocal();
+	idRenderWorldLocal();
 	virtual					~idRenderWorldLocal();
 
 	virtual	qhandle_t		AddEntityDef( const renderEntity_t *re );
@@ -218,7 +218,9 @@ public:
 	int						GetPortalState( qhandle_t portal );
 	bool					AreasAreConnected( int areaNum1, int areaNum2, portalConnection_t connection );
 	void					FloodConnectedAreas( portalArea_t *area, int portalAttributeIndex );
-	idScreenRect &			GetAreaScreenRect( int areaNum ) const { return areaScreenRect[areaNum]; }
+	idScreenRect &			GetAreaScreenRect( int areaNum ) const {
+		return areaScreenRect[areaNum];
+	}
 
 	//--------------------------
 	// RenderWorld_demo.cpp

@@ -135,9 +135,9 @@ void RB_SimpleSurfaceSetup( const drawSurf_t *drawSurf ) {
 	if ( r_useScissor.GetBool() && !backEnd.currentScissor.Equals( drawSurf->scissorRect ) ) {
 		backEnd.currentScissor = drawSurf->scissorRect;
 		qglScissor( backEnd.viewDef->viewport.x1 + backEnd.currentScissor.x1,
-			backEnd.viewDef->viewport.y1 + backEnd.currentScissor.y1,
-			backEnd.currentScissor.x2 + 1 - backEnd.currentScissor.x1,
-			backEnd.currentScissor.y2 + 1 - backEnd.currentScissor.y1 );
+		            backEnd.viewDef->viewport.y1 + backEnd.currentScissor.y1,
+		            backEnd.currentScissor.x2 + 1 - backEnd.currentScissor.x1,
+		            backEnd.currentScissor.y2 + 1 - backEnd.currentScissor.y1 );
 	}
 }
 
@@ -152,9 +152,9 @@ void RB_SimpleWorldSetup( void ) {
 
 	backEnd.currentScissor = backEnd.viewDef->scissor;
 	qglScissor( backEnd.viewDef->viewport.x1 + backEnd.currentScissor.x1,
-		backEnd.viewDef->viewport.y1 + backEnd.currentScissor.y1,
-		backEnd.currentScissor.x2 + 1 - backEnd.currentScissor.x1,
-		backEnd.currentScissor.y2 + 1 - backEnd.currentScissor.y1 );
+	            backEnd.viewDef->viewport.y1 + backEnd.currentScissor.y1,
+	            backEnd.currentScissor.x2 + 1 - backEnd.currentScissor.x1,
+	            backEnd.currentScissor.y2 + 1 - backEnd.currentScissor.y1 );
 }
 
 /*
@@ -355,18 +355,18 @@ void RB_ShowOverdraw( void ) {
 	}
 
 	switch( r_showOverDraw.GetInteger() ) {
-		case 1: // geometry overdraw
-			const_cast<viewDef_t *>(backEnd.viewDef)->drawSurfs = newDrawSurfs;
-			const_cast<viewDef_t *>(backEnd.viewDef)->numDrawSurfs = numDrawSurfs;
-			break;
-		case 2: // light interaction overdraw
-			const_cast<viewDef_t *>(backEnd.viewDef)->drawSurfs = &newDrawSurfs[numDrawSurfs];
-			const_cast<viewDef_t *>(backEnd.viewDef)->numDrawSurfs = interactions;
-			break;
-		case 3: // geometry + light interaction overdraw
-			const_cast<viewDef_t *>(backEnd.viewDef)->drawSurfs = newDrawSurfs;
-			const_cast<viewDef_t *>(backEnd.viewDef)->numDrawSurfs += interactions;
-			break;
+	case 1: // geometry overdraw
+		const_cast<viewDef_t *>(backEnd.viewDef)->drawSurfs = newDrawSurfs;
+		const_cast<viewDef_t *>(backEnd.viewDef)->numDrawSurfs = numDrawSurfs;
+		break;
+	case 2: // light interaction overdraw
+		const_cast<viewDef_t *>(backEnd.viewDef)->drawSurfs = &newDrawSurfs[numDrawSurfs];
+		const_cast<viewDef_t *>(backEnd.viewDef)->numDrawSurfs = interactions;
+		break;
+	case 3: // geometry + light interaction overdraw
+		const_cast<viewDef_t *>(backEnd.viewDef)->drawSurfs = newDrawSurfs;
+		const_cast<viewDef_t *>(backEnd.viewDef)->numDrawSurfs += interactions;
+		break;
 	}
 }
 
@@ -423,7 +423,7 @@ void RB_ShowIntensity( void ) {
 	globalImages->BindNull();
 	qglMatrixMode( GL_MODELVIEW );
 
-	qglDrawPixels( glConfig.vidWidth, glConfig.vidHeight, GL_RGBA , GL_UNSIGNED_BYTE, colorReadback );
+	qglDrawPixels( glConfig.vidWidth, glConfig.vidHeight, GL_RGBA, GL_UNSIGNED_BYTE, colorReadback );
 
 	R_StaticFree( colorReadback );
 }
@@ -461,18 +461,18 @@ void RB_ShowDepthBuffer( void ) {
 	depthReadback = R_StaticAlloc( glConfig.vidWidth * glConfig.vidHeight*4 );
 	memset( depthReadback, 0, glConfig.vidWidth * glConfig.vidHeight*4 );
 
-	qglReadPixels( 0, 0, glConfig.vidWidth, glConfig.vidHeight, GL_DEPTH_COMPONENT , GL_FLOAT, depthReadback );
+	qglReadPixels( 0, 0, glConfig.vidWidth, glConfig.vidHeight, GL_DEPTH_COMPONENT, GL_FLOAT, depthReadback );
 
 #if 0
 	for ( i = 0 ; i < glConfig.vidWidth * glConfig.vidHeight ; i++ ) {
 		((byte *)depthReadback)[i*4] =
-		((byte *)depthReadback)[i*4+1] =
-		((byte *)depthReadback)[i*4+2] = 255 * ((float *)depthReadback)[i];
+		    ((byte *)depthReadback)[i*4+1] =
+		        ((byte *)depthReadback)[i*4+2] = 255 * ((float *)depthReadback)[i];
 		((byte *)depthReadback)[i*4+3] = 1;
 	}
 #endif
 
-	qglDrawPixels( glConfig.vidWidth, glConfig.vidHeight, GL_RGBA , GL_UNSIGNED_BYTE, depthReadback );
+	qglDrawPixels( glConfig.vidWidth, glConfig.vidHeight, GL_RGBA, GL_UNSIGNED_BYTE, depthReadback );
 	R_StaticFree( depthReadback );
 }
 
@@ -569,7 +569,7 @@ void RB_ShowSilhouette( void ) {
 	qglDisable( GL_DEPTH_TEST );
 
 	RB_RenderDrawSurfListWithFunction( backEnd.viewDef->drawSurfs, backEnd.viewDef->numDrawSurfs,
-		RB_T_RenderTriangleSurface );
+	                                   RB_T_RenderTriangleSurface );
 
 
 	//
@@ -582,7 +582,7 @@ void RB_ShowSilhouette( void ) {
 	for ( vLight = backEnd.viewDef->viewLights ; vLight ; vLight = vLight->next ) {
 		for ( i = 0 ; i < 2 ; i++ ) {
 			for ( surf = i ? vLight->localShadows : vLight->globalShadows
-				; surf ; surf = (drawSurf_t *)surf->nextOnLight ) {
+			             ; surf ; surf = (drawSurf_t *)surf->nextOnLight ) {
 				RB_SimpleSurfaceSetup( surf );
 
 				const srfTriangles_t	*tri = surf->geo;
@@ -656,7 +656,7 @@ static void RB_ShowShadowCount( void ) {
 	for ( vLight = backEnd.viewDef->viewLights ; vLight ; vLight = vLight->next ) {
 		for ( i = 0 ; i < 2 ; i++ ) {
 			for ( surf = i ? vLight->localShadows : vLight->globalShadows
-				; surf ; surf = (drawSurf_t *)surf->nextOnLight ) {
+			             ; surf ; surf = (drawSurf_t *)surf->nextOnLight ) {
 				RB_SimpleSurfaceSetup( surf );
 				const srfTriangles_t	*tri = surf->geo;
 				if ( !tri->shadowCache ) {
@@ -818,9 +818,9 @@ static void RB_ShowSurfaceInfo( drawSurf_t **drawSurfs, int numDrawSurfs ) {
 	R_AxisToModelMatrix( mt.entity->axis, mt.entity->origin, matrix );
 
 	tr.primaryWorld->DrawText( mt.entity->hModel->Name(), mt.point + tr.primaryView->renderView.viewaxis[2] * 12,
-		0.35f, colorRed, tr.primaryView->renderView.viewaxis );
+	                           0.35f, colorRed, tr.primaryView->renderView.viewaxis );
 	tr.primaryWorld->DrawText( mt.material->GetName(), mt.point,
-		0.35f, colorBlue, tr.primaryView->renderView.viewaxis );
+	                           0.35f, colorBlue, tr.primaryView->renderView.viewaxis );
 
 	qglEnable( GL_DEPTH_TEST );
 	qglDisable( GL_POLYGON_OFFSET_LINE );
@@ -1061,13 +1061,13 @@ static void RB_ShowTangentSpace( drawSurf_t **drawSurfs, int numDrawSurfs ) {
 
 			if ( r_showTangentSpace.GetInteger() == 1 ) {
 				qglColor4f( 0.5 + 0.5 * v->tangents[0][0],  0.5 + 0.5 * v->tangents[0][1],
-					0.5 + 0.5 * v->tangents[0][2], 0.5 );
+				            0.5 + 0.5 * v->tangents[0][2], 0.5 );
 			} else if ( r_showTangentSpace.GetInteger() == 2 ) {
 				qglColor4f( 0.5 + 0.5 * v->tangents[1][0],  0.5 + 0.5 * v->tangents[1][1],
-					0.5 + 0.5 * v->tangents[1][2], 0.5 );
+				            0.5 + 0.5 * v->tangents[1][2], 0.5 );
 			} else {
 				qglColor4f( 0.5 + 0.5 * v->normal[0],  0.5 + 0.5 * v->normal[1],
-					0.5 + 0.5 * v->normal[2], 0.5 );
+				            0.5 + 0.5 * v->normal[2], 0.5 );
 			}
 			qglVertex3fv( v->xyz.ToFloatPtr() );
 		}
@@ -2088,15 +2088,15 @@ void RB_ShowDebugPolygons( void ) {
 	for ( i = 0 ; i < rb_numDebugPolygons; i++, poly++ ) {
 //		if ( !poly->depthTest ) {
 
-			qglColor4fv( poly->rgb.ToFloatPtr() );
+		qglColor4fv( poly->rgb.ToFloatPtr() );
 
-			qglBegin( GL_POLYGON );
+		qglBegin( GL_POLYGON );
 
-			for ( j = 0; j < poly->winding.GetNumPoints(); j++) {
-				qglVertex3fv( poly->winding[j].ToFloatPtr() );
-			}
+		for ( j = 0; j < poly->winding.GetNumPoints(); j++) {
+			qglVertex3fv( poly->winding[j].ToFloatPtr() );
+		}
 
-			qglEnd();
+		qglEnd();
 //		}
 	}
 
@@ -2338,9 +2338,9 @@ void RB_RenderDebugTools( drawSurf_t **drawSurfs, int numDrawSurfs ) {
 	GL_State( GLS_DEFAULT );
 	backEnd.currentScissor = backEnd.viewDef->scissor;
 	qglScissor( backEnd.viewDef->viewport.x1 + backEnd.currentScissor.x1,
-		backEnd.viewDef->viewport.y1 + backEnd.currentScissor.y1,
-		backEnd.currentScissor.x2 + 1 - backEnd.currentScissor.x1,
-		backEnd.currentScissor.y2 + 1 - backEnd.currentScissor.y1 );
+	            backEnd.viewDef->viewport.y1 + backEnd.currentScissor.y1,
+	            backEnd.currentScissor.x2 + 1 - backEnd.currentScissor.x1,
+	            backEnd.currentScissor.y2 + 1 - backEnd.currentScissor.y1 );
 
 
 	RB_ShowLightCount();

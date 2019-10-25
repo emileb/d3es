@@ -200,7 +200,7 @@ idCVar r_debugRenderToTexture( "r_debugRenderToTexture", "0", CVAR_RENDERER | CV
 // DG: let users disable the "scale menus to 4:3" hack
 idCVar r_scaleMenusTo43( "r_scaleMenusTo43", "1", CVAR_RENDERER | CVAR_ARCHIVE | CVAR_BOOL, "Scale menus, fullscreen videos and PDA to 4:3 aspect ratio" );
 
-idCVar r_useETC1("r_useETC1", "1", CVAR_RENDERER | CVAR_BOOL, "use ETC1 compression");
+idCVar r_useETC1("r_useETC1", "0", CVAR_RENDERER | CVAR_BOOL, "use ETC1 compression");
 idCVar r_useETC1Cache("r_useETC1cache", "1", CVAR_RENDERER | CVAR_BOOL, "use ETC1 compression");
 
 // define qgl functions
@@ -256,25 +256,25 @@ typedef struct vidmode_s {
 } vidmode_t;
 
 vidmode_t r_vidModes[] = {
-  // Useless modes (UI will not fit)
+	// Useless modes (UI will not fit)
 	{ "Mode  0: 320x240",		 320,	240 },
 	{ "Mode  1: 400x300",		 400,	300 },
 	{ "Mode  2: 512x384",		 512,	384 },
 	// Usable modes (UI will be OK)
 	{ "Mode  3: 640x480",		 640,	480 },
-  { "Mode  4: 800x600",		 800,	600 },
-  { "Mode  5: 960x640",    960, 640 },
-  { "Mode  6: 1024x640",  1024, 640 },
-  { "Mode  7: 1280x720",	1280,	720 },
-  { "Mode  8: 1024x768",	1024,	768 },
-  { "Mode  9: 1366x768",	1366,	768 },
+	{ "Mode  4: 800x600",		 800,	600 },
+	{ "Mode  5: 960x640",    960, 640 },
+	{ "Mode  6: 1024x640",  1024, 640 },
+	{ "Mode  7: 1280x720",	1280,	720 },
+	{ "Mode  8: 1024x768",	1024,	768 },
+	{ "Mode  9: 1366x768",	1366,	768 },
 	{ "Mode 10: 1152x864",	1152,	864 },
-  { "Mode 11: 1440x900",	1440,	900 },
-  { "Mode 12: 1600x900",	1600,	900 },
+	{ "Mode 11: 1440x900",	1440,	900 },
+	{ "Mode 12: 1600x900",	1600,	900 },
 	{ "Mode 13: 1280x1024",	1280,	1024 },
-  { "Mode 14: 1400x1050",	1400,	1050 },
-  { "Mode 15: 1680x1050",	1680,	1050 },
-  { "Mode 16: 1920x1080",	1920,	1080 },
+	{ "Mode 14: 1400x1050",	1400,	1050 },
+	{ "Mode 15: 1680x1050",	1680,	1050 },
+	{ "Mode 16: 1920x1080",	1920,	1080 },
 	{ "Mode 17: 1600x1200",	1600,	1200 },
 	{ "Mode 18: 1920x1200",	1920,	1200 },
 };
@@ -321,8 +321,7 @@ struct vidModePtr {
 
 static vidModePtr sortedVidModes[s_numVidModes];
 
-static int vidModeCmp(const void* vm1, const void* vm2)
-{
+static int vidModeCmp(const void* vm1, const void* vm2) {
 	const vidModePtr* v1 = static_cast<const vidModePtr*>(vm1);
 	const vidModePtr* v2 = static_cast<const vidModePtr*>(vm2);
 
@@ -331,16 +330,13 @@ static int vidModeCmp(const void* vm1, const void* vm2)
 	return (wdiff != 0) ? wdiff : (v1->vidMode->width - v2->vidMode->width);
 }
 
-static void initSortedVidModes()
-{
-	if(sortedVidModes[0].vidMode != NULL)
-	{
+static void initSortedVidModes() {
+	if(sortedVidModes[0].vidMode != NULL) {
 		// already initialized
 		return;
 	}
 
-	for(int i=0; i<s_numVidModes; ++i)
-	{
+	for(int i=0; i<s_numVidModes; ++i) {
 		sortedVidModes[i].modeIndex = i;
 		sortedVidModes[i].vidMode = &r_vidModes[i];
 	}
@@ -352,15 +348,12 @@ static void initSortedVidModes()
 //     to overwrite the default resolution list in the system options menu
 
 // "r_custom*;640x480;800x600;1024x768;..."
-idStr R_GetVidModeListString(bool addCustom)
-{
+idStr R_GetVidModeListString(bool addCustom) {
 	idStr ret = addCustom ? "r_custom*" : "";
 
-	for(int i=0; i<s_numVidModes; ++i)
-	{
+	for(int i=0; i<s_numVidModes; ++i) {
 		// for some reason, modes 0-2 are not used. maybe too small for GUI?
-		if(sortedVidModes[i].modeIndex >= 3 && sortedVidModes[i].vidMode != NULL)
-		{
+		if(sortedVidModes[i].modeIndex >= 3 && sortedVidModes[i].vidMode != NULL) {
 			idStr modeStr;
 			sprintf(modeStr, ";%dx%d", sortedVidModes[i].vidMode->width, sortedVidModes[i].vidMode->height);
 			ret += modeStr;
@@ -370,14 +363,11 @@ idStr R_GetVidModeListString(bool addCustom)
 }
 
 // r_mode values for resolutions from R_GetVidModeListString(): "-1;3;4;5;..."
-idStr R_GetVidModeValsString(bool addCustom)
-{
+idStr R_GetVidModeValsString(bool addCustom) {
 	idStr ret = addCustom ? "-1" : ""; // for custom resolutions using r_customWidth/r_customHeight
-	for(int i=0; i<s_numVidModes; ++i)
-	{
+	for(int i=0; i<s_numVidModes; ++i) {
 		// for some reason, modes 0-2 are not used. maybe too small for GUI?
-		if(sortedVidModes[i].modeIndex >= 3 && sortedVidModes[i].vidMode != NULL)
-		{
+		if(sortedVidModes[i].modeIndex >= 3 && sortedVidModes[i].vidMode != NULL) {
 			ret += ";";
 			ret += sortedVidModes[i].modeIndex;
 		}
@@ -463,13 +453,13 @@ void R_InitOpenGL( void ) {
 	Sys_InitInput();
 	soundSystem->InitHW();
 
-  // get our config strings
+	// get our config strings
 	glConfig.vendor_string = (const char *)qglGetString(GL_VENDOR);
 	glConfig.renderer_string = (const char *)qglGetString(GL_RENDERER);
 	glConfig.version_string = (const char *)qglGetString(GL_VERSION);
 	glConfig.extensions_string = (const char *)qglGetString(GL_EXTENSIONS);
 
-  // OpenGL driver constants
+	// OpenGL driver constants
 	qglGetIntegerv( GL_MAX_TEXTURE_SIZE, &temp );
 	glConfig.maxTextureSize = temp;
 
@@ -486,7 +476,7 @@ void R_InitOpenGL( void ) {
 
 	glConfig.isInitialized = true;
 
-  common->Printf("OpenGL vendor: %s\n", glConfig.vendor_string );
+	common->Printf("OpenGL vendor: %s\n", glConfig.vendor_string );
 	common->Printf("OpenGL renderer: %s\n", glConfig.renderer_string );
 	common->Printf("OpenGL version: %s\n", glConfig.version_string );
 
@@ -521,7 +511,7 @@ void GL_CheckErrors( void ) {
 	int		i;
 
 	if (r_ignoreGLErrors.GetBool()) {
-	  return;
+		return;
 	}
 
 	// check for up to 10 errors pending
@@ -531,21 +521,21 @@ void GL_CheckErrors( void ) {
 			return;
 		}
 		switch( err ) {
-			case GL_INVALID_ENUM:
-				strcpy( s, "GL_INVALID_ENUM" );
-				break;
-			case GL_INVALID_VALUE:
-				strcpy( s, "GL_INVALID_VALUE" );
-				break;
-			case GL_INVALID_OPERATION:
-				strcpy( s, "GL_INVALID_OPERATION" );
-				break;
-			case GL_OUT_OF_MEMORY:
-				strcpy( s, "GL_OUT_OF_MEMORY" );
-				break;
-			default:
-				idStr::snPrintf( s, sizeof(s), "%i", err);
-				break;
+		case GL_INVALID_ENUM:
+			strcpy( s, "GL_INVALID_ENUM" );
+			break;
+		case GL_INVALID_VALUE:
+			strcpy( s, "GL_INVALID_VALUE" );
+			break;
+		case GL_INVALID_OPERATION:
+			strcpy( s, "GL_INVALID_OPERATION" );
+			break;
+		case GL_OUT_OF_MEMORY:
+			strcpy( s, "GL_OUT_OF_MEMORY" );
+			break;
+		default:
+			idStr::snPrintf( s, sizeof(s), "%i", err);
+			break;
 		}
 
 		if ( !r_ignoreGLErrors.GetBool() ) {
@@ -788,7 +778,7 @@ void R_ReportImageDuplication_f( const idCmdArgs &args ) {
 				continue;
 			}
 			if ( image2->uploadWidth != image1->uploadWidth
-				|| image2->uploadHeight != image1->uploadHeight ) {
+			        || image2->uploadHeight != image1->uploadHeight ) {
 				continue;
 			}
 			if ( !idStr::Icmp( image1->imgName, image2->imgName ) ) {
@@ -952,7 +942,7 @@ void R_ReadTiledPixels( int width, int height, byte *buffer, renderView_t *ref =
 
 			for ( int y = 0 ; y < h ; y++ ) {
 				memcpy( buffer + ( ( yo + y )* width + xo ) * 4,
-					temp + y * row, w * 4 );
+				        temp + y * row, w * 4 );
 			}
 		}
 	}
@@ -1176,7 +1166,8 @@ void R_EnvShot_f( const idCmdArgs &args ) {
 	viewDef_t	primary;
 	int			blends;
 	const char	*extensions[6] =  { "_px.tga", "_nx.tga", "_py.tga", "_ny.tga",
-		"_pz.tga", "_nz.tga" };
+	                                "_pz.tga", "_nz.tga"
+	                             };
 	int			size;
 
 	if ( args.Argc() != 2 && args.Argc() != 3 && args.Argc() != 4 ) {
@@ -1347,8 +1338,7 @@ GfxInfo_f
 ================
 */
 static void GfxInfo_f( const idCmdArgs &args ) {
-	const char *fsstrings[] =
-	{
+	const char *fsstrings[] = {
 		"windowed",
 		"fullscreen"
 	};
@@ -1389,8 +1379,7 @@ void R_VidRestart_f( const idCmdArgs &args ) {
 	}
 
 	// DG: notify the game DLL about the reloadImages and vid_restart commands
-	if(gameCallbacks.reloadImagesCB != NULL)
-	{
+	if(gameCallbacks.reloadImagesCB != NULL) {
 		gameCallbacks.reloadImagesCB(gameCallbacks.reloadImagesUserArg, args);
 	}
 

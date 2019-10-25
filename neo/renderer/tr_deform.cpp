@@ -164,14 +164,14 @@ static void R_TubeDeform( drawSurf_t *surf ) {
 	int		i, j;
 	int		indexes;
 	const srfTriangles_t *tri;
-static int edgeVerts[6][2] = {
-	{ 0, 1 },
-	{ 1, 2 },
-	{ 2, 0 },
-	{ 3, 4 },
-	{ 4, 5 },
-	{ 5, 3 }
-};
+	static int edgeVerts[6][2] = {
+		{ 0, 1 },
+		{ 1, 2 },
+		{ 2, 0 },
+		{ 3, 4 },
+		{ 4, 5 },
+		{ 5, 3 }
+	};
 
 	tri = surf->geo;
 
@@ -565,8 +565,8 @@ static void R_FlareDeform( drawSurf_t *surf ) {
 	}
 	for ( j = 0 ; j < newTri->numVerts ; j++ ) {
 		ac[j].color[0] =
-		ac[j].color[1] =
-		ac[j].color[2] = color;
+		    ac[j].color[1] =
+		        ac[j].color[2] = color;
 		ac[j].color[3] = 255;
 	}
 
@@ -585,7 +585,7 @@ static void R_FlareDeform( drawSurf_t *surf ) {
 	for ( i = 0 ; i < 4 ; i++ ) {
 		ac[i].xyz = tri->verts[ indexes[i] ].xyz;
 		ac[i].st[0] =
-		ac[i].st[1] = 0.5;
+		    ac[i].st[1] = 0.5;
 
 		idVec3	toEye = tri->verts[ indexes[i] ].xyz - localViewer;
 		toEye.Normalize();
@@ -849,14 +849,14 @@ static void AddTriangleToIsland_r( const srfTriangles_t *tri, int triangleNum, b
 			continue;
 		}
 		if ( tri->indexes[i*3+0] == a
-			|| tri->indexes[i*3+1] == a
-			|| tri->indexes[i*3+2] == a
-			|| tri->indexes[i*3+0] == b
-			|| tri->indexes[i*3+1] == b
-			|| tri->indexes[i*3+2] == b
-			|| tri->indexes[i*3+0] == c
-			|| tri->indexes[i*3+1] == c
-			|| tri->indexes[i*3+2] == c ) {
+		        || tri->indexes[i*3+1] == a
+		        || tri->indexes[i*3+2] == a
+		        || tri->indexes[i*3+0] == b
+		        || tri->indexes[i*3+1] == b
+		        || tri->indexes[i*3+2] == b
+		        || tri->indexes[i*3+0] == c
+		        || tri->indexes[i*3+1] == c
+		        || tri->indexes[i*3+2] == c ) {
 			AddTriangleToIsland_r( tri, i, usedList, island );
 		}
 	}
@@ -1029,7 +1029,7 @@ static void R_ParticleDeform( drawSurf_t *surf, bool useArea ) {
 
 #if 0
 	if ( renderEntity->shaderParms[SHADERPARM_PARTICLE_STOPTIME] &&
-		viewDef->renderView.time*0.001 >= renderEntity->shaderParms[SHADERPARM_PARTICLE_STOPTIME] ) {
+	        viewDef->renderView.time*0.001 >= renderEntity->shaderParms[SHADERPARM_PARTICLE_STOPTIME] ) {
 		// the entire system has faded out
 		return NULL;
 	}
@@ -1138,7 +1138,7 @@ static void R_ParticleDeform( drawSurf_t *surf, bool useArea ) {
 				int	inCycleTime = particleAge - particleCycle * stage->cycleMsec;
 
 				if ( renderEntity->shaderParms[SHADERPARM_PARTICLE_STOPTIME] &&
-					g.renderView->time - inCycleTime >= renderEntity->shaderParms[SHADERPARM_PARTICLE_STOPTIME]*1000 ) {
+				        g.renderView->time - inCycleTime >= renderEntity->shaderParms[SHADERPARM_PARTICLE_STOPTIME]*1000 ) {
 					// don't fire any more particles
 					continue;
 				}

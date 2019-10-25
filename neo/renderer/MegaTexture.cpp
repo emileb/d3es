@@ -77,7 +77,7 @@ static void R_EmptyLevelImage( idImage *image ) {
 
 	// FIXME: this won't live past vid mode changes
 	image->GenerateImage( data, MAX_LEVEL_WIDTH, MAX_LEVEL_WIDTH,
-		TF_DEFAULT, false, TR_REPEAT, TD_HIGH_QUALITY );
+	                      TF_DEFAULT, false, TR_REPEAT, TD_HIGH_QUALITY );
 }
 
 
@@ -313,10 +313,10 @@ void idMegaTexture::SetViewOrigin( const idVec3 viewOrigin ) {
 	// be a different conversion for each megaTexture
 	for ( int i = 0 ; i < 2 ; i++ ) {
 		texCenter[i] =
-			viewOrigin[0] * localViewToTextureCenter[i][0] +
-			viewOrigin[1] * localViewToTextureCenter[i][1] +
-			viewOrigin[2] * localViewToTextureCenter[i][2] +
-			localViewToTextureCenter[i][3];
+		    viewOrigin[0] * localViewToTextureCenter[i][0] +
+		    viewOrigin[1] * localViewToTextureCenter[i][1] +
+		    viewOrigin[2] * localViewToTextureCenter[i][2] +
+		    localViewToTextureCenter[i][3];
 	}
 
 	for ( int i = 0 ; i < numLevels ; i++ ) {
@@ -463,7 +463,7 @@ void idTextureLevel::Invalidate() {
 	for ( int x = 0 ; x < TILE_PER_LEVEL ; x++ ) {
 		for ( int y = 0 ; y < TILE_PER_LEVEL ; y++ ) {
 			tileMap[x][y].x =
-			tileMap[x][y].y = -99999;
+			    tileMap[x][y].y = -99999;
 		}
 	}
 }
@@ -632,7 +632,7 @@ void	idMegaTexture::GenerateMegaPreview( const char *fileName ) {
 
 			for ( int yy = 0 ; yy < tileSize ; yy++ ) {
 				memcpy( pic + ( ( y * tileSize + yy ) * width * tileSize + x * tileSize  ) * 4,
-					oldBlock + yy * tileSize * 4, tileSize * 4 );
+				        oldBlock + yy * tileSize * 4, tileSize * 4 );
 			}
 		}
 	}

@@ -126,7 +126,7 @@ bool R_PreciseCullSurface( const drawSurf_t *drawSurf, idBounds &ndcBounds ) {
 		unsigned int pointFlags;
 
 		R_TransformModelToClip( tri->verts[i].xyz, drawSurf->space->modelViewMatrix,
-			tr.viewDef->projectionMatrix, eye, clip );
+		                        tr.viewDef->projectionMatrix, eye, clip );
 
 		pointFlags = 0;
 		for ( j = 0; j < 3; j++ ) {
@@ -462,8 +462,8 @@ bool	R_GenerateSurfaceSubview( drawSurf_t *drawSurf ) {
 	// already seeing through
 	for ( parms = tr.viewDef ; parms ; parms = parms->superView ) {
 		if ( parms->subviewSurface
-			&& parms->subviewSurface->geo == drawSurf->geo
-			&& parms->subviewSurface->space->entityDef == drawSurf->space->entityDef ) {
+		        && parms->subviewSurface->geo == drawSurf->geo
+		        && parms->subviewSurface->space->entityDef == drawSurf->space->entityDef ) {
 			break;
 		}
 	}

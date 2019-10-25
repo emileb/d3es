@@ -109,8 +109,7 @@ typedef struct {
 	unsigned int dwABitMask;
 } ddsFilePixelFormat_t;
 
-typedef struct
-{
+typedef struct {
 	unsigned int dwSize;
 	unsigned int dwFlags;
 	unsigned int dwHeight;
@@ -152,7 +151,7 @@ typedef enum {
 
 class idImage {
 public:
-				idImage();
+	idImage();
 
 	// Makes this image active on the current GL texture unit.
 	// automatically enables or disables cube mapping
@@ -171,11 +170,11 @@ public:
 	// These perform an implicit Bind() on the current texture unit
 	// FIXME: should we implement cinematics this way, instead of with explicit calls?
 	void		GenerateImage( const byte *pic, int width, int height,
-					   textureFilter_t filter, bool allowDownSize,
-					   textureRepeat_t repeat, textureDepth_t depth );
+	                           textureFilter_t filter, bool allowDownSize,
+	                           textureRepeat_t repeat, textureDepth_t depth );
 	void		GenerateCubeImage( const byte *pic[6], int size,
-						textureFilter_t filter, bool allowDownSize,
-						textureDepth_t depth );
+	                               textureFilter_t filter, bool allowDownSize,
+	                               textureDepth_t depth );
 
 	void		CopyFramebuffer( int x, int y, int width, int height, bool useOversizedBuffer );
 
@@ -195,7 +194,9 @@ public:
 	// check for changed timestamp on disk and reload if necessary
 	void		Reload( bool force );
 
-	void		AddReference()				{ refCount++; };
+	void		AddReference() {
+		refCount++;
+	};
 
 //==========================================================
 
@@ -298,8 +299,8 @@ public:
 	// grid pattern.
 	// Will automatically resample non-power-of-two images and execute image programs if needed.
 	idImage *			ImageFromFile( const char *name,
-							 textureFilter_t filter, bool allowDownSize,
-							 textureRepeat_t repeat, textureDepth_t depth, cubeFiles_t cubeMap = CF_2D );
+	                                   textureFilter_t filter, bool allowDownSize,
+	                                   textureRepeat_t repeat, textureDepth_t depth, cubeFiles_t cubeMap = CF_2D );
 
 	// look for a loaded image, whatever the parameters
 	idImage *			GetImage( const char *name ) const;
@@ -429,9 +430,9 @@ FIXME: make an "imageBlock" type to hold byte*,width,height?
 */
 
 byte *R_Dropsample( const byte *in, int inwidth, int inheight,
-							int outwidth, int outheight );
+                    int outwidth, int outheight );
 byte *R_ResampleTexture( const byte *in, int inwidth, int inheight,
-							int outwidth, int outheight );
+                         int outwidth, int outheight );
 byte *R_MipMapWithAlphaSpecularity( const byte *in, int width, int height );
 byte *R_MipMap( const byte *in, int width, int height, bool preserveBorder );
 byte *R_MipMap3D( const byte *in, int width, int height, int depth, bool preserveBorder );

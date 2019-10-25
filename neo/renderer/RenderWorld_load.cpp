@@ -257,11 +257,11 @@ void idRenderWorldLocal::SetupAreaRefs() {
 	for ( i = 0 ; i < numPortalAreas ; i++ ) {
 		portalAreas[i].areaNum = i;
 		portalAreas[i].lightRefs.areaNext =
-		portalAreas[i].lightRefs.areaPrev =
-			&portalAreas[i].lightRefs;
+		    portalAreas[i].lightRefs.areaPrev =
+		        &portalAreas[i].lightRefs;
 		portalAreas[i].entityRefs.areaNext =
-		portalAreas[i].entityRefs.areaPrev =
-			&portalAreas[i].entityRefs;
+		    portalAreas[i].entityRefs.areaPrev =
+		        &portalAreas[i].entityRefs;
 	}
 }
 
@@ -293,7 +293,7 @@ void idRenderWorldLocal::ParseInterAreaPortals( idLexer *src ) {
 	}
 
 	doublePortals = (doublePortal_t *)R_ClearedStaticAlloc( numInterAreaPortals *
-		sizeof( doublePortals [0] ) );
+	                sizeof( doublePortals [0] ) );
 
 	for ( i = 0 ; i < numInterAreaPortals ; i++ ) {
 		int		numPoints, a1, a2;
@@ -671,9 +671,9 @@ void idRenderWorldLocal::AddWorldModelEntities() {
 		// in case an explicit shader is used on the world, we don't
 		// want it to have a 0 alpha or color
 		def->parms.shaderParms[0] =
-		def->parms.shaderParms[1] =
-		def->parms.shaderParms[2] =
-		def->parms.shaderParms[3] = 1;
+		    def->parms.shaderParms[1] =
+		        def->parms.shaderParms[2] =
+		            def->parms.shaderParms[3] = 1;
 
 		AddEntityRefToArea( def, &portalAreas[i] );
 	}

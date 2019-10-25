@@ -67,8 +67,7 @@ void idGuiModel::WriteToDemo( idDemoFile *demo ) {
 
 	i = verts.Num();
 	demo->WriteInt( i );
-	for ( j = 0; j < i; j++ )
-	{
+	for ( j = 0; j < i; j++ ) {
 		demo->WriteVec3( verts[j].xyz );
 		demo->WriteVec2( verts[j].st );
 		demo->WriteVec3( verts[j].normal );
@@ -115,8 +114,7 @@ void idGuiModel::ReadFromDemo( idDemoFile *demo ) {
 	i = verts.Num();
 	demo->ReadInt( i );
 	verts.SetNum( i, false );
-	for ( j = 0; j < i; j++ )
-	{
+	for ( j = 0; j < i; j++ ) {
 		demo->ReadVec3( verts[j].xyz );
 		demo->ReadVec2( verts[j].st );
 		demo->ReadVec3( verts[j].normal );
@@ -135,7 +133,7 @@ void idGuiModel::ReadFromDemo( idDemoFile *demo ) {
 #if GL_INDEX_TYPE == GL_UNSIGNED_SHORT
 		demo->ReadShort( indexes[j] );
 #else
-    demo->ReadInt( indexes[j] );
+		demo->ReadInt( indexes[j] );
 #endif
 	}
 
@@ -211,7 +209,7 @@ void idGuiModel::EmitToCurrentView( float modelMatrix[16], bool depthHack ) {
 	float	modelViewMatrix[16];
 
 	myGlMultMatrix( modelMatrix, tr.viewDef->worldSpace.modelViewMatrix,
-			modelViewMatrix );
+	                modelViewMatrix );
 
 	for ( int i = 0 ; i < surfaces.Num() ; i++ ) {
 		EmitSurface( &surfaces[i], modelMatrix, modelViewMatrix, depthHack );
@@ -338,7 +336,7 @@ void idGuiModel::SetColor( float r, float g, float b, float a ) {
 		return;
 	}
 	if ( r == surf->color[0] && g == surf->color[1]
-		&& b == surf->color[2] && a == surf->color[3] ) {
+	        && b == surf->color[2] && a == surf->color[3] ) {
 		return;	// no change
 	}
 
@@ -359,7 +357,7 @@ DrawStretchPic
 =============
 */
 void idGuiModel::DrawStretchPic( const idDrawVert *dverts, const glIndex_t *dindexes, int vertCount, int indexCount, const idMaterial *hShader,
-									   bool clip, float min_x, float min_y, float max_x, float max_y ) {
+                                 bool clip, float min_x, float min_y, float max_x, float max_y ) {
 	if ( !glConfig.isInitialized ) {
 		return;
 	}
@@ -392,19 +390,27 @@ void idGuiModel::DrawStretchPic( const idDrawVert *dverts, const glIndex_t *dind
 
 			for ( j = 0; j < 3; j++ ) {
 				if ( w[j].x < min_x || w[j].x > max_x ||
-					w[j].y < min_y || w[j].y > max_y ) {
+				        w[j].y < min_y || w[j].y > max_y ) {
 					break;
 				}
 			}
 			if ( j < 3 ) {
 				idPlane p;
-				p.Normal().y = p.Normal().z = 0.0f; p.Normal().x = 1.0f; p.SetDist( min_x );
+				p.Normal().y = p.Normal().z = 0.0f;
+				p.Normal().x = 1.0f;
+				p.SetDist( min_x );
 				w.ClipInPlace( p );
-				p.Normal().y = p.Normal().z = 0.0f; p.Normal().x = -1.0f; p.SetDist( -max_x );
+				p.Normal().y = p.Normal().z = 0.0f;
+				p.Normal().x = -1.0f;
+				p.SetDist( -max_x );
 				w.ClipInPlace( p );
-				p.Normal().x = p.Normal().z = 0.0f; p.Normal().y = 1.0f; p.SetDist( min_y );
+				p.Normal().x = p.Normal().z = 0.0f;
+				p.Normal().y = 1.0f;
+				p.SetDist( min_y );
 				w.ClipInPlace( p );
-				p.Normal().x = p.Normal().z = 0.0f; p.Normal().y = -1.0f; p.SetDist( -max_y );
+				p.Normal().x = p.Normal().z = 0.0f;
+				p.Normal().y = -1.0f;
+				p.SetDist( -max_y );
 				w.ClipInPlace( p );
 			}
 

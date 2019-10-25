@@ -57,43 +57,43 @@ static void R_PerformanceCounters( void ) {
 
 		if ( r_showPrimitives.GetInteger() > 1 ) {
 			common->Printf( "v:%i ds:%i t:%i/%i v:%i/%i st:%i sv:%i image:%5.1f MB\n",
-				tr.pc.c_numViews,
-				backEnd.pc.c_drawElements + backEnd.pc.c_shadowElements,
-				backEnd.pc.c_drawIndexes / 3,
-				( backEnd.pc.c_drawIndexes - backEnd.pc.c_drawRefIndexes ) / 3,
-				backEnd.pc.c_drawVertexes,
-				( backEnd.pc.c_drawVertexes - backEnd.pc.c_drawRefVertexes ),
-				backEnd.pc.c_shadowIndexes / 3,
-				backEnd.pc.c_shadowVertexes,
-				megaBytes
-				);
+			                tr.pc.c_numViews,
+			                backEnd.pc.c_drawElements + backEnd.pc.c_shadowElements,
+			                backEnd.pc.c_drawIndexes / 3,
+			                ( backEnd.pc.c_drawIndexes - backEnd.pc.c_drawRefIndexes ) / 3,
+			                backEnd.pc.c_drawVertexes,
+			                ( backEnd.pc.c_drawVertexes - backEnd.pc.c_drawRefVertexes ),
+			                backEnd.pc.c_shadowIndexes / 3,
+			                backEnd.pc.c_shadowVertexes,
+			                megaBytes
+			              );
 		} else {
 			common->Printf( "views:%i draws:%i tris:%i (shdw:%i) (vbo:%i) image:%5.1f MB\n",
-				tr.pc.c_numViews,
-				backEnd.pc.c_drawElements + backEnd.pc.c_shadowElements,
-				( backEnd.pc.c_drawIndexes + backEnd.pc.c_shadowIndexes ) / 3,
-				backEnd.pc.c_shadowIndexes / 3,
-				backEnd.pc.c_vboIndexes / 3,
-				megaBytes
-				);
+			                tr.pc.c_numViews,
+			                backEnd.pc.c_drawElements + backEnd.pc.c_shadowElements,
+			                ( backEnd.pc.c_drawIndexes + backEnd.pc.c_shadowIndexes ) / 3,
+			                backEnd.pc.c_shadowIndexes / 3,
+			                backEnd.pc.c_vboIndexes / 3,
+			                megaBytes
+			              );
 		}
 	}
 
 	if ( r_showDynamic.GetBool() ) {
 		common->Printf( "callback:%i md5:%i dfrmVerts:%i dfrmTris:%i tangTris:%i guis:%i\n",
-			tr.pc.c_entityDefCallbacks,
-			tr.pc.c_generateMd5,
-			tr.pc.c_deformedVerts,
-			tr.pc.c_deformedIndexes/3,
-			tr.pc.c_tangentIndexes/3,
-			tr.pc.c_guiSurfs
-			);
+		                tr.pc.c_entityDefCallbacks,
+		                tr.pc.c_generateMd5,
+		                tr.pc.c_deformedVerts,
+		                tr.pc.c_deformedIndexes/3,
+		                tr.pc.c_tangentIndexes/3,
+		                tr.pc.c_guiSurfs
+		              );
 	}
 
 	if ( r_showCull.GetBool() ) {
 		common->Printf( "%i sin %i sclip  %i sout %i bin %i bout\n",
-			tr.pc.c_sphere_cull_in, tr.pc.c_sphere_cull_clip, tr.pc.c_sphere_cull_out,
-			tr.pc.c_box_cull_in, tr.pc.c_box_cull_out );
+		                tr.pc.c_sphere_cull_in, tr.pc.c_sphere_cull_clip, tr.pc.c_sphere_cull_out,
+		                tr.pc.c_box_cull_in, tr.pc.c_box_cull_out );
 	}
 
 	if ( r_showAlloc.GetBool() ) {
@@ -102,16 +102,16 @@ static void R_PerformanceCounters( void ) {
 
 	if ( r_showInteractions.GetBool() ) {
 		common->Printf( "createInteractions:%i createLightTris:%i createShadowVolumes:%i\n",
-			tr.pc.c_createInteractions, tr.pc.c_createLightTris, tr.pc.c_createShadowVolumes );
+		                tr.pc.c_createInteractions, tr.pc.c_createLightTris, tr.pc.c_createShadowVolumes );
 	}
 	if ( r_showDefs.GetBool() ) {
 		common->Printf( "viewEntities:%i  shadowEntities:%i  viewLights:%i\n", tr.pc.c_visibleViewEntities,
-			tr.pc.c_shadowViewEntities, tr.pc.c_viewLights );
+		                tr.pc.c_shadowViewEntities, tr.pc.c_viewLights );
 	}
 	if ( r_showUpdates.GetBool() ) {
 		common->Printf( "entityUpdates:%i  entityRefs:%i  lightUpdates:%i  lightRefs:%i\n",
-			tr.pc.c_entityUpdates, tr.pc.c_entityReferences,
-			tr.pc.c_lightUpdates, tr.pc.c_lightReferences );
+		                tr.pc.c_entityUpdates, tr.pc.c_entityReferences,
+		                tr.pc.c_lightUpdates, tr.pc.c_lightReferences );
 	}
 	if ( r_showMemory.GetBool() ) {
 		int	m1 = frameData ? frameData->memoryHighwater : 0;
@@ -133,7 +133,7 @@ Called by R_EndFrame each frame
 */
 static void R_IssueRenderCommands( void ) {
 	if ( frameData->cmdHead->commandId == RC_NOP
-		&& !frameData->cmdHead->next ) {
+	        && !frameData->cmdHead->next ) {
 		// nothing to issue
 		return;
 	}
@@ -260,8 +260,8 @@ void R_LockSurfaceScene( viewDef_t *parms ) {
 	// the entity matricies
 	for( vModel = tr.lockSurfacesCmd.viewDef->viewEntitys ; vModel ; vModel = vModel->next ) {
 		myGlMultMatrix( vModel->modelMatrix,
-			tr.lockSurfacesCmd.viewDef->worldSpace.modelViewMatrix,
-			vModel->modelViewMatrix );
+		                tr.lockSurfacesCmd.viewDef->worldSpace.modelViewMatrix,
+		                vModel->modelViewMatrix );
 	}
 
 	// add the stored off surface commands again
@@ -332,9 +332,9 @@ DrawStretchPic
 =============
 */
 void idRenderSystemLocal::DrawStretchPic( const idDrawVert *verts, const glIndex_t *indexes, int vertCount, int indexCount, const idMaterial *material,
-									   bool clip, float min_x, float min_y, float max_x, float max_y ) {
+        bool clip, float min_x, float min_y, float max_x, float max_y ) {
 	guiModel->DrawStretchPic( verts, indexes, vertCount, indexCount, material,
-		clip, min_x, min_y, max_x, max_y );
+	                          clip, min_x, min_y, max_x, max_y );
 }
 
 /*
@@ -408,9 +408,9 @@ void idRenderSystemLocal::DrawSmallChar( int x, int y, int ch, const idMaterial 
 	size = 0.0625f;
 
 	DrawStretchPic( x, y, SMALLCHAR_WIDTH, SMALLCHAR_HEIGHT,
-					   fcol, frow,
-					   fcol + size, frow + size,
-					   material );
+	                fcol, frow,
+	                fcol + size, frow + size,
+	                material );
 }
 
 /*
@@ -481,9 +481,9 @@ void idRenderSystemLocal::DrawBigChar( int x, int y, int ch, const idMaterial *m
 	size = 0.0625f;
 
 	DrawStretchPic( x, y, BIGCHAR_WIDTH, BIGCHAR_HEIGHT,
-					   fcol, frow,
-					   fcol + size, frow + size,
-					   material );
+	                fcol, frow,
+	                fcol + size, frow + size,
+	                material );
 }
 
 /*

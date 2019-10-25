@@ -180,7 +180,7 @@ void idRenderWorldLocal::ResizeInteractionTable() {
 AddEntityDef
 ===================
 */
-qhandle_t idRenderWorldLocal::AddEntityDef( const renderEntity_t *re ){
+qhandle_t idRenderWorldLocal::AddEntityDef( const renderEntity_t *re ) {
 	// try and reuse a free spot
 	int entityHandle = entityDefs.FindNull();
 	if ( entityHandle == -1 ) {
@@ -404,12 +404,12 @@ void idRenderWorldLocal::UpdateLightDef( qhandle_t lightHandle, const renderLigh
 		// if the shape of the light stays the same, we don't need to dump
 		// any of our derived data, because shader parms are calculated every frame
 		if ( rlight->axis == light->parms.axis && rlight->end == light->parms.end &&
-			 rlight->lightCenter == light->parms.lightCenter && rlight->lightRadius == light->parms.lightRadius &&
-			 rlight->noShadows == light->parms.noShadows && rlight->origin == light->parms.origin &&
-			 rlight->parallel == light->parms.parallel && rlight->pointLight == light->parms.pointLight &&
-			 rlight->right == light->parms.right && rlight->start == light->parms.start &&
-			 rlight->target == light->parms.target && rlight->up == light->parms.up &&
-			 rlight->shader == light->lightShader && rlight->prelightModel == light->parms.prelightModel ) {
+		        rlight->lightCenter == light->parms.lightCenter && rlight->lightRadius == light->parms.lightRadius &&
+		        rlight->noShadows == light->parms.noShadows && rlight->origin == light->parms.origin &&
+		        rlight->parallel == light->parms.parallel && rlight->pointLight == light->parms.pointLight &&
+		        rlight->right == light->parms.right && rlight->start == light->parms.start &&
+		        rlight->target == light->parms.target && rlight->up == light->parms.up &&
+		        rlight->shader == light->lightShader && rlight->prelightModel == light->parms.prelightModel ) {
 			justUpdate = true;
 		} else {
 			// if we are updating shadows, the prelight model is no longer valid
@@ -919,11 +919,9 @@ void idRenderWorldLocal::BoundsInAreas_r( int nodeNum, const idBounds &bounds, i
 		side = bounds.PlaneSide( node->plane );
 		if ( side == PLANESIDE_FRONT ) {
 			nodeNum = node->children[0];
-		}
-		else if ( side == PLANESIDE_BACK ) {
+		} else if ( side == PLANESIDE_BACK ) {
 			nodeNum = node->children[1];
-		}
-		else {
+		} else {
 			if ( node->children[1] != 0 ) {
 				BoundsInAreas_r( node->children[1], bounds, areas, numAreas, maxAreas );
 				if ( (*numAreas) >= maxAreas ) {
@@ -1537,7 +1535,7 @@ We might alternatively choose to do this with an area flow.
 ==================
 */
 void idRenderWorldLocal::PushVolumeIntoTree_r( idRenderEntityLocal *def, idRenderLightLocal *light, const idSphere *sphere, int numPoints, const idVec3 (*points),
-								 int nodeNum ) {
+        int nodeNum ) {
 	int			i;
 	areaNode_t	*node;
 	bool	front, back;
@@ -1567,7 +1565,7 @@ void idRenderWorldLocal::PushVolumeIntoTree_r( idRenderEntityLocal *def, idRende
 	// if we know that all possible children nodes only touch an area
 	// we have already marked, we can early out
 	if ( r_useNodeCommonChildren.GetBool() &&
-		node->commonChildrenArea != CHILDREN_HAVE_MULTIPLE_AREAS ) {
+	        node->commonChildrenArea != CHILDREN_HAVE_MULTIPLE_AREAS ) {
 		// note that we do NOT try to set a reference in this area
 		// yet, because the test volume may yet wind up being in the
 		// solid part, which would cause bounds slightly poked into

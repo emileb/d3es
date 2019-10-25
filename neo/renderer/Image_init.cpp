@@ -146,13 +146,13 @@ static void R_RampImage( idImage *image ) {
 
 	for (x=0 ; x<256 ; x++) {
 		data[x][0] =
-		data[x][1] =
-		data[x][2] =
-		data[x][3] = x;
+		    data[x][1] =
+		        data[x][2] =
+		            data[x][3] = x;
 	}
 
 	image->GenerateImage( (byte *)data, 256, 1,
-		TF_NEAREST, false, TR_CLAMP, TD_HIGH_QUALITY );
+	                      TF_NEAREST, false, TR_CLAMP, TD_HIGH_QUALITY );
 }
 
 /*
@@ -182,13 +182,13 @@ static void R_SpecularTableImage( idImage *image ) {
 		int		b = (int)(f * 255);
 
 		data[x][0] =
-		data[x][1] =
-		data[x][2] =
-		data[x][3] = b;
+		    data[x][1] =
+		        data[x][2] =
+		            data[x][3] = b;
 	}
 
 	image->GenerateImage( (byte *)data, 256, 1,
-		TF_LINEAR, false, TR_CLAMP, TD_HIGH_QUALITY );
+	                      TF_LINEAR, false, TR_CLAMP, TD_HIGH_QUALITY );
 }
 
 
@@ -204,8 +204,8 @@ static void R_Specular2DTableImage( idImage *image ) {
 	byte	data[256][256][4];
 
 	memset( data, 0, sizeof( data ) );
-		for ( x = 0 ; x < 256 ; x++ ) {
-			float f = x / 255.0f;
+	for ( x = 0 ; x < 256 ; x++ ) {
+		float f = x / 255.0f;
 		for ( y = 0; y < 256; y++ ) {
 
 			int b = (int)( pow( f, y ) * 255.0f );
@@ -216,9 +216,9 @@ static void R_Specular2DTableImage( idImage *image ) {
 			}
 
 			data[y][x][0] =
-			data[y][x][1] =
-			data[y][x][2] =
-			data[y][x][3] = b;
+			    data[y][x][1] =
+			        data[y][x][2] =
+			            data[y][x][3] = b;
 		}
 	}
 
@@ -252,24 +252,24 @@ void idImage::MakeDefault() {
 		// white border
 		for ( x = 0 ; x < DEFAULT_SIZE ; x++ ) {
 			data[0][x][0] =
-				data[0][x][1] =
-				data[0][x][2] =
-				data[0][x][3] = 255;
+			    data[0][x][1] =
+			        data[0][x][2] =
+			            data[0][x][3] = 255;
 
 			data[x][0][0] =
-				data[x][0][1] =
-				data[x][0][2] =
-				data[x][0][3] = 255;
+			    data[x][0][1] =
+			        data[x][0][2] =
+			            data[x][0][3] = 255;
 
 			data[DEFAULT_SIZE-1][x][0] =
-				data[DEFAULT_SIZE-1][x][1] =
-				data[DEFAULT_SIZE-1][x][2] =
-				data[DEFAULT_SIZE-1][x][3] = 255;
+			    data[DEFAULT_SIZE-1][x][1] =
+			        data[DEFAULT_SIZE-1][x][2] =
+			            data[DEFAULT_SIZE-1][x][3] = 255;
 
 			data[x][DEFAULT_SIZE-1][0] =
-				data[x][DEFAULT_SIZE-1][1] =
-				data[x][DEFAULT_SIZE-1][2] =
-				data[x][DEFAULT_SIZE-1][3] = 255;
+			    data[x][DEFAULT_SIZE-1][1] =
+			        data[x][DEFAULT_SIZE-1][2] =
+			            data[x][DEFAULT_SIZE-1][3] = 255;
 		}
 	} else {
 		for ( y = 0 ; y < DEFAULT_SIZE ; y++ ) {
@@ -283,8 +283,8 @@ void idImage::MakeDefault() {
 	}
 
 	GenerateImage( (byte *)data,
-		DEFAULT_SIZE, DEFAULT_SIZE,
-		TF_DEFAULT, true, TR_REPEAT, TD_DEFAULT );
+	               DEFAULT_SIZE, DEFAULT_SIZE,
+	               TF_DEFAULT, true, TR_REPEAT, TD_DEFAULT );
 
 	defaulted = true;
 }
@@ -299,7 +299,7 @@ static void R_WhiteImage( idImage *image ) {
 	// solid white texture
 	memset( data, 255, sizeof( data ) );
 	image->GenerateImage( (byte *)data, DEFAULT_SIZE, DEFAULT_SIZE,
-		TF_DEFAULT, false, TR_REPEAT, TD_DEFAULT );
+	                      TF_DEFAULT, false, TR_REPEAT, TD_DEFAULT );
 }
 
 static void R_BlackImage( idImage *image ) {
@@ -308,7 +308,7 @@ static void R_BlackImage( idImage *image ) {
 	// solid black texture
 	memset( data, 0, sizeof( data ) );
 	image->GenerateImage( (byte *)data, DEFAULT_SIZE, DEFAULT_SIZE,
-		TF_DEFAULT, false, TR_REPEAT, TD_DEFAULT );
+	                      TF_DEFAULT, false, TR_REPEAT, TD_DEFAULT );
 }
 
 
@@ -321,28 +321,28 @@ static void R_BorderClampImage( idImage *image ) {
 	memset( data, 255, sizeof( data ) );
 	for ( int i = 0 ; i < BORDER_CLAMP_SIZE ; i++ ) {
 		data[i][0][0] =
-		data[i][0][1] =
-		data[i][0][2] =
-		data[i][0][3] =
+		    data[i][0][1] =
+		        data[i][0][2] =
+		            data[i][0][3] =
 
-		data[i][BORDER_CLAMP_SIZE-1][0] =
-		data[i][BORDER_CLAMP_SIZE-1][1] =
-		data[i][BORDER_CLAMP_SIZE-1][2] =
-		data[i][BORDER_CLAMP_SIZE-1][3] =
+		                data[i][BORDER_CLAMP_SIZE-1][0] =
+		                    data[i][BORDER_CLAMP_SIZE-1][1] =
+		                        data[i][BORDER_CLAMP_SIZE-1][2] =
+		                            data[i][BORDER_CLAMP_SIZE-1][3] =
 
-		data[0][i][0] =
-		data[0][i][1] =
-		data[0][i][2] =
-		data[0][i][3] =
+		                                data[0][i][0] =
+		                                    data[0][i][1] =
+		                                        data[0][i][2] =
+		                                                data[0][i][3] =
 
-		data[BORDER_CLAMP_SIZE-1][i][0] =
-		data[BORDER_CLAMP_SIZE-1][i][1] =
-		data[BORDER_CLAMP_SIZE-1][i][2] =
-		data[BORDER_CLAMP_SIZE-1][i][3] = 0;
+		                                                        data[BORDER_CLAMP_SIZE-1][i][0] =
+		                                                                data[BORDER_CLAMP_SIZE-1][i][1] =
+		                                                                        data[BORDER_CLAMP_SIZE-1][i][2] =
+		                                                                                data[BORDER_CLAMP_SIZE-1][i][3] = 0;
 	}
 
 	image->GenerateImage( (byte *)data, BORDER_CLAMP_SIZE, BORDER_CLAMP_SIZE,
-		TF_LINEAR /* TF_NEAREST */, false, TR_CLAMP_TO_BORDER, TD_DEFAULT );
+	                      TF_LINEAR /* TF_NEAREST */, false, TR_CLAMP_TO_BORDER, TD_DEFAULT );
 
 	if ( !glConfig.isInitialized ) {
 		// can't call qglTexParameterfv yet
@@ -366,7 +366,7 @@ static void R_RGBA8Image( idImage *image ) {
 	data[0][0][3] = 96;
 
 	image->GenerateImage( (byte *)data, DEFAULT_SIZE, DEFAULT_SIZE,
-		TF_DEFAULT, false, TR_REPEAT, TD_HIGH_QUALITY );
+	                      TF_DEFAULT, false, TR_REPEAT, TD_HIGH_QUALITY );
 }
 
 #if 0
@@ -380,7 +380,7 @@ static void R_RGB8Image( idImage *image ) {
 	data[0][0][3] = 255;
 
 	image->GenerateImage( (byte *)data, DEFAULT_SIZE, DEFAULT_SIZE,
-		TF_DEFAULT, false, TR_REPEAT, TD_HIGH_QUALITY );
+	                      TF_DEFAULT, false, TR_REPEAT, TD_HIGH_QUALITY );
 }
 #endif
 
@@ -395,7 +395,7 @@ static void R_AlphaNotchImage( idImage *image ) {
 	data[1][3] = 255;
 
 	image->GenerateImage( (byte *)data, 2, 1,
-		TF_NEAREST, false, TR_CLAMP, TD_HIGH_QUALITY );
+	                      TF_NEAREST, false, TR_CLAMP, TD_HIGH_QUALITY );
 }
 
 static void R_FlatNormalImage( idImage *image ) {
@@ -412,7 +412,7 @@ static void R_FlatNormalImage( idImage *image ) {
 		data[0][i][alpha] = 255;
 	}
 	image->GenerateImage( (byte *)data, 2, 2,
-		TF_DEFAULT, true, TR_REPEAT, TD_HIGH_QUALITY );
+	                      TF_DEFAULT, true, TR_REPEAT, TD_HIGH_QUALITY );
 }
 
 static void R_AmbientNormalImage( idImage *image ) {
@@ -474,8 +474,8 @@ static void CreateSquareLight( void ) {
 				d = 0;
 			}
 			buffer[(y*128+x)*4+0] =
-			buffer[(y*128+x)*4+1] =
-			buffer[(y*128+x)*4+2] = d;
+			    buffer[(y*128+x)*4+1] =
+			        buffer[(y*128+x)*4+2] = d;
 			buffer[(y*128+x)*4+3] = 255;
 		}
 	}
@@ -500,8 +500,8 @@ static void CreateFlashOff( void ) {
 		for ( y = 0 ; y < height ; y++ ) {
 			d = 255 - ( x * 256 / width );
 			buffer[(y*width+x)*4+0] =
-			buffer[(y*width+x)*4+1] =
-			buffer[(y*width+x)*4+2] = d;
+			    buffer[(y*width+x)*4+1] =
+			        buffer[(y*width+x)*4+2] = d;
 			buffer[(y*width+x)*4+3] = 255;
 		}
 	}
@@ -540,8 +540,8 @@ void CreatePitFogImage( void ) {
 
 		for ( j = 0 ; j < 16 ; j++ ) {
 			data[j][i][0] =
-			data[j][i][1] =
-			data[j][i][2] = 255;
+			    data[j][i][1] =
+			        data[j][i][2] = 255;
 			data[j][i][3] = a;
 		}
 	}
@@ -568,8 +568,8 @@ void CreatealphaSquareImage( void ) {
 				a = 255;
 			}
 			data[j][i][0] =
-			data[j][i][1] =
-			data[j][i][2] = 255;
+			    data[j][i][1] =
+			        data[j][i][2] = 255;
 			data[j][i][3] = a;
 		}
 	}
@@ -585,53 +585,53 @@ void CreatealphaSquareImage( void ) {
  * return the cooresponding normalized vector.
  */
 static void getCubeVector(int i, int cubesize, int x, int y, float *vector) {
-  float s, t, sc, tc, mag;
+	float s, t, sc, tc, mag;
 
-  s = ((float)x + 0.5) / (float)cubesize;
-  t = ((float)y + 0.5) / (float)cubesize;
-  sc = s*2.0 - 1.0;
-  tc = t*2.0 - 1.0;
+	s = ((float)x + 0.5) / (float)cubesize;
+	t = ((float)y + 0.5) / (float)cubesize;
+	sc = s*2.0 - 1.0;
+	tc = t*2.0 - 1.0;
 
-  switch (i) {
-  case 0:
-	vector[0] = 1.0;
-	vector[1] = -tc;
-	vector[2] = -sc;
-	break;
-  case 1:
-	vector[0] = -1.0;
-	vector[1] = -tc;
-	vector[2] = sc;
-	break;
-  case 2:
-	vector[0] = sc;
-	vector[1] = 1.0;
-	vector[2] = tc;
-	break;
-  case 3:
-	vector[0] = sc;
-	vector[1] = -1.0;
-	vector[2] = -tc;
-	break;
-  case 4:
-	vector[0] = sc;
-	vector[1] = -tc;
-	vector[2] = 1.0;
-	break;
-  case 5:
-	vector[0] = -sc;
-	vector[1] = -tc;
-	vector[2] = -1.0;
-	break;
-  default:
-	common->Error ("getCubeVector: invalid cube map face index");
-	return;
-  }
+	switch (i) {
+	case 0:
+		vector[0] = 1.0;
+		vector[1] = -tc;
+		vector[2] = -sc;
+		break;
+	case 1:
+		vector[0] = -1.0;
+		vector[1] = -tc;
+		vector[2] = sc;
+		break;
+	case 2:
+		vector[0] = sc;
+		vector[1] = 1.0;
+		vector[2] = tc;
+		break;
+	case 3:
+		vector[0] = sc;
+		vector[1] = -1.0;
+		vector[2] = -tc;
+		break;
+	case 4:
+		vector[0] = sc;
+		vector[1] = -tc;
+		vector[2] = 1.0;
+		break;
+	case 5:
+		vector[0] = -sc;
+		vector[1] = -tc;
+		vector[2] = -1.0;
+		break;
+	default:
+		common->Error ("getCubeVector: invalid cube map face index");
+		return;
+	}
 
-  mag = idMath::InvSqrt(vector[0]*vector[0] + vector[1]*vector[1] + vector[2]*vector[2]);
-  vector[0] *= mag;
-  vector[1] *= mag;
-  vector[2] *= mag;
+	mag = idMath::InvSqrt(vector[0]*vector[0] + vector[1]*vector[1] + vector[2]*vector[2]);
+	vector[0] *= mag;
+	vector[1] *= mag;
+	vector[2] *= mag;
 }
 
 /* Initialize a cube map texture object that generates RGB values
@@ -652,18 +652,18 @@ static void makeNormalizeVectorCubeMap( idImage *image ) {
 	for (i = 0; i < 6; i++) {
 		pixels[i] = pixels[0] + i*size*size*4;
 		for (y = 0; y < size; y++) {
-		  for (x = 0; x < size; x++) {
-			getCubeVector(i, size, x, y, vector);
-			pixels[i][4*(y*size+x) + 0] = (byte)(128 + 127*vector[0]);
-			pixels[i][4*(y*size+x) + 1] = (byte)(128 + 127*vector[1]);
-			pixels[i][4*(y*size+x) + 2] = (byte)(128 + 127*vector[2]);
-			pixels[i][4*(y*size+x) + 3] = 255;
-		  }
+			for (x = 0; x < size; x++) {
+				getCubeVector(i, size, x, y, vector);
+				pixels[i][4*(y*size+x) + 0] = (byte)(128 + 127*vector[0]);
+				pixels[i][4*(y*size+x) + 1] = (byte)(128 + 127*vector[1]);
+				pixels[i][4*(y*size+x) + 2] = (byte)(128 + 127*vector[2]);
+				pixels[i][4*(y*size+x) + 3] = 255;
+			}
 		}
 	}
 
 	image->GenerateCubeImage( (const byte **)pixels, size,
-						   TF_LINEAR, false, TD_HIGH_QUALITY );
+	                          TF_LINEAR, false, TD_HIGH_QUALITY );
 
 	Mem_Free(pixels[0]);
 }
@@ -692,7 +692,7 @@ static void R_CreateNoFalloffImage( idImage *image ) {
 		}
 	}
 	image->GenerateImage( (byte *)data, FALLOFF_TEXTURE_SIZE, 16,
-		TF_DEFAULT, false, TR_CLAMP_TO_ZERO, TD_HIGH_QUALITY );
+	                      TF_DEFAULT, false, TR_CLAMP_TO_ZERO, TD_HIGH_QUALITY );
 }
 
 
@@ -711,20 +711,20 @@ void R_FogImage( idImage *image ) {
 	byte	data[FOG_SIZE][FOG_SIZE][4];
 	int		b;
 
-    float	step[256];
-    int		i;
-    float	remaining = 1.0;
-    for ( i = 0 ; i < 256 ; i++ ) {
-	    step[i] = remaining;
-	    remaining *= 0.982f;
-    }
+	float	step[256];
+	int		i;
+	float	remaining = 1.0;
+	for ( i = 0 ; i < 256 ; i++ ) {
+		step[i] = remaining;
+		remaining *= 0.982f;
+	}
 
 	for (x=0 ; x<FOG_SIZE ; x++) {
 		for (y=0 ; y<FOG_SIZE ; y++) {
 			float	d;
 
 			d = idMath::Sqrt( (x - FOG_SIZE/2) * (x - FOG_SIZE/2)
-				+ (y - FOG_SIZE/2) * (y - FOG_SIZE / 2) );
+			                  + (y - FOG_SIZE/2) * (y - FOG_SIZE / 2) );
 			d /= FOG_SIZE/2-1;
 
 			b = (byte)(d * 255);
@@ -733,19 +733,19 @@ void R_FogImage( idImage *image ) {
 			} else if ( b > 255 ) {
 				b = 255;
 			}
-            b = (byte)(255 * ( 1.0 - step[b] ));
+			b = (byte)(255 * ( 1.0 - step[b] ));
 			if ( x == 0 || x == FOG_SIZE-1 || y == 0 || y == FOG_SIZE-1 ) {
 				b = 255;		// avoid clamping issues
 			}
 			data[y][x][0] =
-			data[y][x][1] =
-			data[y][x][2] = 255;
+			    data[y][x][1] =
+			        data[y][x][2] = 255;
 			data[y][x][3] = b;
 		}
 	}
 
 	image->GenerateImage( (byte *)data, FOG_SIZE, FOG_SIZE,
-		TF_LINEAR, false, TR_CLAMP, TD_HIGH_QUALITY );
+	                      TF_LINEAR, false, TR_CLAMP, TD_HIGH_QUALITY );
 }
 
 
@@ -845,15 +845,15 @@ void R_FogEnterImage( idImage *image ) {
 				b = 255;
 			}
 			data[y][x][0] =
-			data[y][x][1] =
-			data[y][x][2] = 255;
+			    data[y][x][1] =
+			        data[y][x][2] = 255;
 			data[y][x][3] = b;
 		}
 	}
 
 	// if mipmapped, acutely viewed surfaces fade wrong
 	image->GenerateImage( (byte *)data, FOG_ENTER_SIZE, FOG_ENTER_SIZE,
-		TF_LINEAR, false, TR_CLAMP, TD_HIGH_QUALITY );
+	                      TF_LINEAR, false, TR_CLAMP, TD_HIGH_QUALITY );
 }
 
 
@@ -891,14 +891,14 @@ void R_QuadraticImage( idImage *image ) {
 				b = 255;
 			}
 			data[y][x][0] =
-			data[y][x][1] =
-			data[y][x][2] = b;
+			    data[y][x][1] =
+			        data[y][x][2] = b;
 			data[y][x][3] = 255;
 		}
 	}
 
 	image->GenerateImage( (byte *)data, QUADRATIC_WIDTH, QUADRATIC_HEIGHT,
-		TF_DEFAULT, false, TR_CLAMP, TD_HIGH_QUALITY );
+	                      TF_DEFAULT, false, TR_CLAMP, TD_HIGH_QUALITY );
 }
 
 //=====================================================================
@@ -923,14 +923,14 @@ void idImageManager::ChangeTextureFilter( void ) {
 	int		i;
 	idImage	*glt;
 	const char	*string;
-static const filterName_t textureFilters[] = {
-	{"GL_LINEAR_MIPMAP_NEAREST", GL_LINEAR_MIPMAP_NEAREST, GL_LINEAR},
-	{"GL_LINEAR_MIPMAP_LINEAR", GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR},
-	{"GL_NEAREST", GL_NEAREST, GL_NEAREST},
-	{"GL_LINEAR", GL_LINEAR, GL_LINEAR},
-	{"GL_NEAREST_MIPMAP_NEAREST", GL_NEAREST_MIPMAP_NEAREST, GL_NEAREST},
-	{"GL_NEAREST_MIPMAP_LINEAR", GL_NEAREST_MIPMAP_LINEAR, GL_NEAREST}
-};
+	static const filterName_t textureFilters[] = {
+		{"GL_LINEAR_MIPMAP_NEAREST", GL_LINEAR_MIPMAP_NEAREST, GL_LINEAR},
+		{"GL_LINEAR_MIPMAP_LINEAR", GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR},
+		{"GL_NEAREST", GL_NEAREST, GL_NEAREST},
+		{"GL_LINEAR", GL_LINEAR, GL_LINEAR},
+		{"GL_NEAREST_MIPMAP_NEAREST", GL_NEAREST_MIPMAP_NEAREST, GL_NEAREST},
+		{"GL_NEAREST_MIPMAP_LINEAR", GL_NEAREST_MIPMAP_LINEAR, GL_NEAREST}
+	};
 
 	// if these are changed dynamically, it will force another ChangeTextureFilter
 	image_filter.ClearModified();
@@ -1043,8 +1043,7 @@ void R_ReloadImages_f( const idCmdArgs &args ) {
 	bool	all;
 
 	// DG: notify the game DLL about the reloadImages command
-	if(gameCallbacks.reloadImagesCB != NULL)
-	{
+	if(gameCallbacks.reloadImagesCB != NULL) {
 		gameCallbacks.reloadImagesCB(gameCallbacks.reloadImagesUserArg, args);
 	}
 
@@ -1217,7 +1216,7 @@ void R_ListImages_f( const idCmdArgs &args ) {
 			partialSize += sortedArray[i].image->StorageSize();
 			if ( ( (i+1) % 10 ) == 0 ) {
 				common->Printf( "-------- %5.1f of %5.1f megs --------\n",
-					partialSize / (1024*1024.0), totalSize / (1024*1024.0) );
+				                partialSize / (1024*1024.0), totalSize / (1024*1024.0) );
 			}
 		}
 	}
@@ -1346,8 +1345,8 @@ void idImageManager::SetNormalPalette( void ) {
 
 	// color 255 will be the "nullnormal" color for no reflection
 	temptable[255*3+0] =
-	temptable[255*3+1] =
-	temptable[255*3+2] = 128;
+	    temptable[255*3+1] =
+	        temptable[255*3+2] = 128;
 
 	return;
 }
@@ -1437,7 +1436,7 @@ Loading of the image may be deferred for dynamic loading.
 ==============
 */
 idImage	*idImageManager::ImageFromFile( const char *_name, textureFilter_t filter, bool allowDownSize,
-						 textureRepeat_t repeat, textureDepth_t depth, cubeFiles_t cubeMap ) {
+                                        textureRepeat_t repeat, textureDepth_t depth, cubeFiles_t cubeMap ) {
 	idStr name;
 	idImage	*image;
 	int hash;
@@ -1878,7 +1877,7 @@ void idImageManager::EndLevelLoad() {
 			if ( ( loadCount & 15 ) == 0 ) {
 				session->PacifierUpdate();
 #ifdef __EMSCRIPTEN__
-        emscripten_sleep(1);
+				emscripten_sleep(1);
 #endif
 			}
 		}

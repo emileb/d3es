@@ -255,7 +255,7 @@ void idImage::GetDownsize( int &scaled_width, int &scaled_height ) const {
 	// This causes a 512*256 texture to sample down to
 	// 256*128 on a voodoo3, even though it could be 256*256
 	while ( scaled_width > glConfig.maxTextureSize
-		|| scaled_height > glConfig.maxTextureSize ) {
+	        || scaled_height > glConfig.maxTextureSize ) {
 		scaled_width >>= 1;
 		scaled_height >>= 1;
 	}
@@ -264,49 +264,46 @@ void idImage::GetDownsize( int &scaled_width, int &scaled_height ) const {
 
 //Code from raspberrypi q3
 
-static int isopaque(GLint width, GLint height, const GLvoid *pixels)
-{
-   unsigned char const *cpixels = (unsigned char const *)pixels;
-   int i;
-   for (i = 0; i < width * height; i++) {
-      if (cpixels[i*4+3] != 0xff)
-         return 0;
-   }
-   return 1;
+static int isopaque(GLint width, GLint height, const GLvoid *pixels) {
+	unsigned char const *cpixels = (unsigned char const *)pixels;
+	int i;
+	for (i = 0; i < width * height; i++) {
+		if (cpixels[i*4+3] != 0xff)
+			return 0;
+	}
+	return 1;
 }
 
 void rgba4444_convert_tex_image(
-   char* cachefname,
-   GLenum target,
-   GLint level,
-   GLenum internalformat,
-   GLsizei width,
-   GLsizei height,
-   GLint border,
-   GLenum format,
-   GLenum type,
-   const GLvoid *pixels)
-{
-   unsigned char const *cpixels = (unsigned char const *)pixels;
-   unsigned short *rgba4444data = (unsigned short *)malloc(2*width*height+1);
-   ((unsigned char*)rgba4444data)[0]=1;
-   rgba4444data=(unsigned short *)((unsigned char*)rgba4444data+1);
-   int i;
-   for (i = 0; i < width * height; i++) {
-      unsigned char r,g,b,a;
-      r = cpixels[4*i]>>4;
-      g = cpixels[4*i+1]>>4;
-      b = cpixels[4*i+2]>>4;
-      a = cpixels[4*i+3]>>4;
-      rgba4444data[i] = r << 12 | g << 8 | b << 4 | a;
-   }
-   qglTexImage2D(target, level, format, width, height,border,format,GL_UNSIGNED_SHORT_4_4_4_4,rgba4444data);
-   rgba4444data=(unsigned short *)((unsigned char*)rgba4444data-1);
-   if (cachefname!=0)
-   {
-	fileSystem->WriteFile(cachefname, rgba4444data, width*height*2+1);
-   }
-   free(rgba4444data);
+    char* cachefname,
+    GLenum target,
+    GLint level,
+    GLenum internalformat,
+    GLsizei width,
+    GLsizei height,
+    GLint border,
+    GLenum format,
+    GLenum type,
+    const GLvoid *pixels) {
+	unsigned char const *cpixels = (unsigned char const *)pixels;
+	unsigned short *rgba4444data = (unsigned short *)malloc(2*width*height+1);
+	((unsigned char*)rgba4444data)[0]=1;
+	rgba4444data=(unsigned short *)((unsigned char*)rgba4444data+1);
+	int i;
+	for (i = 0; i < width * height; i++) {
+		unsigned char r,g,b,a;
+		r = cpixels[4*i]>>4;
+		g = cpixels[4*i+1]>>4;
+		b = cpixels[4*i+2]>>4;
+		a = cpixels[4*i+3]>>4;
+		rgba4444data[i] = r << 12 | g << 8 | b << 4 | a;
+	}
+	qglTexImage2D(target, level, format, width, height,border,format,GL_UNSIGNED_SHORT_4_4_4_4,rgba4444data);
+	rgba4444data=(unsigned short *)((unsigned char*)rgba4444data-1);
+	if (cachefname!=0) {
+		fileSystem->WriteFile(cachefname, rgba4444data, width*height*2+1);
+	}
+	free(rgba4444data);
 }
 //#define USE_RG_ETC1
 #ifdef USE_RG_ETC1
@@ -316,82 +313,69 @@ void rgba4444_convert_tex_image(
 #endif
 
 unsigned int etc1_data_size(unsigned int width, unsigned int height) {
-    return (((width + 3) & ~3) * ((height + 3) & ~3)) >> 1;
+	return (((width + 3) & ~3) * ((height + 3) & ~3)) >> 1;
 }
 
 void etc1_compress_tex_image(
-   char* cachefname,
-   GLenum target,
-   GLint level,
-   GLenum internalformat,
-   GLsizei width,
-   GLsizei height,
-   GLint border,
-   GLenum format,
-   GLenum type,
-   const GLvoid *pixels)
-{
-   unsigned char const *cpixels = (unsigned char const *)pixels;
-   unsigned char *etc1data;
-   unsigned int size=etc1_data_size(width,height);
-   etc1data = (unsigned char *)malloc(size+1);
-   etc1data[0]=0;
-   etc1data++;
-   #ifdef USE_RG_ETC1
-   rg_etc1::etc1_encode_image(cpixels, width, height,
-        4, width*4, etc1data);
-   #else
-   etc1_encode_image(cpixels, width, height,
-        4, width*4, etc1data);
-   #endif
-   qglCompressedTexImage2D(
-      target,
-      level,
-      GL_ETC1_RGB8_OES,
-      width,
-      height,
-      0,
-      size,
-      etc1data);
-   etc1data--;
-   if (cachefname!=0)
-   {
-	fileSystem->WriteFile(cachefname, etc1data, size+1);
-   }
-   free(etc1data);
+    char* cachefname,
+    GLenum target,
+    GLint level,
+    GLenum internalformat,
+    GLsizei width,
+    GLsizei height,
+    GLint border,
+    GLenum format,
+    GLenum type,
+    const GLvoid *pixels) {
+	unsigned char const *cpixels = (unsigned char const *)pixels;
+	unsigned char *etc1data;
+	unsigned int size=etc1_data_size(width,height);
+	etc1data = (unsigned char *)malloc(size+1);
+	etc1data[0]=0;
+	etc1data++;
+#ifdef USE_RG_ETC1
+	rg_etc1::etc1_encode_image(cpixels, width, height,
+	                           4, width*4, etc1data);
+#else
+	etc1_encode_image(cpixels, width, height,
+	                  4, width*4, etc1data);
+#endif
+	qglCompressedTexImage2D(
+	    target,
+	    level,
+	    GL_ETC1_RGB8_OES,
+	    width,
+	    height,
+	    0,
+	    size,
+	    etc1data);
+	etc1data--;
+	if (cachefname!=0) {
+		fileSystem->WriteFile(cachefname, etc1data, size+1);
+	}
+	free(etc1data);
 }
 
-int etcavail(char* cachefname)
-{
+int etcavail(char* cachefname) {
 	return (r_useETC1Cache.GetBool())&&(r_useETC1.GetBool())&&(cachefname!=0)&&(fileSystem->ReadFile(cachefname,0,0)!=-1);
 }
 
-int uploadetc(char* cachefname,GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type)
-{
+int uploadetc(char* cachefname,GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type) {
 	char* tmp;
 	int failed=0;
 	int sz=fileSystem->ReadFile(cachefname,(void**)&tmp,0);
-	if (tmp[0]==0)
-	{
-		if (sz==etc1_data_size(width,height)+1)
-		{
+	if (tmp[0]==0) {
+		if (sz==etc1_data_size(width,height)+1) {
 			tmp++;
 			qglCompressedTexImage2D(target,level,GL_ETC1_RGB8_OES,width,height,0,etc1_data_size(width,height),tmp);
-		}
-		else
-		{
+		} else {
 			failed=1;
 		}
-	}
-	else
-	{
-		if (sz==width*height*2+1)
-		{
+	} else {
+		if (sz==width*height*2+1) {
 			tmp++;
 			qglTexImage2D(target,level,format,width,height,border,format,GL_UNSIGNED_SHORT_4_4_4_4,tmp);
-		}
-		else
-		{
+		} else {
 			failed=1;
 		}
 	}
@@ -401,25 +385,22 @@ int uploadetc(char* cachefname,GLenum target, GLint level, GLint internalformat,
 	return failed;
 }
 
-void myglTexImage2D(char* cachefname,GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const GLvoid *pixels)
-{
+void myglTexImage2D(char* cachefname,GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const GLvoid *pixels) {
 	static int opaque = 0;
 	if (r_useETC1.GetBool() && format == GL_RGBA && type == GL_UNSIGNED_BYTE) {
 
-	  if (level == 0)
-	     opaque = isopaque(width, height, pixels);
+		if (level == 0)
+			opaque = isopaque(width, height, pixels);
 
-	  if (!r_useETC1Cache.GetBool())
-		cachefname=0;
+		if (!r_useETC1Cache.GetBool())
+			cachefname=0;
 
-	  if (opaque)
-	     etc1_compress_tex_image(cachefname,target, level, format, width, height, border, format, type, pixels);
-	  else
-	     rgba4444_convert_tex_image(cachefname,target, level, format, width, height, border, format, type, pixels);
-	}
-	else
-	{
-	    qglTexImage2D(target,level,internalformat,width,height,border,format,type,pixels);
+		if (opaque)
+			etc1_compress_tex_image(cachefname,target, level, format, width, height, border, format, type, pixels);
+		else
+			rgba4444_convert_tex_image(cachefname,target, level, format, width, height, border, format, type, pixels);
+	} else {
+		qglTexImage2D(target,level,internalformat,width,height,border,format,type,pixels);
 	}
 }
 
@@ -455,8 +436,8 @@ There is no way to specify explicit mip map levels
 ================
 */
 void idImage::GenerateImage( const byte *pic, int width, int height,
-					   textureFilter_t filterParm, bool allowDownSizeParm,
-					   textureRepeat_t repeatParm, textureDepth_t depthParm ) {
+                             textureFilter_t filterParm, bool allowDownSizeParm,
+                             textureRepeat_t repeatParm, textureDepth_t depthParm ) {
 	bool	preserveBorder;
 	byte		*scaledBuffer;
 	int			scaled_width, scaled_height;
@@ -613,8 +594,7 @@ void idImage::GenerateImage( const byte *pic, int width, int height,
 	char *ext = strrchr(filename, '.');
 	if (ext) {
 		strcpy(ext, ".etc");
-	}
-	else
+	} else
 		fptr=0;
 	myglTexImage2D(fptr,GL_TEXTURE_2D, 0, internalFormat, scaled_width, scaled_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, scaledBuffer);
 
@@ -647,19 +627,19 @@ void idImage::GenerateImage( const byte *pic, int width, int height,
 		}
 
 		// upload the mip map
-			//qglTexImage2D( GL_TEXTURE_2D, miplevel, internalFormat, scaled_width, scaled_height,
-			//	0, GL_RGBA, GL_UNSIGNED_BYTE, scaledBuffer );
-			char filename[MAX_IMAGE_NAME];
-			char*fptr=&filename[0];
-			ImageProgramStringToCompressedFileName(imgName, filename);
-			char *ext = strrchr(filename, '.');
-			if (ext) {
-				strcpy(ext, ".e");
-				ext[2]='0'+miplevel/10;ext[3]='0'+miplevel%10;
-			}
-			else
-				fptr=0;
-			myglTexImage2D(fptr,GL_TEXTURE_2D, miplevel, internalFormat, scaled_width, scaled_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, scaledBuffer);
+		//qglTexImage2D( GL_TEXTURE_2D, miplevel, internalFormat, scaled_width, scaled_height,
+		//	0, GL_RGBA, GL_UNSIGNED_BYTE, scaledBuffer );
+		char filename[MAX_IMAGE_NAME];
+		char*fptr=&filename[0];
+		ImageProgramStringToCompressedFileName(imgName, filename);
+		char *ext = strrchr(filename, '.');
+		if (ext) {
+			strcpy(ext, ".e");
+			ext[2]='0'+miplevel/10;
+			ext[3]='0'+miplevel%10;
+		} else
+			fptr=0;
+		myglTexImage2D(fptr,GL_TEXTURE_2D, miplevel, internalFormat, scaled_width, scaled_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, scaledBuffer);
 
 	}
 
@@ -681,8 +661,8 @@ Non-square cube sides are not allowed
 ====================
 */
 void idImage::GenerateCubeImage( const byte *pic[6], int size,
-					   textureFilter_t filterParm, bool allowDownSizeParm,
-					   textureDepth_t depthParm ) {
+                                 textureFilter_t filterParm, bool allowDownSizeParm,
+                                 textureDepth_t depthParm ) {
 	int			scaled_width, scaled_height;
 	int			width, height;
 	int			i;
@@ -746,7 +726,7 @@ void idImage::GenerateCubeImage( const byte *pic[6], int size,
 	// FIXME: support GL_COLOR_INDEX8_EXT?
 	for ( i = 0 ; i < 6 ; i++ ) {
 		qglTexImage2D( GL_TEXTURE_CUBE_MAP_POSITIVE_X+i, 0, internalFormat, scaled_width, scaled_height, 0,
-			GL_RGBA, GL_UNSIGNED_BYTE, pic[i] );
+		               GL_RGBA, GL_UNSIGNED_BYTE, pic[i] );
 	}
 
 
@@ -764,8 +744,8 @@ void idImage::GenerateCubeImage( const byte *pic[6], int size,
 			byte	*shrunken;
 
 			qglTexImage2D( GL_TEXTURE_CUBE_MAP_POSITIVE_X+i, miplevel, internalFormat,
-				scaled_width / 2, scaled_height / 2, 0,
-				GL_RGBA, GL_UNSIGNED_BYTE, shrunk[i] );
+			               scaled_width / 2, scaled_height / 2, 0,
+			               GL_RGBA, GL_UNSIGNED_BYTE, shrunk[i] );
 
 			if ( scaled_width > 2 ) {
 				shrunken = R_MipMap( shrunk[i], scaled_width/2, scaled_height/2, false );
@@ -1007,7 +987,7 @@ void idImage::CopyFramebuffer( int x, int y, int imageWidth, int imageHeight, bo
 	// only resize if the current dimensions can't hold it at all,
 	// otherwise subview renderings could thrash this
 	if ( ( useOversizedBuffer && ( uploadWidth < potWidth || uploadHeight < potHeight ) )
-		|| ( !useOversizedBuffer && ( uploadWidth != potWidth || uploadHeight != potHeight ) ) ) {
+	        || ( !useOversizedBuffer && ( uploadWidth != potWidth || uploadHeight != potHeight ) ) ) {
 		uploadWidth = potWidth;
 		uploadHeight = potHeight;
 		if ( potWidth == imageWidth && potHeight == imageHeight ) {
@@ -1122,7 +1102,7 @@ void idImage::UploadScratch( const byte *data, int cols, int rows ) {
 			// it and don't try and do a texture compression
 			for ( i = 0 ; i < 6 ; i++ ) {
 				qglTexSubImage2D( GL_TEXTURE_CUBE_MAP_POSITIVE_X+i, 0, 0, 0, cols, rows,
-					GL_RGBA, GL_UNSIGNED_BYTE, data + cols*rows*4*i );
+				                  GL_RGBA, GL_UNSIGNED_BYTE, data + cols*rows*4*i );
 			}
 		}
 		qglTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
@@ -1256,7 +1236,7 @@ void idImage::Print() const {
 		common->Printf( "RGBA4 " );
 		break;
 	case GL_RGB5_A1:
-	    common->Printf( "RGB5_A1  " );
+		common->Printf( "RGB5_A1  " );
 		break;
 	case 0:
 		common->Printf( "      " );

@@ -79,32 +79,32 @@ RB_RenderView
 =============
 */
 void RB_RenderView(void) {
-  drawSurf_t **drawSurfs = (drawSurf_t * *) & backEnd.viewDef->drawSurfs[0];
-  const int numDrawSurfs = backEnd.viewDef->numDrawSurfs;
+	drawSurf_t **drawSurfs = (drawSurf_t * *) & backEnd.viewDef->drawSurfs[0];
+	const int numDrawSurfs = backEnd.viewDef->numDrawSurfs;
 
-  // clear the z buffer, set the projection matrix, etc
-  RB_BeginDrawingView();
+	// clear the z buffer, set the projection matrix, etc
+	RB_BeginDrawingView();
 
-  // Setup GLSL shader state
-  RB_GLSL_PrepareShaders();
+	// Setup GLSL shader state
+	RB_GLSL_PrepareShaders();
 
-  // fill the depth buffer and clear color buffer to black except on subviews
+	// fill the depth buffer and clear color buffer to black except on subviews
 	RB_GLSL_FillDepthBuffer( drawSurfs, numDrawSurfs );
 
-  // main light renderer
-  RB_GLSL_DrawInteractions();
+	// main light renderer
+	RB_GLSL_DrawInteractions();
 
-  // disable stencil shadow test
-  qglStencilFunc(GL_ALWAYS, 128, 255);
+	// disable stencil shadow test
+	qglStencilFunc(GL_ALWAYS, 128, 255);
 
-  // now draw any non-light dependent shading passes
-  const int processed = RB_GLSL_DrawShaderPasses(drawSurfs, numDrawSurfs);
+	// now draw any non-light dependent shading passes
+	const int processed = RB_GLSL_DrawShaderPasses(drawSurfs, numDrawSurfs);
 
-  // fog and blend lights
-  RB_GLSL_FogAllLights();
+	// fog and blend lights
+	RB_GLSL_FogAllLights();
 
-  // now draw any post-processing effects using _currentRender
-  if (processed < numDrawSurfs) {
-    RB_GLSL_DrawShaderPasses(drawSurfs + processed, numDrawSurfs - processed);
-  }
+	// now draw any post-processing effects using _currentRender
+	if (processed < numDrawSurfs) {
+		RB_GLSL_DrawShaderPasses(drawSurfs + processed, numDrawSurfs - processed);
+	}
 }

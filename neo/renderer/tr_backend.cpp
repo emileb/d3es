@@ -46,7 +46,7 @@ void RB_SetDefaultGLState( void ) {
 	// Clear value for the Depth buffer
 	qglClearDepthf(1.0f);
 
-  // make sure our GL state vector is set correctly
+	// make sure our GL state vector is set correctly
 	memset( &backEnd.glState, 0, sizeof( backEnd.glState ) );
 	backEnd.glState.forceGlState = true;
 
@@ -68,10 +68,10 @@ void RB_SetDefaultGLState( void ) {
 		qglScissor( 0, 0, glConfig.vidWidth, glConfig.vidHeight );
 	}
 
-  backEnd.glState.currentTexture = -1;  // Force texture unit to be reset
+	backEnd.glState.currentTexture = -1;  // Force texture unit to be reset
 	for ( i = glConfig.maxTextureUnits - 1 ; i >= 0 ; i-- ) {
 		GL_SelectTexture( i );
-    globalImages->BindNull();
+		globalImages->BindNull();
 	}
 	// Last active texture is Tex0
 }
@@ -82,10 +82,10 @@ GL_SelectTexture
 ====================
 */
 void GL_SelectTexture( int unit ) {
-  if ( backEnd.glState.currentTexture != unit ) {
-    qglActiveTexture(GL_TEXTURE0 + unit);
-    backEnd.glState.currentTexture = unit;
-  }
+	if ( backEnd.glState.currentTexture != unit ) {
+		qglActiveTexture(GL_TEXTURE0 + unit);
+		backEnd.glState.currentTexture = unit;
+	}
 }
 
 /*
@@ -103,7 +103,7 @@ void GL_Cull( int cullType ) {
 
 	if ( cullType == CT_TWO_SIDED ) {
 		qglDisable( GL_CULL_FACE );
-	} else  {
+	} else {
 		if ( backEnd.glState.faceCulling == CT_TWO_SIDED ) {
 			qglEnable( GL_CULL_FACE );
 		}
@@ -324,14 +324,14 @@ RB_SwapBuffers
 */
 const void	RB_SwapBuffers( const void *data ) {
 
-  #ifdef WEBGL
-  // GAB Note Dec 2018: Clear the Alpha channel, so that final render will not blend with the HTML5 background (canvas with premultiplied alpha)
-  qglColorMask(0, 0, 0, 1);
-  qglClear(GL_COLOR_BUFFER_BIT);
-  #endif
+#ifdef WEBGL
+	// GAB Note Dec 2018: Clear the Alpha channel, so that final render will not blend with the HTML5 background (canvas with premultiplied alpha)
+	qglColorMask(0, 0, 0, 1);
+	qglClear(GL_COLOR_BUFFER_BIT);
+#endif
 
 
-  // force a gl sync if requested
+	// force a gl sync if requested
 	if ( r_finish.GetBool() ) {
 		qglFinish();
 	}
@@ -391,8 +391,7 @@ void RB_ExecuteBackEndCommands( const emptyCommand_t *cmds ) {
 			RB_DrawView( cmds );
 			if ( ((const drawSurfsCommand_t *)cmds)->viewDef->viewEntitys ) {
 				c_draw3d++;
-			}
-			else {
+			} else {
 				c_draw2d++;
 			}
 			break;

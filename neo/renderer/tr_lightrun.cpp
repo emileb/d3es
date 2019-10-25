@@ -191,10 +191,10 @@ void R_CreateEntityRefs( idRenderEntityLocal *def ) {
 	}
 
 	if ( r_showUpdates.GetBool() &&
-		( def->referenceBounds[1][0] - def->referenceBounds[0][0] > 1024 ||
-		def->referenceBounds[1][1] - def->referenceBounds[0][1] > 1024 )  ) {
+	        ( def->referenceBounds[1][0] - def->referenceBounds[0][0] > 1024 ||
+	          def->referenceBounds[1][1] - def->referenceBounds[0][1] > 1024 )  ) {
 		common->Printf( "big entityRef: %f,%f\n", def->referenceBounds[1][0] - def->referenceBounds[0][0],
-						def->referenceBounds[1][1] - def->referenceBounds[0][1] );
+		                def->referenceBounds[1][1] - def->referenceBounds[0][1] );
 	}
 
 	for (i = 0 ; i < 8 ; i++) {
@@ -232,7 +232,7 @@ This is also called by dmap during map processing.
 =====================
 */
 void R_SetLightProject( idPlane lightProject[4], const idVec3 origin, const idVec3 target,
-					   const idVec3 rightVector, const idVec3 upVector, const idVec3 start, const idVec3 stop ) {
+                        const idVec3 rightVector, const idVec3 upVector, const idVec3 start, const idVec3 stop ) {
 	float		dist;
 	float		scale;
 	float		rLen, uLen;
@@ -387,7 +387,7 @@ void R_DeriveLightData( idRenderLightLocal *light ) {
 		// projected light
 
 		R_SetLightProject( light->lightProject, vec3_origin /* light->parms.origin */, light->parms.target,
-			light->parms.right, light->parms.up, light->parms.start, light->parms.end);
+		                   light->parms.right, light->parms.up, light->parms.start, light->parms.end);
 	} else {
 		// point light
 		memset( light->lightProject, 0, sizeof( light->lightProject ) );
@@ -464,9 +464,9 @@ void R_CreateLightRefs( idRenderLightLocal *light ) {
 	}
 
 	if (  r_showUpdates.GetBool() && ( tri->bounds[1][0] - tri->bounds[0][0] > 1024 ||
-		tri->bounds[1][1] - tri->bounds[0][1] > 1024 ) ) {
+	                                   tri->bounds[1][1] - tri->bounds[0][1] > 1024 ) ) {
 		common->Printf( "big lightRef: %f,%f\n", tri->bounds[1][0] - tri->bounds[0][0]
-			,tri->bounds[1][1] - tri->bounds[0][1] );
+		                ,tri->bounds[1][1] - tri->bounds[0][1] );
 	}
 
 	// determine the areaNum for the light origin, which may let us
