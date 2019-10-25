@@ -638,6 +638,8 @@ void idRenderSystemLocal::EndFrame( int *frontEndMsec, int *backEndMsec ) {
 	cmd = (emptyCommand_t *)R_GetCommandBuffer( sizeof( *cmd ) );
 	cmd->commandId = RC_SWAP_BUFFERS;
 
+    vertexCache.BeginBackEnd();
+
 	// start the back end up again with the new command list
 	R_IssueRenderCommands();
 
