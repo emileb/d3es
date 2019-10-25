@@ -142,7 +142,7 @@ typedef struct renderEntity_s {
 
 	int						numJoints;
 	idJointMat *			joints;					// array of joints that will modify vertices.
-													// NULL if non-deformable model.  NOT freed by renderer
+	// NULL if non-deformable model.  NOT freed by renderer
 
 	float					modelDepthHack;			// squash depth range so particle effects don't clip into walls
 
@@ -151,12 +151,12 @@ typedef struct renderEntity_s {
 	bool					noShadow;				// no shadow at all
 
 	bool					noDynamicInteractions;	// don't create any light / shadow interactions after
-													// the level load is completed.  This is a performance hack
-													// for the gigantic outdoor meshes in the monorail map, so
-													// all the lights in the moving monorail don't touch the meshes
+	// the level load is completed.  This is a performance hack
+	// for the gigantic outdoor meshes in the monorail map, so
+	// all the lights in the moving monorail don't touch the meshes
 
 	bool					weaponDepthHack;		// squash depth range so view weapons don't poke into walls
-													// this automatically implies noShadow
+	// this automatically implies noShadow
 	int						forceUpdate;			// force an update (NOTE: not a bool to keep this struct a multiple of 4 bytes)
 	int						timeGroup;
 	int						xrayIndex;
@@ -186,7 +186,7 @@ typedef struct renderLight_s {
 	bool					parallel;			// lightCenter gives the direction to the light at infinity
 	idVec3					lightRadius;		// xyz radius for point lights
 	idVec3					lightCenter;		// offset the lighting direction for shading and
-												// shadows, relative to origin
+	// shadows, relative to origin
 
 	// frustum definition for projected lights, all reletive to origin
 	// FIXME: we should probably have real plane equations here, and offer

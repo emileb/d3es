@@ -65,30 +65,32 @@ typedef struct decalProjectionInfo_s {
 
 class idRenderModelDecal {
 public:
-								idRenderModelDecal( void );
-								~idRenderModelDecal( void );
+	idRenderModelDecal( void );
+	~idRenderModelDecal( void );
 
 	static idRenderModelDecal *	Alloc( void );
 	static void					Free( idRenderModelDecal *decal );
 
-								// Creates decal projection info.
+	// Creates decal projection info.
 	static bool					CreateProjectionInfo( decalProjectionInfo_t &info, const idFixedWinding &winding, const idVec3 &projectionOrigin, const bool parallel, const float fadeDepth, const idMaterial *material, const int startTime );
 
-								// Transform the projection info from global space to local.
+	// Transform the projection info from global space to local.
 	static void					GlobalProjectionInfoToLocal( decalProjectionInfo_t &localInfo, const decalProjectionInfo_t &info, const idVec3 &origin, const idMat3 &axis );
 
-								// Creates a deal on the given model.
+	// Creates a deal on the given model.
 	void						CreateDecal( const idRenderModel *model, const decalProjectionInfo_t &localInfo );
 
-								// Remove decals that are completely faded away.
+	// Remove decals that are completely faded away.
 	static idRenderModelDecal *	RemoveFadedDecals( idRenderModelDecal *decals, int time );
 
-								// Updates the vertex colors, removing any faded indexes,
-								// then copy the verts to temporary vertex cache and adds a drawSurf.
+	// Updates the vertex colors, removing any faded indexes,
+	// then copy the verts to temporary vertex cache and adds a drawSurf.
 	void						AddDecalDrawSurf( struct viewEntity_s *space );
 
-								// Returns the next decal in the chain.
-	idRenderModelDecal *		Next( void ) const { return nextDecal; }
+	// Returns the next decal in the chain.
+	idRenderModelDecal *		Next( void ) const {
+		return nextDecal;
+	}
 
 	void						ReadFromDemoFile( class idDemoFile *f );
 	void						WriteToDemoFile( class idDemoFile *f ) const;
@@ -105,14 +107,14 @@ private:
 	int							indexStartTime[MAX_DECAL_INDEXES];
 	idRenderModelDecal *		nextDecal;
 
-								// Adds the winding triangles to the appropriate decal in the
-								// chain, creating a new one if necessary.
+	// Adds the winding triangles to the appropriate decal in the
+	// chain, creating a new one if necessary.
 	void						AddWinding( const idWinding &w, const idMaterial *decalMaterial, const idPlane fadePlanes[2], float fadeDepth, int startTime );
 
-								// Adds depth faded triangles for the winding to the appropriate
-								// decal in the chain, creating a new one if necessary.
-								// The part of the winding at the front side of both fade planes is not faded.
-								// The parts at the back sides of the fade planes are faded with the given depth.
+	// Adds depth faded triangles for the winding to the appropriate
+	// decal in the chain, creating a new one if necessary.
+	// The part of the winding at the front side of both fade planes is not faded.
+	// The parts at the back sides of the fade planes are faded with the given depth.
 	void						AddDepthFadedWinding( const idWinding &w, const idMaterial *decalMaterial, const idPlane fadePlanes[2], float fadeDepth, int startTime );
 };
 

@@ -271,7 +271,7 @@ localTrace_t R_LocalTrace( const idVec3 &start, const idVec3 &end, const float r
 #ifdef TEST_TRACE
 	trace_timer.Stop();
 	common->Printf( "testVerts:%i c_testPlanes:%i c_testEdges:%i c_intersect:%i msec:%u\n",
-					tri->numVerts, c_testPlanes, c_testEdges, c_intersect, trace_timer.Milliseconds() );
+	                tri->numVerts, c_testPlanes, c_testEdges, c_intersect, trace_timer.Milliseconds() );
 #endif
 
 	return hit;

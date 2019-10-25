@@ -91,7 +91,7 @@ typedef struct srfTriangles_s {
 	bool						facePlanesCalculated;	// set when the face planes have been calculated
 	bool						perfectHull;			// true if there aren't any dangling edges
 	bool						deformedSurface;		// if true, indexes, silIndexes, mirrorVerts, and silEdges are
-														// pointers into the original surface, and should not be freed
+	// pointers into the original surface, and should not be freed
 
 	int							numVerts;				// number of vertices
 	idDrawVert *				verts;					// vertices, allocated with special allocator
@@ -118,16 +118,16 @@ typedef struct srfTriangles_s {
 	int							numShadowIndexesNoCaps;			// shadow volumes with the front and rear caps omitted
 
 	int							shadowCapPlaneBits;		// bits 0-5 are set when that plane of the interacting light has triangles
-														// projected on it, which means that if the view is on the outside of that
-														// plane, we need to draw the rear caps of the shadow volume
-														// turboShadows will have SHADOW_CAP_INFINITE
+	// projected on it, which means that if the view is on the outside of that
+	// plane, we need to draw the rear caps of the shadow volume
+	// turboShadows will have SHADOW_CAP_INFINITE
 
 	shadowCache_t *				shadowVertexes;			// these will be copied to shadowCache when it is going to be drawn.
-														                // these are NULL when vertex programs are available, or if it is precomputed shadow
+	// these are NULL when vertex programs are available, or if it is precomputed shadow
 
 
 	struct srfTriangles_s *		ambientSurface;			// for light interactions, point back at the original surface that generated
-														// the interaction, which we will get the ambientCache from
+	// the interaction, which we will get the ambientCache from
 
 	struct srfTriangles_s *		nextDeferredFree;		// chain of tris to free next frame
 
@@ -157,7 +157,9 @@ typedef enum {
 
 class idMD5Joint {
 public:
-								idMD5Joint() { parent = NULL; }
+	idMD5Joint() {
+		parent = NULL;
+	}
 	idStr						name;
 	const idMD5Joint *			parent;
 };

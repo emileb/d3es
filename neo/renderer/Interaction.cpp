@@ -280,8 +280,8 @@ it will never clip triangles, but it may cull on a per-triangle basis.
 ====================
 */
 static srfTriangles_t *R_CreateLightTris( const idRenderEntityLocal *ent,
-									 const srfTriangles_t *tri, const idRenderLightLocal *light,
-									 const idMaterial *shader, srfCullInfo_t &cullInfo ) {
+        const srfTriangles_t *tri, const idRenderLightLocal *light,
+        const idMaterial *shader, srfCullInfo_t &cullInfo ) {
 	int			i;
 	int			numIndexes;
 	glIndex_t	*indexes;
@@ -301,8 +301,8 @@ static srfTriangles_t *R_CreateLightTris( const idRenderEntityLocal *ent,
 
 	// it is debatable if non-shadowing lights should light back faces. we aren't at the moment
 	if ( r_lightAllBackFaces.GetBool() || light->lightShader->LightEffectsBackSides()
-			|| shader->ReceivesLightingOnBackSides()
-				|| ent->parms.noSelfShadow || ent->parms.noShadow  ) {
+	        || shader->ReceivesLightingOnBackSides()
+	        || ent->parms.noSelfShadow || ent->parms.noShadow  ) {
 		includeBackFaces = true;
 	} else {
 		includeBackFaces = false;
@@ -948,7 +948,7 @@ we can draw it without caps in zpass mode
 ======================
 */
 static bool R_PotentiallyInsideInfiniteShadow( const srfTriangles_t *occluder,
-											  const idVec3 &localView, const idVec3 &localLight ) {
+        const idVec3 &localView, const idVec3 &localLight ) {
 	idBounds	exp;
 
 	// expand the bounds to account for the near clip plane, because the
@@ -1040,7 +1040,7 @@ void idInteraction::AddActiveInteraction( void ) {
 		// use the entity scissor rectangle
 		shadowScissor = vEntity->scissorRect;
 
-	// culling does not seem to be worth it for static world models
+		// culling does not seem to be worth it for static world models
 	} else if ( entityDef->parms.hModel->IsStaticWorldModel() ) {
 
 		// use the light scissor rectangle
@@ -1118,7 +1118,7 @@ void idInteraction::AddActiveInteraction( void ) {
 
 					// make sure the original surface has its ambient cache created
 					if ( !R_CreateAmbientCache( sint->ambientTris, sint->shader->ReceivesLighting() ) ) {
-					  // skip if we were out of vertex memory
+						// skip if we were out of vertex memory
 						continue;
 					}
 					// reference the original surface's ambient cache
@@ -1126,14 +1126,14 @@ void idInteraction::AddActiveInteraction( void ) {
 					lightTris->ambientCache = sint->ambientTris->ambientCache;
 
 					// Even if we reuse the original surface ambient cache, we nevertheless need to compute a local index cache
-          if ( !R_CreateIndexCache( lightTris ) ) {
-            // skip if we were out of vertex memory
-            continue;
-          }
+					if ( !R_CreateIndexCache( lightTris ) ) {
+						// skip if we were out of vertex memory
+						continue;
+					}
 
-          // touch the ambient surface so it won't get purged
-          vertexCache.Touch( lightTris->ambientCache );
-          vertexCache.Touch( lightTris->indexCache );
+					// touch the ambient surface so it won't get purged
+					vertexCache.Touch( lightTris->ambientCache );
+					vertexCache.Touch( lightTris->indexCache );
 
 					// add the surface to the light list
 
@@ -1144,13 +1144,13 @@ void idInteraction::AddActiveInteraction( void ) {
 					// there are surfaces with NOSELFSHADOW
 					if ( sint->shader->Coverage() == MC_TRANSLUCENT ) {
 						R_LinkLightSurf( &vLight->translucentInteractions, lightTris,
-							vEntity, lightDef, shader, lightScissor, false );
+						                 vEntity, lightDef, shader, lightScissor, false );
 					} else if ( !lightDef->parms.noShadows && sint->shader->TestMaterialFlag(MF_NOSELFSHADOW) ) {
 						R_LinkLightSurf( &vLight->localInteractions, lightTris,
-							vEntity, lightDef, shader, lightScissor, false );
+						                 vEntity, lightDef, shader, lightScissor, false );
 					} else {
 						R_LinkLightSurf( &vLight->globalInteractions, lightTris,
-							vEntity, lightDef, shader, lightScissor, false );
+						                 vEntity, lightDef, shader, lightScissor, false );
 					}
 				}
 			}
@@ -1165,11 +1165,11 @@ void idInteraction::AddActiveInteraction( void ) {
 			// check for view specific shadow suppression (player shadows, etc)
 			if ( !r_skipSuppress.GetBool() ) {
 				if ( entityDef->parms.suppressShadowInViewID &&
-					entityDef->parms.suppressShadowInViewID == tr.viewDef->renderView.viewID ) {
+				        entityDef->parms.suppressShadowInViewID == tr.viewDef->renderView.viewID ) {
 					continue;
 				}
 				if ( entityDef->parms.suppressShadowInLightID &&
-					entityDef->parms.suppressShadowInLightID == lightDef->parms.lightId ) {
+				        entityDef->parms.suppressShadowInLightID == lightDef->parms.lightId ) {
 					continue;
 				}
 			}
@@ -1184,49 +1184,49 @@ void idInteraction::AddActiveInteraction( void ) {
 			}
 
 			// If the tri have shadowVertexes (eg. precomputed shadows)
-      if ( shadowTris->shadowVertexes ) {
-        // Create its shadow cache
-        if (!R_CreatePrivateShadowCache( shadowTris )) {
-          // skip if we were out of vertex memory
-          continue;
-        }
-        // And its index cache
-        if (!R_CreateIndexCache( shadowTris ) ) {
-          // skip if we were out of vertex memory
-          continue;
-        }
-      }
-      // Otherwise this is dynamic shadows
-      else {
-        // Make sure the original surface has its shadow cache created
-        if (!R_CreateVertexProgramShadowCache( sint->ambientTris )) {
-          // skip if we were out of vertex memory
-          continue;
-        }
-        // reference the original surface's shadow cache
-        // GAB NOTE: we are in cache "reuse" mode
-        shadowTris->shadowCache = sint->ambientTris->shadowCache;
+			if ( shadowTris->shadowVertexes ) {
+				// Create its shadow cache
+				if (!R_CreatePrivateShadowCache( shadowTris )) {
+					// skip if we were out of vertex memory
+					continue;
+				}
+				// And its index cache
+				if (!R_CreateIndexCache( shadowTris ) ) {
+					// skip if we were out of vertex memory
+					continue;
+				}
+			}
+			// Otherwise this is dynamic shadows
+			else {
+				// Make sure the original surface has its shadow cache created
+				if (!R_CreateVertexProgramShadowCache( sint->ambientTris )) {
+					// skip if we were out of vertex memory
+					continue;
+				}
+				// reference the original surface's shadow cache
+				// GAB NOTE: we are in cache "reuse" mode
+				shadowTris->shadowCache = sint->ambientTris->shadowCache;
 
-        // Even if we reuse the original surface shadow cache, we nevertheless need to compute a local index cache
-        if ( !R_CreateIndexCache( shadowTris ) ) {
-          // skip if we were out of vertex memory
-          continue;
-        }
-      }
+				// Even if we reuse the original surface shadow cache, we nevertheless need to compute a local index cache
+				if ( !R_CreateIndexCache( shadowTris ) ) {
+					// skip if we were out of vertex memory
+					continue;
+				}
+			}
 
 			// In the end, touch the shadow surface so it won't get purged
 			vertexCache.Touch( shadowTris->shadowCache );
-      vertexCache.Touch( shadowTris->indexCache );
+			vertexCache.Touch( shadowTris->indexCache );
 
 			// see if we can avoid using the shadow volume caps
 			bool inside = R_PotentiallyInsideInfiniteShadow( sint->ambientTris, localViewOrigin, localLightOrigin );
 
 			if ( sint->shader->TestMaterialFlag( MF_NOSELFSHADOW ) ) {
 				R_LinkLightSurf( &vLight->localShadows,
-					shadowTris, vEntity, lightDef, NULL, shadowScissor, inside );
+				                 shadowTris, vEntity, lightDef, NULL, shadowScissor, inside );
 			} else {
 				R_LinkLightSurf( &vLight->globalShadows,
-					shadowTris, vEntity, lightDef, NULL, shadowScissor, inside );
+				                 shadowTris, vEntity, lightDef, NULL, shadowScissor, inside );
 			}
 		}
 	}

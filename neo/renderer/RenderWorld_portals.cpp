@@ -152,7 +152,7 @@ FloodViewThroughArea_r
 ===================
 */
 void idRenderWorldLocal::FloodViewThroughArea_r( const idVec3 origin, int areaNum,
-								 const struct portalStack_s *ps ) {
+        const struct portalStack_s *ps ) {
 	portal_t*		p;
 	float			d;
 	portalArea_t *	area;
@@ -298,7 +298,7 @@ void idRenderWorldLocal::FlowViewThroughPortals( const idVec3 origin, int numPla
 	ps.numPortalPlanes = numPlanes;
 	ps.rect = tr.viewDef->scissor;
 
-	if ( tr.viewDef->areaNum < 0 ){
+	if ( tr.viewDef->areaNum < 0 ) {
 
 		for ( i = 0; i < numPortalAreas; i++ ) {
 			areaScreenRect[i] = tr.viewDef->scissor;
@@ -328,7 +328,7 @@ FloodLightThroughArea_r
 ===================
 */
 void idRenderWorldLocal::FloodLightThroughArea_r( idRenderLightLocal *light, int areaNum,
-								 const struct portalStack_s *ps ) {
+        const struct portalStack_s *ps ) {
 	portal_t*		p;
 	float			d;
 	portalArea_t *	area;
@@ -574,7 +574,7 @@ bool idRenderWorldLocal::CullEntityByPortals( const idRenderEntityLocal *entity,
 	// we have determined all the lights that may effect it,
 	// which optimizes cache usage
 	if ( R_CullLocalBox( entity->referenceBounds, entity->modelMatrix,
-							ps->numPortalPlanes, ps->portalPlanes ) ) {
+	                     ps->numPortalPlanes, ps->portalPlanes ) ) {
 		return true;
 	}
 
@@ -612,11 +612,11 @@ void idRenderWorldLocal::AddAreaEntityRefs( int areaNum, const portalStack_t *ps
 		// check for completely suppressing the model
 		if ( !r_skipSuppress.GetBool() ) {
 			if ( entity->parms.suppressSurfaceInViewID
-					&& entity->parms.suppressSurfaceInViewID == tr.viewDef->renderView.viewID ) {
+			        && entity->parms.suppressSurfaceInViewID == tr.viewDef->renderView.viewID ) {
 				continue;
 			}
 			if ( entity->parms.allowSurfaceInViewID
-					&& entity->parms.allowSurfaceInViewID != tr.viewDef->renderView.viewID ) {
+			        && entity->parms.allowSurfaceInViewID != tr.viewDef->renderView.viewID ) {
 				continue;
 			}
 		}
@@ -740,8 +740,8 @@ void idRenderWorldLocal::AddAreaLightRefs( int areaNum, const portalStack_t *ps 
 		// check for being closed off behind a door
 		// a light that doesn't cast shadows will still light even if it is behind a door
 		if ( r_useLightCulling.GetInteger() >= 3 &&
-				!light->parms.noShadows && light->lightShader->LightCastsShadows()
-					&& light->areaNum != -1 && !tr.viewDef->connectedAreas[ light->areaNum ] ) {
+		        !light->parms.noShadows && light->lightShader->LightCastsShadows()
+		        && light->areaNum != -1 && !tr.viewDef->connectedAreas[ light->areaNum ] ) {
 			continue;
 		}
 
@@ -812,7 +812,7 @@ void idRenderWorldLocal::BuildConnectedAreas( void ) {
 	int		i;
 
 	tr.viewDef->connectedAreas = (bool *)R_FrameAlloc( numPortalAreas
-		* sizeof( tr.viewDef->connectedAreas[0] ) );
+	                             * sizeof( tr.viewDef->connectedAreas[0] ) );
 
 	// if we are outside the world, we can see all areas
 	if ( tr.viewDef->areaNum == -1 ) {

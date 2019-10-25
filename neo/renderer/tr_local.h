@@ -182,7 +182,7 @@ public:
 
 class idRenderLightLocal : public idRenderLight {
 public:
-							idRenderLightLocal();
+	idRenderLightLocal();
 
 	virtual void			FreeRenderLight();
 	virtual void			UpdateRenderLight( const renderLight_t *re, bool forceUpdate = false );
@@ -193,7 +193,7 @@ public:
 	renderLight_t			parms;					// specification
 
 	bool					lightHasMoved;			// the light has changed its position since it was
-													// first added, so the prelight model is not valid
+	// first added, so the prelight model is not valid
 
 	float					modelMatrix[16];		// this is just a rearrangement of parms.axis and parms.origin
 
@@ -201,11 +201,11 @@ public:
 	int						index;					// in world lightdefs
 
 	int						areaNum;				// if not -1, we may be able to cull all the light's
-													// interactions if !viewDef->connectedAreas[areaNum]
+	// interactions if !viewDef->connectedAreas[areaNum]
 
 	int						lastModifiedFrameNum;	// to determine if it is constantly changing,
-													// and should go in the dynamic frame memory, or kept
-													// in the cached memory
+	// and should go in the dynamic frame memory, or kept
+	// in the cached memory
 	bool					archived;				// for demo writing
 
 
@@ -238,7 +238,7 @@ public:
 
 class idRenderEntityLocal : public idRenderEntity {
 public:
-							idRenderEntityLocal();
+	idRenderEntityLocal();
 
 	virtual void			FreeRenderEntity();
 	virtual void			UpdateRenderEntity( const renderEntity_t *re, bool forceUpdate = false );
@@ -258,13 +258,13 @@ public:
 	int						index;					// in world entityDefs
 
 	int						lastModifiedFrameNum;	// to determine if it is constantly changing,
-													// and should go in the dynamic frame memory, or kept
-													// in the cached memory
+	// and should go in the dynamic frame memory, or kept
+	// in the cached memory
 	bool					archived;				// for demo writing
 
 	idRenderModel *			dynamicModel;			// if parms.model->IsDynamicModel(), this is the generated data
 	int						dynamicModelFrameCount;	// continuously animating dynamic models will recreate
-													// dynamicModel if this doesn't == tr.viewCount
+	// dynamicModel if this doesn't == tr.viewCount
 	idRenderModel *			cachedDynamicModel;
 
 	idBounds				referenceBounds;		// the local bounds used to place entityRefs, either from parms or a model
@@ -272,7 +272,7 @@ public:
 	// a viewEntity_t is created whenever a idRenderEntityLocal is considered for inclusion
 	// in a given view, even if it turns out to not be visible
 	int						viewCount;				// if tr.viewCount == viewCount, viewEntity is valid,
-													// but the entity may still be off screen
+	// but the entity may still be off screen
 	struct viewEntity_s *	viewEntity;				// in frame temporary memory
 
 	int						visibleCount;
@@ -396,7 +396,7 @@ typedef struct viewDef_s {
 
 	int					numClipPlanes;			// mirrors will often use a single clip plane
 	idPlane				clipPlanes[MAX_CLIP_PLANES];		// in world space, the positive side
-												// of the plane is the visible side
+	// of the plane is the visible side
 	idScreenRect		viewport;				// in real pixels and proper Y flip
 
 	idScreenRect		scissor;
@@ -477,7 +477,7 @@ typedef enum {
 	RC_SET_BUFFER,
 	RC_COPY_RENDER,
 	RC_SWAP_BUFFERS		// can't just assume swap at end of list because
-						// of forced list submission before syncs
+	// of forced list submission before syncs
 } renderCommand_t;
 
 typedef struct {
@@ -597,9 +597,9 @@ typedef struct {
 	int			faceCulling;
 	int			glStateBits;
 	bool		forceGlState;		// the next GL_State will ignore glStateBits and set everything
-  int     currentTexture;
+	int     currentTexture;
 
-  shaderProgram_s	*currentProgram;
+	shaderProgram_s	*currentProgram;
 } glstate_t;
 
 
@@ -645,7 +645,7 @@ typedef struct {
 
 
 const int MAX_GUI_SURFACES	= 1024;		// default size of the drawSurfs list for guis, will
-										// be automatically expanded as needed
+// be automatically expanded as needed
 
 typedef struct {
 	int		x, y, width, height;	// these are in physical, OpenGL Y-at-bottom pixels
@@ -677,7 +677,7 @@ public:
 	virtual void			SetColor( const idVec4 &rgba );
 	virtual void			SetColor4( float r, float g, float b, float a );
 	virtual void			DrawStretchPic ( const idDrawVert *verts, const glIndex_t *indexes, int vertCount, int indexCount, const idMaterial *material,
-											bool clip = true, float x = 0.0f, float y = 0.0f, float w = 640.0f, float h = 0.0f );
+	        bool clip = true, float x = 0.0f, float y = 0.0f, float w = 640.0f, float h = 0.0f );
 	virtual void			DrawStretchPic ( float x, float y, float w, float h, float s1, float t1, float s2, float t2, const idMaterial *material );
 
 	virtual void			DrawStretchTri ( idVec2 p1, idVec2 p2, idVec2 p3, idVec2 t1, idVec2 t2, idVec2 t3, const idMaterial *material );
@@ -702,8 +702,8 @@ public:
 
 public:
 	// internal functions
-							idRenderSystemLocal( void );
-							~idRenderSystemLocal( void );
+	idRenderSystemLocal( void );
+	~idRenderSystemLocal( void );
 
 	void					Clear( void );
 	void					SetBackEndRenderer();			// sets tr.backEndRenderer based on cvars
@@ -717,7 +717,7 @@ public:
 
 	int						frameCount;		// incremented every frame
 	int						viewCount;		// incremented every view (twice a scene if subviewed)
-											// and every R_MarkFragments call
+	// and every R_MarkFragments call
 
 	int						staticAllocCount;	// running total of bytes allocated
 
@@ -1016,8 +1016,8 @@ void		GLimp_SwapBuffers( void );
 // This will not be called if 'r_drawBuffer GL_FRONT'
 
 void		GLimp_SetGamma( unsigned short red[256],
-							unsigned short green[256],
-							unsigned short blue[256] );
+                            unsigned short green[256],
+                            unsigned short blue[256] );
 // Sets the hardware gamma ramps for gamma and brightness adjustment.
 // These are now taken as 16 bit values, so we can take full advantage
 // of dacs with >8 bits of precision
@@ -1085,10 +1085,10 @@ viewEntity_t *R_SetEntityDefViewEntity( idRenderEntityLocal *def );
 viewLight_t *R_SetLightDefViewLight( idRenderLightLocal *def );
 
 void R_AddDrawSurf( const srfTriangles_t *tri, const viewEntity_t *space, const renderEntity_t *renderEntity,
-					const idMaterial *shader, const idScreenRect &scissor );
+                    const idMaterial *shader, const idScreenRect &scissor );
 
 void R_LinkLightSurf( const drawSurf_t **link, const srfTriangles_t *tri, const viewEntity_t *space,
-				   const idRenderLightLocal *light, const idMaterial *shader, const idScreenRect &scissor, bool viewInsideShadow );
+                      const idRenderLightLocal *light, const idMaterial *shader, const idScreenRect &scissor, bool viewInsideShadow );
 
 bool R_CreateAmbientCache( srfTriangles_t *tri, bool needsLighting );
 bool R_CreateIndexCache( srfTriangles_t *tri );
@@ -1108,7 +1108,7 @@ void R_RegenerateWorld_f( const idCmdArgs &args );
 void R_ModulateLights_f( const idCmdArgs &args );
 
 void R_SetLightProject( idPlane lightProject[4], const idVec3 origin, const idVec3 targetPoint,
-	   const idVec3 rightVector, const idVec3 upVector, const idVec3 start, const idVec3 stop );
+                        const idVec3 rightVector, const idVec3 upVector, const idVec3 start, const idVec3 stop );
 
 void R_AddLightSurfaces( void );
 void R_AddModelSurfaces( void );
@@ -1184,12 +1184,12 @@ typedef struct shaderProgram_s {
 	GLint		specularExponent;
 
 	GLint		modelViewProjectionMatrix;
-  GLint		modelViewMatrix;
+	GLint		modelViewMatrix;
 	GLint		textureMatrix;
 	GLint		localLightOrigin;
 	GLint		localViewOrigin;
 
-  GLint		lightProjection;
+	GLint		lightProjection;
 
 	GLint		bumpMatrixS;
 	GLint		bumpMatrixT;
@@ -1204,7 +1204,7 @@ typedef struct shaderProgram_s {
 	GLint		specularColor;
 	GLint		fogColor;
 
-  GLint		fogMatrix;
+	GLint		fogMatrix;
 
 	GLint		clipPlane;
 
@@ -1217,7 +1217,7 @@ typedef struct shaderProgram_s {
 	GLint		attr_Color;
 
 	GLint		u_fragmentMap[MAX_FRAGMENT_IMAGES];
-  GLint		u_fragmentCubeMap[MAX_FRAGMENT_IMAGES];
+	GLint		u_fragmentCubeMap[MAX_FRAGMENT_IMAGES];
 } shaderProgram_t;
 
 void R_ReloadGLSLPrograms_f(const idCmdArgs &args);
@@ -1246,8 +1246,8 @@ typedef enum {
 } shadowGen_t;
 
 srfTriangles_t *R_CreateShadowVolume( const idRenderEntityLocal *ent,
-									 const srfTriangles_t *tri, const idRenderLightLocal *light,
-									 shadowGen_t optimize, srfCullInfo_t &cullInfo );
+                                      const srfTriangles_t *tri, const idRenderLightLocal *light,
+                                      shadowGen_t optimize, srfCullInfo_t &cullInfo );
 
 /*
 ============================================================
@@ -1262,8 +1262,8 @@ calling this function may modify "facing" based on culling
 ============================================================
 */
 srfTriangles_t *R_CreateVertexProgramTurboShadowVolume(const idRenderEntityLocal *ent,
-                                                       const srfTriangles_t *tri, const idRenderLightLocal *light,
-                                                       srfCullInfo_t &cullInfo);
+        const srfTriangles_t *tri, const idRenderLightLocal *light,
+        srfCullInfo_t &cullInfo);
 
 /*srfTriangles_t *R_CreateTurboShadowVolume( const idRenderEntityLocal *ent,
 									 const srfTriangles_t *tri, const idRenderLightLocal *light,
@@ -1454,8 +1454,8 @@ TR_SHADOWBOUNDS
 =============================================================
 */
 idScreenRect R_CalcIntersectionScissor( const idRenderLightLocal * lightDef,
-										const idRenderEntityLocal * entityDef,
-										const viewDef_t * viewDef );
+                                        const idRenderEntityLocal * entityDef,
+                                        const viewDef_t * viewDef );
 
 //=============================================
 

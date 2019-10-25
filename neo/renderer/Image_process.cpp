@@ -46,7 +46,7 @@ after resampling to the next lower power of two.
 */
 #define	MAX_DIMENSION	4096
 byte *R_ResampleTexture( const byte *in, int inwidth, int inheight,
-							int outwidth, int outheight ) {
+                         int outwidth, int outheight ) {
 	int		i, j;
 	const byte	*inrow, *inrow2;
 	unsigned int	frac, fracstep;
@@ -105,7 +105,7 @@ Normal maps and such should not be bilerped.
 ================
 */
 byte *R_Dropsample( const byte *in, int inwidth, int inheight,
-							int outwidth, int outheight ) {
+                    int outwidth, int outheight ) {
 	int		i, j, k;
 	const byte	*inrow;
 	const byte	*pix1;
@@ -518,17 +518,17 @@ byte *R_MipMap3D( const byte *in, int width, int height, int depth, bool preserv
 		for (i=0 ; i<height ; i++, in_p+=row) {
 			for (j=0 ; j<width ; j++, out_p+=4, in_p+=8) {
 				out_p[0] = (in_p[0] + in_p[4] + in_p[row+0] + in_p[row+4] +
-					in_p[plane+0] + in_p[plane+4] + in_p[plane+row+0] + in_p[plane+row+4]
-					)>>3;
+				            in_p[plane+0] + in_p[plane+4] + in_p[plane+row+0] + in_p[plane+row+4]
+				           )>>3;
 				out_p[1] = (in_p[1] + in_p[5] + in_p[row+1] + in_p[row+5] +
-					in_p[plane+1] + in_p[plane+5] + in_p[plane+row+1] + in_p[plane+row+5]
-					)>>3;
+				            in_p[plane+1] + in_p[plane+5] + in_p[plane+row+1] + in_p[plane+row+5]
+				           )>>3;
 				out_p[2] = (in_p[2] + in_p[6] + in_p[row+2] + in_p[row+6] +
-					in_p[plane+2] + in_p[plane+6] + in_p[plane+row+2] + in_p[plane+row+6]
-					)>>3;
+				            in_p[plane+2] + in_p[plane+6] + in_p[plane+row+2] + in_p[plane+row+6]
+				           )>>3;
 				out_p[3] = (in_p[3] + in_p[7] + in_p[row+3] + in_p[row+7] +
-					in_p[plane+3] + in_p[plane+6] + in_p[plane+row+3] + in_p[plane+row+6]
-					)>>3;
+				            in_p[plane+3] + in_p[plane+6] + in_p[plane+row+3] + in_p[plane+row+6]
+				           )>>3;
 			}
 		}
 	}

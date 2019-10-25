@@ -65,7 +65,7 @@ void RB_DrawElementsWithCounters( const srfTriangles_t *tri ) {
 		static bool bOnce = true;
 		if (bOnce) {
 			common->Warning("Attempting to draw without index caching. This is a bug.\n");
-      bOnce = false;
+			bOnce = false;
 		}
 	}
 }
@@ -83,14 +83,14 @@ void RB_DrawShadowElementsWithCounters( const srfTriangles_t *tri, int numIndexe
 	backEnd.pc.c_shadowVertexes += tri->numVerts;
 
 	if ( tri->indexCache ) {
-	  qglDrawElements( GL_TRIANGLES, numIndexes, GL_INDEX_TYPE, (int *)vertexCache.Position( tri->indexCache ) );
+		qglDrawElements( GL_TRIANGLES, numIndexes, GL_INDEX_TYPE, (int *)vertexCache.Position( tri->indexCache ) );
 		backEnd.pc.c_vboIndexes += numIndexes;
 	} else {
-    static bool bOnce = true;
-    if (bOnce) {
-      common->Warning("Attempting to draw without index caching. This is a bug.\n");
-      bOnce = false;
-    }
+		static bool bOnce = true;
+		if (bOnce) {
+			common->Warning("Attempting to draw without index caching. This is a bug.\n");
+			bOnce = false;
+		}
 	}
 }
 
@@ -100,7 +100,7 @@ RB_GetShaderTextureMatrix
 ======================
 */
 void RB_GetShaderTextureMatrix( const float *shaderRegisters,
-							   const textureStage_t *texture, float matrix[16] ) {
+                                const textureStage_t *texture, float matrix[16] ) {
 	matrix[0] = shaderRegisters[ texture->matrix[0][0] ];
 	matrix[4] = shaderRegisters[ texture->matrix[0][1] ];
 	matrix[8] = 0;
@@ -175,17 +175,17 @@ to actually render the visible surfaces for this view
 */
 void RB_BeginDrawingView (void) {
 
-  // set the window clipping
+	// set the window clipping
 	qglViewport( tr.viewportOffset[0] + backEnd.viewDef->viewport.x1,
-		tr.viewportOffset[1] + backEnd.viewDef->viewport.y1,
-		backEnd.viewDef->viewport.x2 + 1 - backEnd.viewDef->viewport.x1,
-		backEnd.viewDef->viewport.y2 + 1 - backEnd.viewDef->viewport.y1 );
+	             tr.viewportOffset[1] + backEnd.viewDef->viewport.y1,
+	             backEnd.viewDef->viewport.x2 + 1 - backEnd.viewDef->viewport.x1,
+	             backEnd.viewDef->viewport.y2 + 1 - backEnd.viewDef->viewport.y1 );
 
 	// the scissor may be smaller than the viewport for subviews
 	qglScissor( tr.viewportOffset[0] + backEnd.viewDef->viewport.x1 + backEnd.viewDef->scissor.x1,
-		tr.viewportOffset[1] + backEnd.viewDef->viewport.y1 + backEnd.viewDef->scissor.y1,
-		backEnd.viewDef->scissor.x2 + 1 - backEnd.viewDef->scissor.x1,
-		backEnd.viewDef->scissor.y2 + 1 - backEnd.viewDef->scissor.y1 );
+	            tr.viewportOffset[1] + backEnd.viewDef->viewport.y1 + backEnd.viewDef->scissor.y1,
+	            backEnd.viewDef->scissor.x2 + 1 - backEnd.viewDef->scissor.x1,
+	            backEnd.viewDef->scissor.y2 + 1 - backEnd.viewDef->scissor.y1 );
 	backEnd.currentScissor = backEnd.viewDef->scissor;
 
 	// ensures that depth writes are enabled for the depth clear
@@ -205,7 +205,7 @@ void RB_BeginDrawingView (void) {
 	}
 
 	backEnd.glState.faceCulling = -1;		// force face culling to set next time
-  GL_Cull( CT_FRONT_SIDED );
+	GL_Cull( CT_FRONT_SIDED );
 }
 
 /*
@@ -214,52 +214,52 @@ RB_SetDrawInteractions
 ==================
 */
 void RB_SetDrawInteraction( const shaderStage_t *surfaceStage, const float *surfaceRegs,
-                           idImage **image, idVec4 matrix[2], float color[4] ) {
-  *image = surfaceStage->texture.image;
-  if ( surfaceStage->texture.hasMatrix ) {
-    matrix[0][0] = surfaceRegs[surfaceStage->texture.matrix[0][0]];
-    matrix[0][1] = surfaceRegs[surfaceStage->texture.matrix[0][1]];
-    matrix[0][2] = 0;
-    matrix[0][3] = surfaceRegs[surfaceStage->texture.matrix[0][2]];
+                            idImage **image, idVec4 matrix[2], float color[4] ) {
+	*image = surfaceStage->texture.image;
+	if ( surfaceStage->texture.hasMatrix ) {
+		matrix[0][0] = surfaceRegs[surfaceStage->texture.matrix[0][0]];
+		matrix[0][1] = surfaceRegs[surfaceStage->texture.matrix[0][1]];
+		matrix[0][2] = 0;
+		matrix[0][3] = surfaceRegs[surfaceStage->texture.matrix[0][2]];
 
-    matrix[1][0] = surfaceRegs[surfaceStage->texture.matrix[1][0]];
-    matrix[1][1] = surfaceRegs[surfaceStage->texture.matrix[1][1]];
-    matrix[1][2] = 0;
-    matrix[1][3] = surfaceRegs[surfaceStage->texture.matrix[1][2]];
+		matrix[1][0] = surfaceRegs[surfaceStage->texture.matrix[1][0]];
+		matrix[1][1] = surfaceRegs[surfaceStage->texture.matrix[1][1]];
+		matrix[1][2] = 0;
+		matrix[1][3] = surfaceRegs[surfaceStage->texture.matrix[1][2]];
 
-    // we attempt to keep scrolls from generating incredibly large texture values, but
-    // center rotations and center scales can still generate offsets that need to be > 1
-    if ( matrix[0][3] < -40 || matrix[0][3] > 40 ) {
-      matrix[0][3] -= (int)matrix[0][3];
-    }
-    if ( matrix[1][3] < -40 || matrix[1][3] > 40 ) {
-      matrix[1][3] -= (int)matrix[1][3];
-    }
-  } else {
-    matrix[0][0] = 1;
-    matrix[0][1] = 0;
-    matrix[0][2] = 0;
-    matrix[0][3] = 0;
+		// we attempt to keep scrolls from generating incredibly large texture values, but
+		// center rotations and center scales can still generate offsets that need to be > 1
+		if ( matrix[0][3] < -40 || matrix[0][3] > 40 ) {
+			matrix[0][3] -= (int)matrix[0][3];
+		}
+		if ( matrix[1][3] < -40 || matrix[1][3] > 40 ) {
+			matrix[1][3] -= (int)matrix[1][3];
+		}
+	} else {
+		matrix[0][0] = 1;
+		matrix[0][1] = 0;
+		matrix[0][2] = 0;
+		matrix[0][3] = 0;
 
-    matrix[1][0] = 0;
-    matrix[1][1] = 1;
-    matrix[1][2] = 0;
-    matrix[1][3] = 0;
-  }
+		matrix[1][0] = 0;
+		matrix[1][1] = 1;
+		matrix[1][2] = 0;
+		matrix[1][3] = 0;
+	}
 
-  if ( color ) {
-    for ( int i = 0 ; i < 4 ; i++ ) {
-      color[i] = surfaceRegs[surfaceStage->color.registers[i]];
-      // clamp here, so card with greater range don't look different.
-      // we could perform overbrighting like we do for lights, but
-      // it doesn't currently look worth it.
-      if ( color[i] < 0 ) {
-        color[i] = 0;
-      } else if ( color[i] > 1.0 ) {
-        color[i] = 1.0;
-      }
-    }
-  }
+	if ( color ) {
+		for ( int i = 0 ; i < 4 ; i++ ) {
+			color[i] = surfaceRegs[surfaceStage->color.registers[i]];
+			// clamp here, so card with greater range don't look different.
+			// we could perform overbrighting like we do for lights, but
+			// it doesn't currently look worth it.
+			if ( color[i] < 0 ) {
+				color[i] = 0;
+			} else if ( color[i] > 1.0 ) {
+				color[i] = 1.0;
+			}
+		}
+	}
 }
 
 /*
@@ -268,30 +268,30 @@ RB_SubmittInteraction
 =================
 */
 void RB_SubmittInteraction( drawInteraction_t *din, void (*DrawInteraction)(const drawInteraction_t *) ) {
-  if ( !din->bumpImage ) {
-    return;
-  }
+	if ( !din->bumpImage ) {
+		return;
+	}
 
-  if ( !din->diffuseImage || r_skipDiffuse.GetBool() ) {
-    din->diffuseImage = globalImages->blackImage;
-  }
-  if ( !din->specularImage || r_skipSpecular.GetBool() || din->ambientLight ) {
-    din->specularImage = globalImages->blackImage;
-  }
-  if ( !din->bumpImage || r_skipBump.GetBool() ) {
-    din->bumpImage = globalImages->flatNormalMap;
-  }
+	if ( !din->diffuseImage || r_skipDiffuse.GetBool() ) {
+		din->diffuseImage = globalImages->blackImage;
+	}
+	if ( !din->specularImage || r_skipSpecular.GetBool() || din->ambientLight ) {
+		din->specularImage = globalImages->blackImage;
+	}
+	if ( !din->bumpImage || r_skipBump.GetBool() ) {
+		din->bumpImage = globalImages->flatNormalMap;
+	}
 
-  // if we wouldn't draw anything, don't call the Draw function
-  if (
-      ( ( din->diffuseColor[0] > 0 ||
-          din->diffuseColor[1] > 0 ||
-          din->diffuseColor[2] > 0 ) && din->diffuseImage != globalImages->blackImage )
-      || ( ( din->specularColor[0] > 0 ||
-             din->specularColor[1] > 0 ||
-             din->specularColor[2] > 0 ) && din->specularImage != globalImages->blackImage ) ) {
-    DrawInteraction( din );
-  }
+	// if we wouldn't draw anything, don't call the Draw function
+	if (
+	    ( ( din->diffuseColor[0] > 0 ||
+	        din->diffuseColor[1] > 0 ||
+	        din->diffuseColor[2] > 0 ) && din->diffuseImage != globalImages->blackImage )
+	    || ( ( din->specularColor[0] > 0 ||
+	           din->specularColor[1] > 0 ||
+	           din->specularColor[2] > 0 ) && din->specularImage != globalImages->blackImage ) ) {
+		DrawInteraction( din );
+	}
 }
 
 /*
