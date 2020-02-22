@@ -1662,6 +1662,9 @@ void RB_GLSL_T_RenderShaderPasses(const drawSurf_t* surf, const float mvp[16]) {
 	// Skip cases
 	//////////////
 
+#ifdef NO_LIGHT
+	if ( !r_noLight.GetBool() )
+#endif
 	if ( !shader->HasAmbient()) {
 		return;
 	}
@@ -1955,6 +1958,20 @@ void RB_GLSL_T_RenderShaderPasses(const drawSurf_t* surf, const float mvp[16]) {
 				qglPolygonOffset(r_offsetFactor.GetFloat(), r_offsetUnits.GetFloat() * pStage->privatePolygonOffset);
 			}
 
+#ifdef NO_LIGHT
+			if (r_noLight.GetBool() )
+			{
+				if (pStage->drawStateBits!=9000)
+	                GL_State(pStage->drawStateBits);
+	            else
+	            {
+	                if (shader->TestMaterialFlag(MF_POLYGONOFFSET))
+	                    GL_State(GLS_SRCBLEND_ONE|GLS_DSTBLEND_ONE|GLS_DEPTHFUNC_LESS);
+	                else
+	                    GL_State(GLS_SRCBLEND_ONE|GLS_DSTBLEND_ONE|GLS_DEPTHFUNC_LESS);
+	            }
+            }
+#endif
 			/////////////////////
 			// Draw the surface!
 			/////////////////////

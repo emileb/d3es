@@ -2268,6 +2268,29 @@ bool idMaterial::Parse( const char *text, const int textLength ) {
 		}
 	}
 
+#ifdef NO_LIGHT
+	if (r_noLight.GetBool() )
+	{
+		int bumpcnt=0;
+
+		for (i = 0 ; i < numStages ; i++) {
+			if (pd->parseStages[i].lighting == SL_BUMP) {
+				bumpcnt++;
+				break;
+			}
+		}
+
+		if (bumpcnt!=0)
+		for (i = 0 ; i < numStages ; i++) {
+			if (pd->parseStages[i].lighting == SL_DIFFUSE) {
+				pd->parseStages[i].lighting = SL_AMBIENT;
+				pd->parseStages[i].drawStateBits=9000;
+				numAmbientStages++;
+				break;
+			}
+		}
+	}
+#endif
 	// add a tiny offset to the sort orders, so that different materials
 	// that have the same sort value will at least sort consistantly, instead
 	// of flickering back and forth
