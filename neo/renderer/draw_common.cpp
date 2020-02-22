@@ -91,6 +91,9 @@ void RB_RenderView(void) {
 	// fill the depth buffer and clear color buffer to black except on subviews
 	RB_GLSL_FillDepthBuffer( drawSurfs, numDrawSurfs );
 
+#ifdef NO_LIGHT
+	if ( !r_noLight.GetBool() )
+#endif
 	// main light renderer
 	RB_GLSL_DrawInteractions();
 

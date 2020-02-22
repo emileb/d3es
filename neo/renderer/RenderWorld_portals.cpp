@@ -727,6 +727,12 @@ void idRenderWorldLocal::AddAreaLightRefs( int areaNum, const portalStack_t *ps 
 	idRenderLightLocal			*light;
 	viewLight_t			*vLight;
 
+#ifdef NO_LIGHT
+	if (r_noLight.GetBool() )
+	{
+		return;
+	}
+#endif
 	area = &portalAreas[ areaNum ];
 
 	for ( lref = area->lightRefs.areaNext ; lref != &area->lightRefs ; lref = lref->areaNext ) {
