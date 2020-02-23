@@ -28,8 +28,9 @@ LOCAL_CPPFLAGS += -Wno-sign-compare \
 
 LOCAL_CPPFLAGS += -DD3ES -DENGINE_NAME=\"d3es\"
 
+LOCAL_CPPFLAGS += -DNO_LIGHT
 
-# Not avaliable in Android untill N
+# Not avaliable in Android until N
 LOCAL_CFLAGS := -DIOAPI_NO_64
 
 LOCAL_CFLAGS += -fno-unsafe-math-optimizations -fno-strict-aliasing -fno-math-errno -fno-trapping-math -fomit-frame-pointer -fvisibility=hidden -fsigned-char

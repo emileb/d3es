@@ -22,6 +22,8 @@ extern "C"
 static char* consoleCmd = NULL;
 
 extern int SDL_SendKeyboardKey(Uint8 state, SDL_Scancode scancode);
+void Android_OnMouse( int androidButton, int action, float x, float y);
+
 
 int PortableKeyEvent(int state, int code, int unicode){
 
@@ -141,7 +143,7 @@ void PortableAutomapControl(float zoom, float x, float y)
 
 touchscreemode_t PortableGetScreenMode()
 {
-	return TS_MENU;
+	return TS_GAME;
 }
 
 int PortableShowKeyboard(void)
@@ -149,7 +151,23 @@ int PortableShowKeyboard(void)
 	return 0;
 }
 
+#define ACTION_DOWN 0
+#define ACTION_UP 1
+#define ACTION_MOVE 2
+#define ACTION_MOVE_REL 3
+#define ACTION_HOVER_MOVE 7
+#define ACTION_SCROLL 8
+#define BUTTON_PRIMARY 1
+#define BUTTON_SECONDARY 2
+#define BUTTON_TERTIARY 4
+#define BUTTON_BACK 8
+#define BUTTON_FORWARD 16
 
-
+void Android_PumpEvents()
+{
+   Android_OnMouse(0, ACTION_MOVE_REL, -look_yaw_mouse * 1000, -look_pitch_mouse * 400);
+   look_yaw_mouse = 0;
+   look_pitch_mouse = 0;
+}
 
 }
