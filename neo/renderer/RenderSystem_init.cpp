@@ -202,7 +202,7 @@ idCVar r_scaleMenusTo43( "r_scaleMenusTo43", "1", CVAR_RENDERER | CVAR_ARCHIVE |
 
 idCVar r_noLight("r_noLight", "0", CVAR_RENDERER | CVAR_BOOL, "lighting disable hack");
 idCVar r_useETC1("r_useETC1", "0", CVAR_RENDERER | CVAR_BOOL, "use ETC1 compression");
-idCVar r_useETC1Cache("r_useETC1cache", "1", CVAR_RENDERER | CVAR_BOOL, "use ETC1 compression");
+idCVar r_useETC1Cache("r_useETC1cache", "1", CVAR_RENDERER | CVAR_BOOL, "cache ETC1 data");
 
 // define qgl functions
 #define QGLPROC(name, rettype, args) rettype (GL_APIENTRYP q##name) args;

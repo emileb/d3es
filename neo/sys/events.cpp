@@ -693,6 +693,7 @@ void Sys_ClearEvents() {
 	mouse_polls.SetNum(0, false);
 }
 
+extern "C" void Android_PumpEvents();
 /*
 ================
 Sys_GenerateEvents
@@ -705,6 +706,8 @@ void Sys_GenerateEvents() {
 		PushConsoleEvent(s);
 
 	SDL_PumpEvents();
+
+	Android_PumpEvents();
 }
 
 /*
