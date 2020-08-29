@@ -740,6 +740,9 @@ public:
 	volatile renderCrop_t	*pixelsCrop = NULL;
 	volatile byte           *pixels = NULL;
 
+	// For FPS limiting
+	unsigned int lastRenderTime = 0;
+
 	// The backend task
 	void					BackendThreadTask();
 
@@ -979,6 +982,7 @@ extern idCVar r_useETC1;				// ETC1 compression
 extern idCVar r_useETC1Cache;			// use ETC1 cache
 extern idCVar r_useIndexVBO;
 extern idCVar r_useVertexVBO;
+extern idCVar r_maxFps;
 /*
 ====================================================================
 

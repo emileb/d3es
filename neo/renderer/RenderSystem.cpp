@@ -773,6 +773,20 @@ void idRenderSystemLocal::RenderCommands(renderCrop_t *pc, byte *pix)
 		//Wait for last backend rendering to finish
 		BackendThreadWait();
 
+		// Limit maximum FPS
+		int maxFPS = r_maxFps.GetInteger();
+		if(maxFPS)
+		{
+			unsigned int limit = 1000 / maxFPS;
+			unsigned int currentTime = Sys_Milliseconds();
+			int timeTook = currentTime - lastRenderTime;
+			if(timeTook < limit)
+			{
+				usleep((limit - timeTook) * 1000);
+			}
+			lastRenderTime = Sys_Milliseconds();
+		}
+
 		// LOGI("---------------------NEW FRAME---------------------");
 
 		// We have turned off multithreading, we need to shut it down

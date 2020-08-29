@@ -209,6 +209,8 @@ idCVar r_useETC1Cache("r_useETC1cache", "0", CVAR_RENDERER | CVAR_BOOL, "cache E
 idCVar r_useIndexVBO("r_useIndexVBO", "0", CVAR_RENDERER | CVAR_BOOL, "Upload Index data to VBO");
 idCVar r_useVertexVBO("r_useVertexVBO", "1", CVAR_RENDERER | CVAR_BOOL, "Upload Vertex data to VBO");
 
+idCVar r_maxFps( "r_maxFps", "0", CVAR_RENDERER | CVAR_INTEGER, "Limit maximum FPS. 0 = unlimited" );
+
 // define qgl functions
 #define QGLPROC(name, rettype, args) rettype (GL_APIENTRYP q##name) args;
 #include "renderer/qgl_proc.h"
