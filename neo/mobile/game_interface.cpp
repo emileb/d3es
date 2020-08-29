@@ -172,7 +172,7 @@ static int cmdButtons[UB_MAX_BUTTONS];
 
 static void buttonChange(int state, int key )
 {
-	cmdButtons[key] = state;
+	cmdButtons[key] = !!state;
 }
 
 static int getButton(int key)
@@ -275,9 +275,29 @@ void PortableAction(int state, int action)
 			if(state)
 				getButton(UB_DOWN) ? buttonChange(0, UB_DOWN): buttonChange(1, UB_DOWN);
             break;
-		case PORT_ACT_SPRINT: // Toggles
-			if(state)
-				getButton(UB_SPEED) ? buttonChange(0, UB_SPEED): buttonChange(1, UB_SPEED);
+		case PORT_ACT_SPRINT: // Toggles on tap, down/up on long press
+			{
+				unsigned int timeNow = Sys_Milliseconds();
+				static unsigned int timeDown = 0;
+				static int wasActive = 0;
+				if(state)
+				{
+					wasActive = getButton(UB_SPEED);
+					buttonChange(1, UB_SPEED); // Need to active
+					timeDown = timeNow;
+				}
+				else
+				{
+					if((timeNow - timeDown) < 500) // Was a tap
+					{
+						wasActive ? buttonChange(0, UB_SPEED): buttonChange(1, UB_SPEED);
+					}
+					else // Long press, speed off
+					{
+						buttonChange(0, UB_SPEED);
+					}
+				}
+			}
 			break;
         case PORT_ACT_NEXT_WEP:
             if (state)
