@@ -292,44 +292,34 @@ void PortableAction(int state, int action)
                 SetImpuse(UB_IMPULSE13);
             break;
       	case PORT_ACT_WEAP0:
-            if (state)
-                SetImpuse(UB_IMPULSE0);
+      		PortableKeyEvent(state, SDL_SCANCODE_0, 0);
             break;
         case PORT_ACT_WEAP1:
-            if (state)
-                SetImpuse(UB_IMPULSE1);
+      		PortableKeyEvent(state, SDL_SCANCODE_1, 0);
             break;
         case PORT_ACT_WEAP2:
-            if (state)
-                SetImpuse(UB_IMPULSE2);
+      		PortableKeyEvent(state, SDL_SCANCODE_2, 0);
             break;
         case PORT_ACT_WEAP3:
-            if (state)
-                SetImpuse(UB_IMPULSE3);
+      		PortableKeyEvent(state, SDL_SCANCODE_3, 0);
             break;
         case PORT_ACT_WEAP4:
-            if (state)
-                SetImpuse(UB_IMPULSE4);
+      		PortableKeyEvent(state, SDL_SCANCODE_4, 0);
             break;
         case PORT_ACT_WEAP5:
-            if (state)
-                SetImpuse(UB_IMPULSE5);
+      		PortableKeyEvent(state, SDL_SCANCODE_5, 0);
             break;
         case PORT_ACT_WEAP6:
-            if (state)
-                SetImpuse(UB_IMPULSE6);
+      		PortableKeyEvent(state, SDL_SCANCODE_6, 0);
             break;
         case PORT_ACT_WEAP7:
-            if (state)
-                SetImpuse(UB_IMPULSE7);
+      		PortableKeyEvent(state, SDL_SCANCODE_7, 0);
             break;
         case PORT_ACT_WEAP8:
-            if (state)
-                SetImpuse(UB_IMPULSE8);
+      		PortableKeyEvent(state, SDL_SCANCODE_8, 0);
             break;
         case PORT_ACT_WEAP9:
-            if (state)
-                SetImpuse(UB_IMPULSE9);
+      		PortableKeyEvent(state, SDL_SCANCODE_9, 0);
             break;
 		case PORT_ACT_FLASH_LIGHT:
 			if (state)
@@ -349,10 +339,12 @@ void PortableAction(int state, int action)
 				SetImpuse(UB_IMPULSE19);
 			break;
         case PORT_ACT_QUICKLOAD:
-			PortableCommand("loadgame quick");
+			if (state)
+				PortableCommand("loadgame quick");
             break;
         case PORT_ACT_QUICKSAVE:
-			PortableCommand("savegame quick");
+         	if (state)
+				PortableCommand("savegame quick");
             break;
         case PORT_ACT_CONSOLE:
             if (state)
