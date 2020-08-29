@@ -753,6 +753,9 @@ public:
 	static int				EFXAvailable;
 
 	// DG: for CheckDeviceAndRecoverIfNeeded()
+#ifdef __ANDROID__
+	typedef ALCboolean(ALC_APIENTRY * 	LPALCRESETDEVICESOFT )(ALCdevice *device, const ALCint *attribs);
+#endif
 	LPALCRESETDEVICESOFT	alcResetDeviceSOFT; // needs ALC_SOFT_HRTF extension
 	int						resetRetryCount;
 	unsigned int			lastCheckTime;
