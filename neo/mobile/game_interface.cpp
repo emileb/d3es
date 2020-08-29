@@ -272,7 +272,8 @@ void PortableAction(int state, int action)
             buttonChange(state, UB_DOWN);
             break;
         case PORT_ACT_TOGGLE_CROUCH:
-
+			if(state)
+				getButton(UB_DOWN) ? buttonChange(0, UB_DOWN): buttonChange(1, UB_DOWN);
             break;
 		case PORT_ACT_SPRINT: // Toggles
 			if(state)
