@@ -1796,6 +1796,16 @@ Shutdown
 */
 void idImageManager::Shutdown() {
 	images.DeleteContents( true );
+
+	while(imagesAlloc.Num() > 0)
+	{
+		imagesAlloc.RemoveIndex( 0 );
+	}
+
+	while(imagesPurge.Num() > 0)
+	{
+		imagesPurge.RemoveIndex( 0 );
+	}
 }
 
 /*
