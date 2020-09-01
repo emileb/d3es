@@ -420,6 +420,9 @@ void R_InitOpenGL( void ) {
 		common->FatalError( "R_InitOpenGL called while active" );
 	}
 
+
+	((idRenderSystemLocal*)renderSystem)->BackendThreadWait();
+
 	// in case we had an error while doing a tiled rendering
 	tr.viewportOffset[0] = 0;
 	tr.viewportOffset[1] = 0;
@@ -429,33 +432,38 @@ void R_InitOpenGL( void ) {
 	//
 	// initialize OS specific portions of the renderSystem
 	//
-	for ( i = 0 ; i < 2 ; i++ ) {
-		// set the parameters we are trying
-		R_GetModeInfo( &glConfig.vidWidth, &glConfig.vidHeight, r_mode.GetInteger() );
+	static bool GotContext = false;
+	if(!GotContext)
+	{
+		for ( i = 0 ; i < 2 ; i++ ) {
+			// set the parameters we are trying
+			R_GetModeInfo( &glConfig.vidWidth, &glConfig.vidHeight, r_mode.GetInteger() );
 
-		parms.width = glConfig.vidWidth;
-		parms.height = glConfig.vidHeight;
-		parms.fullScreen = r_fullscreen.GetBool();
-		parms.displayHz = r_displayRefresh.GetInteger();
-		parms.multiSamples = r_multiSamples.GetInteger();
-		parms.stereo = false;
+			parms.width = glConfig.vidWidth;
+			parms.height = glConfig.vidHeight;
+			parms.fullScreen = r_fullscreen.GetBool();
+			parms.displayHz = r_displayRefresh.GetInteger();
+			parms.multiSamples = r_multiSamples.GetInteger();
+			parms.stereo = false;
 
-		if ( GLimp_Init( parms ) ) {
-			// it worked
-			break;
+			if ( GLimp_Init( parms ) ) {
+				// it worked
+				break;
+			}
+
+			if ( i == 1 ) {
+				common->FatalError( "Unable to initialize OpenGL" );
+			}
+
+			// if we failed, set everything back to "safe mode"
+			// and try again
+			r_mode.SetInteger( 3 );
+			r_fullscreen.SetInteger( 0 );
+			r_displayRefresh.SetInteger( 0 );
+			r_multiSamples.SetInteger( 0 );
 		}
-
-		if ( i == 1 ) {
-			common->FatalError( "Unable to initialize OpenGL" );
-		}
-
-		// if we failed, set everything back to "safe mode"
-		// and try again
-		r_mode.SetInteger( 3 );
-		r_fullscreen.SetInteger( 0 );
-		r_displayRefresh.SetInteger( 0 );
-		r_multiSamples.SetInteger( 0 );
 	}
+	GotContext = true;
 
 // load qgl function pointers
 #define QGLPROC(name, rettype, args) \
@@ -1661,6 +1669,8 @@ idRenderSystemLocal::Shutdown
 void idRenderSystemLocal::Shutdown( void ) {
 	common->Printf( "idRenderSystem::Shutdown()\n" );
 
+	((idRenderSystemLocal*)renderSystem)->BackendThreadWait();
+
 	R_DoneFreeType( );
 
 	if ( glConfig.isInitialized ) {
@@ -1740,7 +1750,7 @@ idRenderSystemLocal::ShutdownOpenGL
 void idRenderSystemLocal::ShutdownOpenGL( void ) {
 	// free the context and close the window
 	R_ShutdownFrameData();
-	GLimp_Shutdown();
+	//GLimp_Shutdown();
 	glConfig.isInitialized = false;
 }
 
