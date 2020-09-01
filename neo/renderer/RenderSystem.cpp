@@ -762,6 +762,9 @@ void idRenderSystemLocal::BackendThreadShutdown()
 
 		// Clear handle
 		renderThread.threadHandle = 0;
+
+		//Take GL context
+		GLimp_ActivateContext();
 	}
 }
 
@@ -793,7 +796,6 @@ void idRenderSystemLocal::RenderCommands(renderCrop_t *pc, byte *pix)
 		if(multithreadActive && !r_multithread.GetBool())
 		{
 			BackendThreadShutdown();
-			GLimp_ActivateContext();
 			multithreadActive = false;
 		}
 		else if( !multithreadActive && r_multithread.GetBool() )
