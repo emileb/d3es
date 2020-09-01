@@ -420,8 +420,8 @@ void R_InitOpenGL( void ) {
 		common->FatalError( "R_InitOpenGL called while active" );
 	}
 
-
-	((idRenderSystemLocal*)renderSystem)->BackendThreadWait();
+	// Wait for BE to finish and take back the GL context
+	((idRenderSystemLocal*)renderSystem)->BackendThreadShutdown();
 
 	// in case we had an error while doing a tiled rendering
 	tr.viewportOffset[0] = 0;
