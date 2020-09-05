@@ -4396,7 +4396,15 @@ idGameLocal::InGameGuiActive
 */
 bool idGameLocal::InGameGuiActive()
 {
-	if( GetLocalPlayer() && GetLocalPlayer()->GuiActive())
+	if( GetLocalPlayer() && GetLocalPlayer()->GuiActive() )
+		return true;
+	else
+		return false;
+}
+
+bool idGameLocal::InCinematic()
+{
+	if( inCinematic )
 		return true;
 	else
 		return false;
@@ -4404,7 +4412,7 @@ bool idGameLocal::InGameGuiActive()
 
 bool idGameLocal::ObjectiveSystemActive()
 {
-	if( GetLocalPlayer() && GetLocalPlayer()->objectiveSystemOpen)
+	if( GetLocalPlayer() && GetLocalPlayer()->objectiveSystemOpen )
 		return true;
 	else
 		return false;

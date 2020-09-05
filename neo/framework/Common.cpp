@@ -2394,10 +2394,11 @@ void idCommonLocal::Frame( void ) {
 		Sys_GenerateEvents();
 
 		int inMenu = (((idSessionLocal*)session)->guiActive != 0);
-		int inGameGui = ( game && game->InGameGuiActive());
+		int inGameGui = (game && game->InGameGuiActive());
 		int objectiveActive = ( game && game->ObjectiveSystemActive());
+		int inCinematic = (game && game->InCinematic());
 
-		Android_PumpEvents(inMenu?1:0 + inGameGui?2:0 + objectiveActive?4:0);
+		Android_PumpEvents(inMenu?1:0 + inGameGui?2:0 + objectiveActive?4:0 + inCinematic?8:0);
 
 		// write config file if anything changed
 		WriteConfiguration();

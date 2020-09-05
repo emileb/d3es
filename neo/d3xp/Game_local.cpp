@@ -5009,3 +5009,11 @@ bool idGameLocal::ObjectiveSystemActive()
 	else
 		return false;
 }
+
+bool idGameLocal::InCinematic()
+{
+	if( inCinematic )
+		return true;
+	else
+		return false;
+}

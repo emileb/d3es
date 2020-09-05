@@ -338,6 +338,7 @@ public:
 
 	virtual bool			DownloadRequest( const char *IP, const char *guid, const char *paks, char urls[ MAX_STRING_CHARS ] );
 	virtual bool			InGameGuiActive();
+	virtual bool			InCinematic();
 	virtual bool			ObjectiveSystemActive();
 	// ---------------------- Public idGameLocal Interface -------------------
 

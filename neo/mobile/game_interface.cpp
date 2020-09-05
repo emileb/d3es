@@ -31,6 +31,7 @@ static char* consoleCmd = NULL;
 
 static bool inMenu = false;
 static bool inGameGuiActive = false;
+static bool inCinematic = false;
 static bool objectiveSystemActive = false;
 
 extern int SDL_SendKeyboardKey(Uint8 state, SDL_Scancode scancode);
@@ -492,6 +493,8 @@ touchscreemode_t PortableGetScreenMode()
 		return TS_PDA;
 	else if(inMenu)
 		return TS_MENU;
+	else if(inCinematic)
+		return TS_BLANK;
 	else
 		return TS_GAME;
 }
@@ -528,6 +531,7 @@ void Android_PumpEvents(int screen)
 	inMenu = screen & 0x1;
 	inGameGuiActive = !!(screen & 0x2);
 	objectiveSystemActive = !!(screen & 0x4);
+	inCinematic= !!(screen & 0x8);
 
 	// Let the joystick move the mouse
 	if( inMenu || objectiveSystemActive )

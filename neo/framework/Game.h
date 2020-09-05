@@ -199,6 +199,7 @@ public:
 
 	// Added by Emile
 	virtual bool				InGameGuiActive() = 0;
+	virtual bool			    InCinematic() = 0;
 	virtual bool			    ObjectiveSystemActive() = 0;
 };
 
