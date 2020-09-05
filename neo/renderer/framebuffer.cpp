@@ -308,6 +308,7 @@ void R_FrameBufferEnd()
 
 	glDisable(GL_BLEND);
 	glDisable(GL_SCISSOR_TEST);
+	glDisable(GL_DEPTH_TEST);
 
 	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 }
