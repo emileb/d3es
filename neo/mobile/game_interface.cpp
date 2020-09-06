@@ -1,7 +1,5 @@
 
 
-
-
 extern int main_android(int argc, char *argv[]);
 
 #include "renderer/tr_local.h"
@@ -14,6 +12,7 @@ extern "C"
 #include "SDL.h"
 #include "SDL_keycode.h"
 
+#include "SmartToggle.h"
 
 #define ACTION_DOWN 0
 #define ACTION_UP 1
@@ -273,31 +272,17 @@ void PortableAction(int state, int action)
             buttonChange(state, UB_DOWN);
             break;
         case PORT_ACT_TOGGLE_CROUCH:
-			if(state)
-				getButton(UB_DOWN) ? buttonChange(0, UB_DOWN): buttonChange(1, UB_DOWN);
+        	{
+				static SmartToggle_t smartToggle;
+				int activate = SmartToggleAction( &smartToggle, state, getButton(UB_DOWN));
+				buttonChange(activate, UB_DOWN);
+			}
             break;
 		case PORT_ACT_SPRINT: // Toggles on tap, down/up on long press
 			{
-				unsigned int timeNow = Sys_Milliseconds();
-				static unsigned int timeDown = 0;
-				static int wasActive = 0;
-				if(state)
-				{
-					wasActive = getButton(UB_SPEED);
-					buttonChange(1, UB_SPEED); // Need to active
-					timeDown = timeNow;
-				}
-				else
-				{
-					if((timeNow - timeDown) < 500) // Was a tap
-					{
-						wasActive ? buttonChange(0, UB_SPEED): buttonChange(1, UB_SPEED);
-					}
-					else // Long press, speed off
-					{
-						buttonChange(0, UB_SPEED);
-					}
-				}
+				static SmartToggle_t smartToggle;
+				int activate = SmartToggleAction( &smartToggle, state, getButton(UB_SPEED));
+				buttonChange(activate, UB_SPEED);
 			}
 			break;
         case PORT_ACT_NEXT_WEP:
