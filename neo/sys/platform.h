@@ -231,7 +231,7 @@ extern "C"
 {
   	#define GAME_DOOM3  16
     #define GAME_DOOM3_ROE  17
-
+	#define GAME_DOOM3_CDOOM 18
 	extern int gameType;
 	extern char const * nativeLibsPath;
 }

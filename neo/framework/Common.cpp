@@ -2653,6 +2653,8 @@ void idCommonLocal::LoadGameDLL( void ) {
 		strcpy(dll,"/libd3es_game.so");
 	else if(gameType == GAME_DOOM3_ROE)
 		strcpy(dll,"/libd3es_d3xp.so");
+	else if(gameType == GAME_DOOM3_CDOOM)
+		 strcpy(dll,"/libd3es_cdoom.so");
 	else
 		common->Warning( "BAD GAME TYPE" );
 
