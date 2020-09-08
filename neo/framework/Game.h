@@ -201,6 +201,12 @@ public:
 	virtual bool				InGameGuiActive() = 0;
 	virtual bool			    InCinematic() = 0;
 	virtual bool			    ObjectiveSystemActive() = 0;
+
+#ifdef AIM_ASSIST
+	// compute an angle offset to be applied to the given client's aim
+	virtual void				GetAimAssistAngles( idAngles & angles ) = 0;
+	virtual float				GetAimAssistSensitivity() = 0;
+#endif
 };
 
 extern idGame *					game;

@@ -11,7 +11,7 @@ $(TOP_DIR)/Doom/d3es/neo/mobile \
 $(TOP_DIR)/Doom/d3es/neo/game \
 
 
-LOCAL_CPPFLAGS :=  -DGAME_DLL -fPIC
+LOCAL_CPPFLAGS :=  -DGAME_DLL -DAIM_ASSIST -fPIC
 
 LOCAL_CPPFLAGS += -std=gnu++11 -D__DOOM_DLL__ -frtti -fexceptions  -Wno-error=format-security
 
@@ -79,6 +79,7 @@ src_idlib = \
 
 
 src_game = \
+    game/AimAssist.cpp \
 	game/AF.cpp \
 	game/AFEntity.cpp \
 	game/Actor.cpp \
@@ -153,6 +154,6 @@ LOCAL_SRC_FILES = $(src_idlib) $(src_game)
 
 LOCAL_SHARED_LIBRARIES := saffal
 LOCAL_STATIC_LIBRARIES :=
-LOCAL_LDLIBS :=
+LOCAL_LDLIBS := -llog
 
 include $(BUILD_SHARED_LIBRARY)

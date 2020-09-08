@@ -34,6 +34,7 @@ If you have questions concerning this license or the applicable additional terms
 #include "framework/async/AsyncNetwork.h"
 
 #include "framework/UsercmdGen.h"
+#include "framework/Game.h"
 
 /*
 ================
@@ -353,6 +354,10 @@ private:
 	void			JoystickMove( void );
 	void			MouseMove( void );
 	void			CmdButtons( void );
+
+#ifdef AIM_ASSIST
+	void			AimAssist();
+#endif
 
 	void			Mouse( void );
 	void			Keyboard( void );
@@ -811,6 +816,9 @@ void idUsercmdGenLocal::MakeCurrent( void ) {
 		viewangles[YAW] += yaw;
 		viewangles[PITCH] += pitch;
 
+#ifdef AIM_ASSIST
+		AimAssist();
+#endif
 		// check to make sure the angles haven't wrapped
 		if ( viewangles[PITCH] - oldAngles[PITCH] > 90 ) {
 			viewangles[PITCH] = oldAngles[PITCH] + 90;
@@ -834,6 +842,26 @@ void idUsercmdGenLocal::MakeCurrent( void ) {
 
 }
 
+#ifdef AIM_ASSIST
+/*
+================
+idUsercmdGenLocal::AimAssist
+================
+*/
+void idUsercmdGenLocal::AimAssist() {
+	// callback to the game to update the aim assist for the current device
+	idAngles aimAssistAngles( 0.0f, 0.0f, 0.0f );
+
+	idGame * game = common->Game();
+	if ( game != NULL ) {
+		game->GetAimAssistAngles( aimAssistAngles );
+	}
+
+	viewangles[YAW] += aimAssistAngles.yaw;
+	viewangles[PITCH] += aimAssistAngles.pitch;
+	viewangles[ROLL] += aimAssistAngles.roll;
+}
+#endif
 //=====================================================================
 
 

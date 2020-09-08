@@ -18,7 +18,7 @@ $(TOP_DIR)/Clibs_OpenTouch/idtech1 \
 
 
 
-LOCAL_CPPFLAGS := -DUSE_GLES2
+LOCAL_CPPFLAGS := -DUSE_GLES2 -DAIM_ASSIST
 LOCAL_CPPFLAGS += -std=gnu++11 -D__DOOM_DLL__ -frtti -fexceptions  -Wno-error=format-security
 
 
