@@ -162,6 +162,7 @@ public:
 	virtual int					ButtonState( int key );
 	virtual int					KeyState( int key );
 
+	virtual idGame *			Game() { return game; }
 	// DG: hack to allow adding callbacks and exporting additional functions without breaking the game ABI
 	//     see Common.h for longer explanation...
 
