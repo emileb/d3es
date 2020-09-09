@@ -49,6 +49,10 @@ If you have questions concerning this license or the applicable additional terms
 
 #include "sys/posix/posix_public.h"
 
+#ifdef __ANDROID__
+#include "LogWritter.h"
+#endif
+
 #define					COMMAND_HISTORY 64
 
 static int				input_hide = 0;
@@ -891,6 +895,7 @@ void Sys_DebugPrintf( const char *fmt, ... ) {
 	char p[1000];
     idStr::vsnPrintf(p, sizeof(p), fmt, argptr);
 	LOGI("D3: %s",p);
+	LogWritter_Write(p);
 #else
 	vprintf( fmt, argptr );
 #endif
@@ -904,6 +909,7 @@ void Sys_DebugVPrintf( const char *fmt, va_list arg ) {
     char p[1000];
     idStr::vsnPrintf(p, sizeof(p), fmt, arg);
     LOGI("D3: %s",p);
+	LogWritter_Write(p);
 #else
 	vprintf( fmt, arg );
 #endif
@@ -919,6 +925,7 @@ void Sys_Printf(const char *msg, ...) {
 	char p[1000];
     idStr::vsnPrintf(p, sizeof(p), msg, argptr);
 	LOGI("D3: %s",p);
+	LogWritter_Write(p);
 #else
 	vprintf( msg, argptr );
 #endif
@@ -932,6 +939,7 @@ void Sys_VPrintf(const char *msg, va_list arg) {
 	char p[1000];
     idStr::vsnPrintf(p, sizeof(p), msg, arg);
 	LOGI("D3: %s",p);
+	LogWritter_Write(p);
 #else
 	vprintf(msg, arg);
 #endif
