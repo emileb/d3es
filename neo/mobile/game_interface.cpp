@@ -337,8 +337,11 @@ void PortableAction(int state, int action)
 			}
 			break;
 		case PORT_ACT_ZOOM_IN:
-			if(state)
-				getButton(UB_ZOOM) ? buttonChange(0, UB_ZOOM): buttonChange(1, UB_ZOOM);
+			{
+				static SmartToggle_t smartToggle;
+				int activate = SmartToggleAction( &smartToggle, state, getButton(UB_ZOOM));
+				buttonChange(activate, UB_ZOOM);
+			}
 			break;
 		case PORT_ACT_HELPCOMP:
 			if (state)
