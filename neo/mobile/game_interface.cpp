@@ -330,9 +330,9 @@ void PortableAction(int state, int action)
 		case PORT_ACT_FLASH_LIGHT:
 			if (state)
 			{
-				if(gameType == GAME_DOOM3)
+				if(gameType == GAME_TYPE_DOOM3)
 					SetImpuse(UB_IMPULSE11);
-				else if(gameType == GAME_DOOM3_ROE)
+				else if(gameType == GAME_TYPE_DOOM3_ROE)
 					SetImpuse(UB_IMPULSE0);
 			}
 			break;
@@ -356,8 +356,7 @@ void PortableAction(int state, int action)
 				PortableCommand("savegame quick");
             break;
         case PORT_ACT_CONSOLE:
-            if (state)
-                PortableCommand("toggleconsole");
+			PortableKeyEvent(state, SDL_SCANCODE_GRAVE, 0);
             break;
         }
 	}
@@ -397,7 +396,7 @@ void PortableMove(float fwd, float strafe)
 //======================================================================
 
 //Look up and down
-float look_pitch_mouse,look_pitch_abs,look_pitch_joy;
+static float look_pitch_mouse, look_pitch_abs, look_pitch_joy;
 void PortableLookPitch(int mode, float pitch)
 {
 	switch(mode)
@@ -415,7 +414,7 @@ void PortableLookPitch(int mode, float pitch)
 }
 
 //left right
-float look_yaw_mouse,look_yaw_joy;
+static float look_yaw_mouse, look_yaw_joy;
 void PortableLookYaw(int mode, float yaw)
 {
 	switch(mode)
@@ -428,7 +427,6 @@ void PortableLookYaw(int mode, float yaw)
 		break;
 	}
 }
-
 
 
 
@@ -533,16 +531,6 @@ extern "C" int blockGamepad( void );
 void Android_GetMovement(int frameTime, int *forward, int *strafe, float *yaw, float *pitch)
 {
 	//LOGI("Android_GetMovement frameTime = %d", frameTime);
-/*
-	if(abs(forwardmove_android) >= 1)
-	{
-		buttonChange(1, UB_SPEED);
-	}
-	else
-	{
-		buttonChange(0, UB_SPEED);
-	}
-*/
 
     int blockMove = blockGamepad() & ANALOGUE_AXIS_FWD;
     int blockLook = blockGamepad() & ANALOGUE_AXIS_PITCH;

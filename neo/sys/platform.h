@@ -229,9 +229,11 @@ typedef int						qhandle_t;
 #ifdef __ANDROID__
 extern "C"
 {
-  	#define GAME_DOOM3  16
-    #define GAME_DOOM3_ROE  17
-	#define GAME_DOOM3_CDOOM 18
+  	#define GAME_TYPE_DOOM3  16
+    #define GAME_TYPE_DOOM3_ROE  17
+	#define GAME_TYPE_DOOM3_CDOOM 18
+	#define GAME_TYPE_DOOM3_LE 19
+
 	extern int gameType;
 	extern char const * nativeLibsPath;
 }
