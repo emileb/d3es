@@ -234,7 +234,7 @@ extern "C"
 	#define GAME_TYPE_DOOM3_CDOOM 18
 	#define GAME_TYPE_DOOM3_LE 19
 
-	extern int gameType;
+	extern int gameMod; // This is used in the game
 	extern char const * nativeLibsPath;
 }
 #endif

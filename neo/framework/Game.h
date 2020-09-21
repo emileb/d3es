@@ -80,7 +80,7 @@ public:
 	virtual						~idGame() {}
 
 	// Initialize the game for the first time.
-	virtual void				Init( void ) = 0;
+	virtual void				Init( int gameMod ) = 0;
 
 	// Shut down the entire game.
 	virtual void				Shutdown( void ) = 0;

@@ -293,9 +293,13 @@ main
 ===============
 */
 #ifdef __ANDROID__
-int main_android(int argc, char **argv) {
+int main_android(int argc, char **argv, int gameMod_) {
 #else
 int main(int argc, char **argv) {
+#endif
+
+#ifdef __ANDROID__
+	gameMod = gameMod_;
 #endif
 	// fallback path to the binary for systems without /proc
 	// while not 100% reliable, its good enough
@@ -327,3 +331,6 @@ int main(int argc, char **argv) {
 	}
 	return 0;
 }
+
+
+int gameMod;

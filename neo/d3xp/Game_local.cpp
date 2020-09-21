@@ -307,7 +307,7 @@ idGameLocal::Init
   initialize the game object, only happens once at startup, not each level load
 ============
 */
-void idGameLocal::Init( void ) {
+void idGameLocal::Init( int gameMod_ ) {
 	const idDict *dict;
 	idAAS *aas;
 
@@ -328,9 +328,12 @@ void idGameLocal::Init( void ) {
 
 #endif
 
+	gameMod = gameMod_;
+
 	Printf( "----- Initializing Game -----\n" );
 	Printf( "gamename: %s\n", GAME_VERSION );
 	Printf( "gamedate: %s\n", ID__DATE__ );
+	Printf( "gameMod: %d\n", gameMod );
 
 	// register game specific decl types
 	declManager->RegisterDeclType( "model",				DECL_MODELDEF,		idDeclAllocator<idDeclModelDef> );

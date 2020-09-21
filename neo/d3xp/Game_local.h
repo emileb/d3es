@@ -208,6 +208,12 @@ public:
 
 	idEntityPtr<type> &		operator=( type *ent );
 
+	//added for LM
+	idEntityPtr &			operator=( const idEntityPtr & ep );
+	bool					operator==( const idEntityPtr & ep ) { return spawnId == ep.spawnId; }
+	type *					operator->() const { return GetEntity(); }
+							operator type * () const { return GetEntity(); }
+
 	// synchronize entity pointers over the network
 	int						GetSpawnId( void ) const { return spawnId; }
 	bool					SetSpawnId( int id );
@@ -358,7 +364,7 @@ public:
 
 							idGameLocal();
 
-	virtual void			Init( void );
+	virtual void			Init( int gameMod );
 	virtual void			Shutdown( void );
 	virtual void			SetLocalClient( int clientNum );
 	virtual void			ThrottleUserInfo( void );
@@ -661,6 +667,13 @@ ID_INLINE idEntityPtr<type> &idEntityPtr<type>::operator=( type *ent ) {
 	} else {
 		spawnId = ( gameLocal.spawnIds[ent->entityNumber] << GENTITYNUM_BITS ) | ent->entityNumber;
 	}
+	return *this;
+}
+
+//added for LM
+template< class type >
+ID_INLINE idEntityPtr< type > &idEntityPtr<type>::operator=( const idEntityPtr & ep ) {
+	spawnId = ep.spawnId;
 	return *this;
 }
 

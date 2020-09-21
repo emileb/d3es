@@ -1,6 +1,6 @@
 
 
-extern int main_android(int argc, char *argv[]);
+extern int main_android(int argc, char *argv[], int gameMod);
 
 #include "renderer/tr_local.h"
 #include "sys/platform.h"
@@ -25,6 +25,8 @@ extern "C"
 #define BUTTON_TERTIARY 4
 #define BUTTON_BACK 8
 #define BUTTON_FORWARD 16
+
+extern int gameType;
 
 static char* consoleCmd = NULL;
 
@@ -330,9 +332,9 @@ void PortableAction(int state, int action)
 		case PORT_ACT_FLASH_LIGHT:
 			if (state)
 			{
-				if(gameType == GAME_TYPE_DOOM3)
+				if(gameMod == GAME_TYPE_DOOM3)
 					SetImpuse(UB_IMPULSE11);
-				else if(gameType == GAME_TYPE_DOOM3_ROE)
+				else if(gameMod == GAME_TYPE_DOOM3_ROE || gameMod == GAME_TYPE_DOOM3_LE)
 					SetImpuse(UB_IMPULSE0);
 			}
 			break;
@@ -433,7 +435,7 @@ void PortableLookYaw(int mode, float yaw)
 void PortableInit(int argc,const char ** argv){
 	memset(cmdButtons,0,sizeof(cmdButtons));
 
-	main_android(argc,(char **)argv);
+	main_android(argc,(char **)argv, gameType);
 }
 
 static float mouseAccumX = 0;

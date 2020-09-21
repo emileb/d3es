@@ -1912,6 +1912,14 @@ void idPlayer::Spawn( void ) {
 	inventory.selPDA = 0;
 
 	if ( !gameLocal.isMultiplayer ) {
+
+		if( gameMod == GAME_TYPE_DOOM3_LE )
+		{
+        	int startingHealth = gameLocal.world->spawnArgs.GetInt( "startingHealth", "0");
+        	if ( (startingHealth > 0) && (health > startingHealth) ) {
+            	health = startingHealth;
+        	}
+		}
 		if ( g_skill.GetInteger() < 2 ) {
 			if ( health < 25 ) {
 				health = 25;

@@ -301,7 +301,7 @@ public:
 
 							idGameLocal();
 
-	virtual void			Init( void );
+	virtual void			Init( int gameMod );
 	virtual void			Shutdown( void );
 	virtual void			SetLocalClient( int clientNum );
 	virtual void			ThrottleUserInfo( void );

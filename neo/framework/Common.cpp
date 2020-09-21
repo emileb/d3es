@@ -2648,16 +2648,14 @@ void idCommonLocal::LoadGameDLL( void ) {
 	gameDLL = 0;
 
 #ifdef __ANDROID__
-	common->Warning( "nativeLibsPath = %s, gameType = %d", nativeLibsPath, gameType );
+	common->Warning( "nativeLibsPath = %s, gameMod = %d", nativeLibsPath, gameMod );
 
-	if(gameType == GAME_TYPE_DOOM3)
+	if(gameMod == GAME_TYPE_DOOM3)
 		strcpy(dll,"/libd3es_game.so");
-	else if(gameType == GAME_TYPE_DOOM3_ROE)
+	else if(gameMod == GAME_TYPE_DOOM3_ROE || gameMod == GAME_TYPE_DOOM3_LE)
 		strcpy(dll,"/libd3es_d3xp.so");
-	else if(gameType == GAME_TYPE_DOOM3_CDOOM)
+	else if(gameMod == GAME_TYPE_DOOM3_CDOOM)
 		 strcpy(dll,"/libd3es_cdoom.so");
-	else if(gameType == GAME_TYPE_DOOM3_LE)
-		 strcpy(dll,"/libd3es_le.so");
 	else
 		common->Warning( "BAD GAME TYPE" );
 
@@ -2722,7 +2720,7 @@ void idCommonLocal::LoadGameDLL( void ) {
 
 	// initialize the game object
 	if ( game != NULL ) {
-		game->Init();
+		game->Init( gameMod );
 	}
 }
 
