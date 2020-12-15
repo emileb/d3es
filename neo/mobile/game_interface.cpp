@@ -11,6 +11,7 @@ extern "C"
 #include "game_interface.h"
 #include "SDL.h"
 #include "SDL_keycode.h"
+#include "SDL_beloko_extra.h"
 
 #include "SmartToggle.h"
 
@@ -36,7 +37,7 @@ static bool inCinematic = false;
 static bool objectiveSystemActive = false;
 
 extern int SDL_SendKeyboardKey(Uint8 state, SDL_Scancode scancode);
-void Android_OnMouse( int androidButton, int action, float x, float y);
+//void Android_OnMouse( int androidButton, int action, float x, float y);
 
 
 int PortableKeyEvent(int state, int code, int unicode){
@@ -210,9 +211,9 @@ void PortableAction(int state, int action)
 		{
 			if( state )
 			{
-				Android_OnMouse(BUTTON_PRIMARY, ACTION_DOWN, 0, 0);
+				SDL_InjectMouse(BUTTON_PRIMARY, ACTION_DOWN, 0, 0, SDL_TRUE);
 				usleep(200 * 1000); // Need this for the PDA to work, needs a frame to react..
-				Android_OnMouse(BUTTON_PRIMARY, ACTION_UP,0, 0);
+				SDL_InjectMouse(0, ACTION_UP, 0, 0, SDL_TRUE);
 			}
 		}
 
@@ -224,9 +225,9 @@ void PortableAction(int state, int action)
 		{
 			if( state )
 			{
-				Android_OnMouse(BUTTON_PRIMARY, ACTION_DOWN, 0, 0);
+				SDL_InjectMouse(BUTTON_PRIMARY, ACTION_DOWN, 0, 0, SDL_TRUE);
 				usleep(200 * 1000); // Need this for the PDA to work, needs a frame to react..
-				Android_OnMouse(BUTTON_PRIMARY, ACTION_UP,0, 0);
+				SDL_InjectMouse(0, ACTION_UP, 0, 0, SDL_TRUE);
 			}
 		}
 			// Allow pda button to exit the PDA again
@@ -448,7 +449,7 @@ void PortableMouse(float dx,float dy)
     mouseAccumY += -dy * (float)glConfig.vidHeight * 2.f;
     if(abs(mouseAccumX) > MIN_MOUSE_MOVE || abs(mouseAccumY) > MIN_MOUSE_MOVE)
     {
-    	Android_OnMouse(0, ACTION_MOVE_REL, mouseAccumX, mouseAccumY);
+    	SDL_InjectMouse(0, ACTION_MOVE, mouseAccumX, mouseAccumY, SDL_TRUE);
     	if(abs(mouseAccumX) > MIN_MOUSE_MOVE)
     		mouseAccumX = 0;
 
@@ -461,12 +462,10 @@ void PortableMouseButton(int state, int button, float dx,float dy)
 {
 	LOGI("PortableMouseButton %d", state);
 
-	//PortableAction(state, PORT_ACT_ATTACK);
-	//return;
     if( state )
-        Android_OnMouse(BUTTON_PRIMARY, ACTION_DOWN, 0, 0);
+       	SDL_InjectMouse(BUTTON_PRIMARY, ACTION_DOWN, 0, 0, SDL_TRUE);
     else
-        Android_OnMouse(BUTTON_PRIMARY, ACTION_UP,0, 0);
+        SDL_InjectMouse(0, ACTION_UP, 0, 0, SDL_TRUE);
 }
 
 
@@ -524,7 +523,7 @@ void Android_PumpEvents(int screen)
 	// Let the joystick move the mouse
 	if( inMenu || objectiveSystemActive )
 	{
-	   	Android_OnMouse(0, ACTION_MOVE_REL, -look_yaw_joy * 20, look_pitch_joy * 20);
+		SDL_InjectMouse(0, ACTION_MOVE, -look_yaw_joy * 20, look_pitch_joy * 20, SDL_TRUE);
 	}
 }
 
