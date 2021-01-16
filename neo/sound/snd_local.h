@@ -678,7 +678,9 @@ public:
 	virtual void			PrintMemInfo( MemInfo_t *mi );
 
 	virtual int				IsEFXAvailable( void );
-
+#ifdef __ANDROID__
+	void					Pause( bool pause );
+#endif
 	//-------------------------
 
 	int						GetCurrent44kHzTime( void ) const;

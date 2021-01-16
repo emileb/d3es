@@ -37,6 +37,10 @@ If you have questions concerning this license or the applicable additional terms
 #include "renderer/RenderSystem.h"
 #include "renderer/tr_local.h"
 
+#ifdef __ANDROID__
+#include "sound/snd_local.h"
+#endif
+
 #include "sys/sys_public.h"
 
 #if !SDL_VERSION_ATLEAST(2, 0, 0)
@@ -380,7 +384,9 @@ void Sys_GrabMouseCursor(bool grabIt) {
 
 	GLimp_GrabInput(flags);
 }
-
+#ifdef __ANDROID__
+extern idSoundSystemLocal	soundSystemLocal;
+#endif
 /*
 ================
 Sys_GetEvent
@@ -448,11 +454,16 @@ sysEvent_t Sys_GetEvent() {
 
 					// start playing the game sound world again (when coming from editor)
 					session->SetPlayingSoundWorld();
-
+#ifdef __ANDROID__
+					soundSystemLocal.Pause( false );
+#endif
 					break;
 				case SDL_WINDOWEVENT_FOCUS_LOST:
 					GLimp_GrabInput(0);
 					GLimp_WindowActive(false);
+#ifdef __ANDROID__
+					soundSystemLocal.Pause( true );
+#endif
 					break;
 			}
 
