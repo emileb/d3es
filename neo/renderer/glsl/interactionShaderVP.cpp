@@ -78,11 +78,9 @@ void main(void)
   var_L = L * M;
   var_H = H * M;
 
-  if (u_colorModulate == 0.0) {
-    var_Color = vec4(u_colorAdd);
-  } else {
-    var_Color = (attr_Color * u_colorModulate) + vec4(u_colorAdd);
-  }
+
+  var_Color = (attr_Color * u_colorModulate) + vec4(u_colorAdd);
+
   
   gl_Position = u_modelViewProjectionMatrix * attr_Vertex;
 }
