@@ -152,7 +152,7 @@ FloodViewThroughArea_r
 ===================
 */
 void idRenderWorldLocal::FloodViewThroughArea_r( const idVec3 origin, int areaNum,
-								 const struct portalStack_s *ps ) {
+        const struct portalStack_s *ps ) {
 	portal_t*		p;
 	float			d;
 	portalArea_t *	area;
@@ -298,7 +298,7 @@ void idRenderWorldLocal::FlowViewThroughPortals( const idVec3 origin, int numPla
 	ps.numPortalPlanes = numPlanes;
 	ps.rect = tr.viewDef->scissor;
 
-	if ( tr.viewDef->areaNum < 0 ){
+	if ( tr.viewDef->areaNum < 0 ) {
 
 		for ( i = 0; i < numPortalAreas; i++ ) {
 			areaScreenRect[i] = tr.viewDef->scissor;
@@ -328,7 +328,7 @@ FloodLightThroughArea_r
 ===================
 */
 void idRenderWorldLocal::FloodLightThroughArea_r( idRenderLightLocal *light, int areaNum,
-								 const struct portalStack_s *ps ) {
+        const struct portalStack_s *ps ) {
 	portal_t*		p;
 	float			d;
 	portalArea_t *	area;
@@ -574,7 +574,7 @@ bool idRenderWorldLocal::CullEntityByPortals( const idRenderEntityLocal *entity,
 	// we have determined all the lights that may effect it,
 	// which optimizes cache usage
 	if ( R_CullLocalBox( entity->referenceBounds, entity->modelMatrix,
-							ps->numPortalPlanes, ps->portalPlanes ) ) {
+	                     ps->numPortalPlanes, ps->portalPlanes ) ) {
 		return true;
 	}
 
@@ -612,11 +612,11 @@ void idRenderWorldLocal::AddAreaEntityRefs( int areaNum, const portalStack_t *ps
 		// check for completely suppressing the model
 		if ( !r_skipSuppress.GetBool() ) {
 			if ( entity->parms.suppressSurfaceInViewID
-					&& entity->parms.suppressSurfaceInViewID == tr.viewDef->renderView.viewID ) {
+			        && entity->parms.suppressSurfaceInViewID == tr.viewDef->renderView.viewID ) {
 				continue;
 			}
 			if ( entity->parms.allowSurfaceInViewID
-					&& entity->parms.allowSurfaceInViewID != tr.viewDef->renderView.viewID ) {
+			        && entity->parms.allowSurfaceInViewID != tr.viewDef->renderView.viewID ) {
 				continue;
 			}
 		}
@@ -727,6 +727,12 @@ void idRenderWorldLocal::AddAreaLightRefs( int areaNum, const portalStack_t *ps 
 	idRenderLightLocal			*light;
 	viewLight_t			*vLight;
 
+#ifdef NO_LIGHT
+	if (r_noLight.GetBool() )
+	{
+		return;
+	}
+#endif
 	area = &portalAreas[ areaNum ];
 
 	for ( lref = area->lightRefs.areaNext ; lref != &area->lightRefs ; lref = lref->areaNext ) {
@@ -740,8 +746,8 @@ void idRenderWorldLocal::AddAreaLightRefs( int areaNum, const portalStack_t *ps 
 		// check for being closed off behind a door
 		// a light that doesn't cast shadows will still light even if it is behind a door
 		if ( r_useLightCulling.GetInteger() >= 3 &&
-				!light->parms.noShadows && light->lightShader->LightCastsShadows()
-					&& light->areaNum != -1 && !tr.viewDef->connectedAreas[ light->areaNum ] ) {
+		        !light->parms.noShadows && light->lightShader->LightCastsShadows()
+		        && light->areaNum != -1 && !tr.viewDef->connectedAreas[ light->areaNum ] ) {
 			continue;
 		}
 
@@ -812,7 +818,7 @@ void idRenderWorldLocal::BuildConnectedAreas( void ) {
 	int		i;
 
 	tr.viewDef->connectedAreas = (bool *)R_FrameAlloc( numPortalAreas
-		* sizeof( tr.viewDef->connectedAreas[0] ) );
+	                             * sizeof( tr.viewDef->connectedAreas[0] ) );
 
 	// if we are outside the world, we can see all areas
 	if ( tr.viewDef->areaNum == -1 ) {
@@ -1031,44 +1037,3 @@ int		idRenderWorldLocal::GetPortalState( qhandle_t portal ) {
 	return doublePortals[portal-1].blockingBits;
 }
 
-/*
-=====================
-idRenderWorldLocal::ShowPortals
-
-Debugging tool, won't work correctly with SMP or when mirrors are present
-=====================
-*/
-void idRenderWorldLocal::ShowPortals() {
-	int			i, j;
-	portalArea_t	*area;
-	portal_t	*p;
-	idWinding	*w;
-
-	// flood out through portals, setting area viewCount
-	for ( i = 0 ; i < numPortalAreas ; i++ ) {
-		area = &portalAreas[i];
-		if ( area->viewCount != tr.viewCount ) {
-			continue;
-		}
-		for ( p = area->portals ; p ; p = p->next ) {
-			w = p->w;
-			if ( !w ) {
-				continue;
-			}
-
-			if ( portalAreas[ p->intoArea ].viewCount != tr.viewCount ) {
-				// red = can't see
-				qglColor3f( 1, 0, 0 );
-			} else {
-				// green = see through
-				qglColor3f( 0, 1, 0 );
-			}
-
-			qglBegin( GL_LINE_LOOP );
-			for ( j = 0 ; j < w->GetNumPoints() ; j++ ) {
-				qglVertex3fv( (*w)[j].ToFloatPtr() );
-			}
-			qglEnd();
-		}
-	}
-}

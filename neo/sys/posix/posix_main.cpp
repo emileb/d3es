@@ -49,6 +49,10 @@ If you have questions concerning this license or the applicable additional terms
 
 #include "sys/posix/posix_public.h"
 
+#ifdef __ANDROID__
+#include "LogWritter.h"
+#endif
+
 #define					COMMAND_HISTORY 64
 
 static int				input_hide = 0;
@@ -268,6 +272,9 @@ TODO: OSX - use the native API instead? NSModule
 =================
 */
 uintptr_t Sys_DLL_Load( const char *path ) {
+#ifdef __ANDROID__
+	Sys_Printf( "Sys_DLL_Load %s\n", path );
+#endif
 	void* ret = dlopen( path, RTLD_NOW );
 	if (ret == NULL) {
 		// dlopen() failed - this might be ok (we tried one possible path and the next will work)
@@ -896,20 +903,38 @@ char *Sys_ConsoleInput( void ) {
 low level output
 ===============
 */
+#ifdef __ANDROID__
+#include <android/log.h>
+#define LOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO,"Utils NDK", __VA_ARGS__))
+#endif
 
 void Sys_DebugPrintf( const char *fmt, ... ) {
 	va_list argptr;
 
 	tty_Hide();
 	va_start( argptr, fmt );
+#ifdef __ANDROID__
+	char p[1000];
+    idStr::vsnPrintf(p, sizeof(p), fmt, argptr);
+	LOGI("D3: %s",p);
+	LogWritter_Write(p);
+#else
 	vprintf( fmt, argptr );
+#endif
 	va_end( argptr );
 	tty_Show();
 }
 
 void Sys_DebugVPrintf( const char *fmt, va_list arg ) {
 	tty_Hide();
+#ifdef __ANDROID__
+    char p[1000];
+    idStr::vsnPrintf(p, sizeof(p), fmt, arg);
+    LOGI("D3: %s",p);
+	LogWritter_Write(p);
+#else
 	vprintf( fmt, arg );
+#endif
 	tty_Show();
 }
 
@@ -918,14 +943,28 @@ void Sys_Printf(const char *msg, ...) {
 
 	tty_Hide();
 	va_start( argptr, msg );
+#ifdef __ANDROID__
+	char p[1000];
+    idStr::vsnPrintf(p, sizeof(p), msg, argptr);
+	LOGI("D3: %s",p);
+	LogWritter_Write(p);
+#else
 	vprintf( msg, argptr );
+#endif
 	va_end( argptr );
 	tty_Show();
 }
 
 void Sys_VPrintf(const char *msg, va_list arg) {
 	tty_Hide();
+#ifdef __ANDROID__
+	char p[1000];
+    idStr::vsnPrintf(p, sizeof(p), msg, arg);
+	LOGI("D3: %s",p);
+	LogWritter_Write(p);
+#else
 	vprintf(msg, arg);
+#endif
 	tty_Show();
 }
 

@@ -176,8 +176,8 @@ void R_OrderIndexes( int numIndexes, glIndex_t *indexes ) {
 
 					// if this triangle also uses v2, grab it
 					if ( oldIndexes[tri*3+0] == v2
-						|| oldIndexes[tri*3+1] == v2
-						|| oldIndexes[tri*3+2] == v2 ) {
+					        || oldIndexes[tri*3+1] == v2
+					        || oldIndexes[tri*3+2] == v2 ) {
 						break;
 					}
 				}

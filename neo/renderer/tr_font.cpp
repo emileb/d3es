@@ -102,8 +102,7 @@ FT_Bitmap *R_RenderGlyph(FT_GlyphSlot glyph, glyphInfo_t* glyphOut) {
 		glyphOut->bottom = bottom;
 
 		return bit2;
-	}
-	else {
+	} else {
 		common->Printf( "Non-outline fonts are not supported\n" );
 	}
 	return NULL;
@@ -142,14 +141,14 @@ glyphInfo_t *RE_ConstructGlyphInfo( unsigned char *imageOut, int *xOut, int *yOu
 			return &glyph;
 		}
 
-/*
-		// need to convert to power of 2 sizes so we do not get
-		// any scaling from the gl upload
-		for (scaled_width = 1 ; scaled_width < glyph.pitch ; scaled_width<<=1)
-			;
-		for (scaled_height = 1 ; scaled_height < glyph.height ; scaled_height<<=1)
-			;
-*/
+		/*
+				// need to convert to power of 2 sizes so we do not get
+				// any scaling from the gl upload
+				for (scaled_width = 1 ; scaled_width < glyph.pitch ; scaled_width<<=1)
+					;
+				for (scaled_height = 1 ; scaled_height < glyph.height ; scaled_height<<=1)
+					;
+		*/
 
 		scaled_width = glyph.pitch;
 		scaled_height = glyph.height;
@@ -163,8 +162,8 @@ glyphInfo_t *RE_ConstructGlyphInfo( unsigned char *imageOut, int *xOut, int *yOu
 				Mem_Free(bitmap);
 				return &glyph;
 			} else {
-			*xOut = 0;
-			*yOut += *maxHeight + 1;
+				*xOut = 0;
+				*yOut += *maxHeight + 1;
 			}
 		} else if (*yOut + *maxHeight + 1 >= 255) {
 			*yOut = -1;
@@ -246,16 +245,24 @@ int readInt( void ) {
 	return i;
 }
 
+typedef union {
+	byte	fred[4];
+	float	ffred;
+} poor;
+
 /*
 ============
 readFloat
 ============
 */
 float readFloat( void ) {
-	float f;
-	memcpy(&f, &fdFile[fdOffset], sizeof(float));
-	fdOffset += sizeof(float);
-	return LittleFloat(f);
+	poor	me;
+	me.fred[0] = fdFile[fdOffset+0];
+	me.fred[1] = fdFile[fdOffset+1];
+	me.fred[2] = fdFile[fdOffset+2];
+	me.fred[3] = fdFile[fdOffset+3];
+	fdOffset += 4;
+	return me.ffred;
 }
 
 /*
@@ -282,22 +289,21 @@ bool idRenderSystemLocal::RegisterFont( const char *fontName, fontInfoEx_t &font
 	char name[1024];
 
 	int pointSize = 12;
-/*
-	if ( registeredFontCount >= MAX_FONTS ) {
-		common->Warning( "RegisterFont: Too many fonts registered already." );
-		return false;
-	}
-
-	int pointSize = 12;
-	idStr::snPrintf( name, sizeof(name), "%s/fontImage_%i.dat", fontName, pointSize );
-	for ( i = 0; i < registeredFontCount; i++ ) {
-		if ( idStr::Icmp(name, registeredFont[i].fontInfoSmall.name) == 0 ) {
-			memcpy( &font, &registeredFont[i], sizeof( fontInfoEx_t ) );
-			return true;
+	/*
+		if ( registeredFontCount >= MAX_FONTS ) {
+			common->Warning( "RegisterFont: Too many fonts registered already." );
+			return false;
 		}
-	}
-*/
-	assert(sizeof(float) == 4 && "if this is false, readFloat() won't work");
+
+		int pointSize = 12;
+		idStr::snPrintf( name, sizeof(name), "%s/fontImage_%i.dat", fontName, pointSize );
+		for ( i = 0; i < registeredFontCount; i++ ) {
+			if ( idStr::Icmp(name, registeredFont[i].fontInfoSmall.name) == 0 ) {
+				memcpy( &font, &registeredFont[i], sizeof( fontInfoEx_t ) );
+				return true;
+			}
+		}
+	*/
 
 	memset( &font, 0, sizeof( font ) );
 
@@ -319,11 +325,9 @@ bool idRenderSystemLocal::RegisterFont( const char *fontName, fontInfoEx_t &font
 		fontInfo_t *outFont;
 		if ( fontCount == 0 ) {
 			outFont = &font.fontInfoSmall;
-		}
-		else if ( fontCount == 1 ) {
+		} else if ( fontCount == 1 ) {
 			outFont = &font.fontInfoMedium;
-		}
-		else {
+		} else {
 			outFont = &font.fontInfoLarge;
 		}
 
@@ -442,7 +446,7 @@ bool idRenderSystemLocal::RegisterFont( const char *fontName, fontInfoEx_t &font
 
 		glyph = RE_ConstructGlyphInfo(out, &xOut, &yOut, &maxHeight, face, (unsigned char)i, qfalse);
 
-		if (xOut == -1 || yOut == -1 || i == GLYPH_END)  {
+		if (xOut == -1 || yOut == -1 || i == GLYPH_END) {
 			// ran out of room
 			// we need to create an image from the bitmap, set all the handles in the glyphs to this point
 			//

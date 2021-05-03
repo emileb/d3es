@@ -50,42 +50,25 @@ typedef struct glconfig_s {
 	const char			*version_string;
 	const char			*extensions_string;
 
-	float				glVersion;				// atof( version_string )
-
-
 	int					maxTextureSize;			// queried from GL
 	int					maxTextureUnits;
-	int					maxTextureCoords;
-	int					maxTextureImageUnits;
 	float				maxTextureAnisotropy;
 
-	int					colorBits, alphabits, depthBits, stencilBits;
+	int					colorBits, depthBits, stencilBits;
 
-	bool				multitextureAvailable;
-	bool				textureCompressionAvailable;
 	bool				anisotropicAvailable;
-	bool				textureLODBiasAvailable;
-	bool				textureEnvAddAvailable;
-	bool				textureEnvCombineAvailable;
-	bool				registerCombinersAvailable;
-	bool				cubeMapAvailable;
-	bool				envDot3Available;
-	bool				texture3DAvailable;
-	bool				sharedTexturePaletteAvailable;
-	bool				ARBVertexBufferObjectAvailable;
-	bool				ARBVertexProgramAvailable;
-	bool				ARBFragmentProgramAvailable;
-	bool				twoSidedStencilAvailable;
-	bool				textureNonPowerOfTwoAvailable;
-	bool				depthBoundsTestAvailable;
+
+	bool				npotAvailable;
+
+	bool				depthStencilAvailable;
 
 	int					vidWidth, vidHeight;	// passed to R_BeginFrame
+
+	int					vidWidthReal, vidHeightReal; // The real resolution of the screen, uses framebuffer if not the same as vidWidth
 
 	int					displayFrequency;
 
 	bool				isFullscreen;
-
-	bool				allowARB2Path;
 
 	bool				isInitialized;
 } glconfig_t;
@@ -189,7 +172,7 @@ public:
 	virtual void			SetColor4( float r, float g, float b, float a ) = 0;
 
 	virtual void			DrawStretchPic( const idDrawVert *verts, const glIndex_t *indexes, int vertCount, int indexCount, const idMaterial *material,
-											bool clip = true, float min_x = 0.0f, float min_y = 0.0f, float max_x = 640.0f, float max_y = 480.0f ) = 0;
+	                                        bool clip = true, float min_x = 0.0f, float min_y = 0.0f, float max_x = 640.0f, float max_y = 480.0f ) = 0;
 	virtual void			DrawStretchPic( float x, float y, float w, float h, float s1, float t1, float s2, float t2, const idMaterial *material ) = 0;
 
 	virtual void			DrawStretchTri ( idVec2 p1, idVec2 p2, idVec2 p3, idVec2 t1, idVec2 t2, idVec2 t3, const idMaterial *material ) = 0;
@@ -218,7 +201,6 @@ public:
 	// if the pointers are not NULL, timing info will be returned
 	virtual void			EndFrame( int *frontEndMsec, int *backEndMsec ) = 0;
 
-	// aviDemo uses this.
 	// Will automatically tile render large screen shots if necessary
 	// Samples is the number of jittered frames for anti-aliasing
 	// If ref == NULL, session->updateScreen will be used

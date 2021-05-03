@@ -212,8 +212,8 @@ void idRenderModelDecal::AddWinding( const idWinding &w, const idMaterial *decal
 	decalInfo_t	decalInfo;
 
 	if ( ( material == NULL || material == decalMaterial ) &&
-			tri.numVerts + w.GetNumPoints() < MAX_DECAL_VERTS &&
-				tri.numIndexes + ( w.GetNumPoints() - 2 ) * 3 < MAX_DECAL_INDEXES ) {
+	        tri.numVerts + w.GetNumPoints() < MAX_DECAL_VERTS &&
+	        tri.numIndexes + ( w.GetNumPoints() - 2 ) * 3 < MAX_DECAL_INDEXES ) {
 
 		material = decalMaterial;
 
@@ -251,8 +251,8 @@ void idRenderModelDecal::AddWinding( const idWinding &w, const idMaterial *decal
 			tri.indexes[tri.numIndexes + 1] = tri.numVerts + i - 1;
 			tri.indexes[tri.numIndexes + 2] = tri.numVerts + i;
 			indexStartTime[tri.numIndexes] =
-			indexStartTime[tri.numIndexes + 1] =
-			indexStartTime[tri.numIndexes + 2] = startTime;
+			    indexStartTime[tri.numIndexes + 1] =
+			        indexStartTime[tri.numIndexes + 2] = startTime;
 			tri.numIndexes += 3;
 		}
 		tri.numVerts += w.GetNumPoints();
@@ -334,7 +334,7 @@ void idRenderModelDecal::CreateDecal( const idRenderModel *model, const decalPro
 
 			// skip back facing triangles
 			if ( stri->facePlanes && stri->facePlanesCalculated &&
-					stri->facePlanes[triNum].Normal() * localInfo.boundingPlanes[NUM_DECAL_BOUNDING_PLANES - 2].Normal() < -0.1f ) {
+			        stri->facePlanes[triNum].Normal() * localInfo.boundingPlanes[NUM_DECAL_BOUNDING_PLANES - 2].Normal() < -0.1f ) {
 				continue;
 			}
 
@@ -513,7 +513,8 @@ void idRenderModelDecal::AddDecalDrawSurf( viewEntity_t *space ) {
 	*newTri = tri;
 
 	// copy the current vertexes to temp vertex cache
-	newTri->ambientCache = vertexCache.AllocFrameTemp( tri.verts, tri.numVerts * sizeof( idDrawVert ) );
+	newTri->ambientCache = vertexCache.AllocFrameTemp( tri.verts, tri.numVerts * sizeof( idDrawVert ), false);
+	newTri->indexCache   = vertexCache.AllocFrameTemp( tri.indexes, tri.numIndexes * sizeof( glIndex_t ), true );
 
 	// create the drawsurf
 	R_AddDrawSurf( newTri, space, &space->entityDef->parms, material, space->scissorRect );

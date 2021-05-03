@@ -142,8 +142,10 @@ void idRenderModelLiquid::WaterDrop( int x, int y, float *page ) {
 		y = 1 + drop_radius + random.RandomInt( verts_y - 2 * drop_radius - 1 );
 	}
 
-	left=-drop_radius; right = drop_radius;
-	top=-drop_radius; bottom = drop_radius;
+	left=-drop_radius;
+	right = drop_radius;
+	top=-drop_radius;
+	bottom = drop_radius;
 
 	// Perform edge clipping...
 	if ( x - drop_radius < 1 ) {
@@ -210,7 +212,7 @@ void idRenderModelLiquid::IntersectBounds( const idBounds &bounds, float displac
 	for ( cy = top; cy < bottom; cy++ ) {
 		for ( cx = left; cx < right; cx++ ) {
 			pos = &page1[ verts_x * cy + cx ];
-			if ( *pos > down ) {//&& ( *pos < up ) ) {
+			if ( *pos > down ) { //&& ( *pos < up ) ) {
 				*pos = down;
 			}
 		}
@@ -249,16 +251,16 @@ void idRenderModelLiquid::Update( void ) {
 			p1 += verts_x;
 			for ( x = 1; x < verts_x - 1; x++ ) {
 				value =
-					( p2[ x + verts_x ] +
-					p2[ x - verts_x ] +
-					p2[ x + 1 ] +
-					p2[ x - 1 ] +
-					p2[ x - verts_x - 1 ] +
-					p2[ x - verts_x + 1 ] +
-					p2[ x + verts_x - 1 ] +
-					p2[ x + verts_x + 1 ] +
-					p2[ x ] ) * ( 2.0f / 9.0f ) -
-					p1[ x ];
+				    ( p2[ x + verts_x ] +
+				      p2[ x - verts_x ] +
+				      p2[ x + 1 ] +
+				      p2[ x - 1 ] +
+				      p2[ x - verts_x - 1 ] +
+				      p2[ x - verts_x + 1 ] +
+				      p2[ x + verts_x - 1 ] +
+				      p2[ x + verts_x + 1 ] +
+				      p2[ x ] ) * ( 2.0f / 9.0f ) -
+				    p1[ x ];
 
 				p1[ x ] = value * density;
 			}
@@ -271,15 +273,15 @@ void idRenderModelLiquid::Update( void ) {
 			p1 += verts_x;
 			for ( x = 1; x < verts_x - 1; x++ ) {
 				value =
-					( p2[ x + verts_x ] +
-					p2[ x - verts_x ] +
-					p2[ x + 1 ] +
-					p2[ x - 1 ] +
-					p2[ x - verts_x - 1 ] +
-					p2[ x - verts_x + 1 ] +
-					p2[ x + verts_x - 1 ] +
-					p2[ x + verts_x + 1 ] ) * 0.25f -
-					p1[ x ];
+				    ( p2[ x + verts_x ] +
+				      p2[ x - verts_x ] +
+				      p2[ x + 1 ] +
+				      p2[ x - 1 ] +
+				      p2[ x - verts_x - 1 ] +
+				      p2[ x - verts_x + 1 ] +
+				      p2[ x + verts_x - 1 ] +
+				      p2[ x + verts_x + 1 ] ) * 0.25f -
+				    p1[ x ];
 
 				p1[ x ] = value * density;
 			}
@@ -292,15 +294,15 @@ void idRenderModelLiquid::Update( void ) {
 			p1 += verts_x;
 			for ( x = 1; x < verts_x - 1; x++ ) {
 				value =
-					( p2[ x + verts_x ] +
-					p2[ x - verts_x ] +
-					p2[ x + 1 ] +
-					p2[ x - 1 ] +
-					p2[ x - verts_x - 1 ] +
-					p2[ x - verts_x + 1 ] +
-					p2[ x + verts_x - 1 ] +
-					p2[ x + verts_x + 1 ] +
-					p2[ x ] ) * ( 1.0f / 9.0f );
+				    ( p2[ x + verts_x ] +
+				      p2[ x - verts_x ] +
+				      p2[ x + 1 ] +
+				      p2[ x - 1 ] +
+				      p2[ x - verts_x - 1 ] +
+				      p2[ x - verts_x + 1 ] +
+				      p2[ x + verts_x - 1 ] +
+				      p2[ x + verts_x + 1 ] +
+				      p2[ x ] ) * ( 1.0f / 9.0f );
 
 				p1[ x ] = value * density;
 			}

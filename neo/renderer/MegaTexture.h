@@ -76,9 +76,9 @@ public:
 	void	BindForViewOrigin( const idVec3 origin );	// binds images and sets program parameters
 	void	Unbind();								// removes texture bindings
 
-	static	void MakeMegaTexture_f( const idCmdArgs &args );
+	//static	void MakeMegaTexture_f( const idCmdArgs &args );
 private:
-friend class idTextureLevel;
+	friend class idTextureLevel;
 	void	SetViewOrigin( const idVec3 origin );
 	static void	GenerateMegaMipMaps( megaTextureHeader_t *header, idFile *file );
 	static void	GenerateMegaPreview( const char *fileName );

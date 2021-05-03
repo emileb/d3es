@@ -92,22 +92,30 @@ bool Sys_GetPath(sysPath_t type, idStr &path) {
 		return false;
 
 	case PATH_CONFIG:
+#ifdef __ANDROID__
+		s = getenv("USER_FILES");
+		idStr::snPrintf(buf, sizeof(buf), "%s/d3es/config", s);
+#else
 		s = getenv("XDG_CONFIG_HOME");
 		if (s)
 			idStr::snPrintf(buf, sizeof(buf), "%s/dhewm3", s);
 		else
 			idStr::snPrintf(buf, sizeof(buf), "%s/.config/dhewm3", getenv("HOME"));
-
+#endif
 		path = buf;
 		return true;
 
 	case PATH_SAVE:
+#ifdef __ANDROID__
+		s = getenv("USER_FILES");
+		idStr::snPrintf(buf, sizeof(buf), "%s/d3es/saves", s);
+#else
 		s = getenv("XDG_DATA_HOME");
 		if (s)
 			idStr::snPrintf(buf, sizeof(buf), "%s/dhewm3", s);
 		else
 			idStr::snPrintf(buf, sizeof(buf), "%s/.local/share/dhewm3", getenv("HOME"));
-
+#endif
 		path = buf;
 		return true;
 
@@ -284,7 +292,15 @@ void idSysLocal::OpenURL( const char *url, bool quit ) {
 main
 ===============
 */
+#ifdef __ANDROID__
+int main_android(int argc, char **argv, int gameMod_) {
+#else
 int main(int argc, char **argv) {
+#endif
+
+#ifdef __ANDROID__
+	gameMod = gameMod_;
+#endif
 	// fallback path to the binary for systems without /proc
 	// while not 100% reliable, its good enough
 	if (argc > 0) {
@@ -301,8 +317,9 @@ int main(int argc, char **argv) {
 	// so set $LC_ALL to "C".
 	setenv("LC_ALL", "C", 1);
 
+#ifndef __ANDROID__
 	Posix_InitSignalHandlers();
-
+#endif
 	if ( argc > 1 ) {
 		common->Init( argc-1, &argv[1] );
 	} else {
@@ -314,3 +331,6 @@ int main(int argc, char **argv) {
 	}
 	return 0;
 }
+
+
+int gameMod;

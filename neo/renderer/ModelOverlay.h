@@ -61,8 +61,8 @@ typedef struct overlayMaterial_s {
 
 class idRenderModelOverlay {
 public:
-								idRenderModelOverlay();
-								~idRenderModelOverlay();
+	idRenderModelOverlay();
+	~idRenderModelOverlay();
 
 	static idRenderModelOverlay *Alloc( void );
 	static void					Free( idRenderModelOverlay *overlay );

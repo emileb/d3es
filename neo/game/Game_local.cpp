@@ -279,7 +279,7 @@ idGameLocal::Init
   initialize the game object, only happens once at startup, not each level load
 ============
 */
-void idGameLocal::Init( void ) {
+void idGameLocal::Init( int gameMod ) {
 	const idDict *dict;
 	idAAS *aas;
 
@@ -1208,6 +1208,10 @@ void idGameLocal::InitFromNewMap( const char *mapName, idRenderWorld *renderWorl
 
 	gameRenderWorld = renderWorld;
 	gameSoundWorld = soundWorld;
+
+#ifdef AIM_ASSIST
+	aimAssistEntities.Clear();
+#endif
 
 	LoadMap( mapName, randseed );
 
@@ -4429,3 +4433,76 @@ idGameLocal::GetMapLoadingGUI
 ===============
 */
 void idGameLocal::GetMapLoadingGUI( char gui[ MAX_STRING_CHARS ] ) { }
+
+/*
+===============
+idGameLocal::InGameGuiActive
+===============
+*/
+bool idGameLocal::InGameGuiActive()
+{
+	if( GetLocalPlayer() && GetLocalPlayer()->GuiActive() )
+		return true;
+	else
+		return false;
+}
+
+bool idGameLocal::InCinematic()
+{
+	if( inCinematic )
+		return true;
+	else
+		return false;
+}
+
+bool idGameLocal::ObjectiveSystemActive()
+{
+	if( GetLocalPlayer() && GetLocalPlayer()->objectiveSystemOpen )
+		return true;
+	else
+		return false;
+}
+
+#ifdef AIM_ASSIST
+/*
+========================
+idGameLocal::GetAimAssistAngles
+========================
+*/
+void idGameLocal::GetAimAssistAngles( idAngles & angles ) {
+	angles.Zero();
+
+	// Take a look at serializing this to the clients
+	idPlayer * player = GetLocalPlayer();
+	if ( player == NULL ) {
+		return;
+	}
+
+	idAimAssist * aimAssist = player->GetAimAssist();
+	if ( aimAssist == NULL ) {
+		return;
+	}
+
+	aimAssist->GetAngleCorrection( angles );
+}
+
+/*
+========================
+idGameLocal::GetAimAssistSensitivity
+========================
+*/
+float idGameLocal::GetAimAssistSensitivity() {
+	// Take a look at serializing this to the clients
+	idPlayer * player = GetLocalPlayer();
+	if ( player == NULL ) {
+		return 1.0f;
+	}
+
+	idAimAssist * aimAssist = player->GetAimAssist();
+	if ( aimAssist == NULL ) {
+		return 1.0f;
+	}
+
+	return aimAssist->GetFrictionScalar();
+}
+#endif

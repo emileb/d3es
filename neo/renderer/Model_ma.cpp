@@ -673,32 +673,31 @@ void MA_ParseMesh(idParser& parser) {
 
 	//Now that the normals are good...lets reorder the verts to make the tris face the right way
 	for(int i = 0; i < pMesh->numFaces; i++) {
-			int tmp = pMesh->faces[i].vertexNum[1];
-			pMesh->faces[i].vertexNum[1] = pMesh->faces[i].vertexNum[2];
-			pMesh->faces[i].vertexNum[2] = tmp;
+		int tmp = pMesh->faces[i].vertexNum[1];
+		pMesh->faces[i].vertexNum[1] = pMesh->faces[i].vertexNum[2];
+		pMesh->faces[i].vertexNum[2] = tmp;
 
-			idVec3 tmpVec = pMesh->faces[i].vertexNormals[1];
-			pMesh->faces[i].vertexNormals[1] = pMesh->faces[i].vertexNormals[2];
-			pMesh->faces[i].vertexNormals[2] = tmpVec;
+		idVec3 tmpVec = pMesh->faces[i].vertexNormals[1];
+		pMesh->faces[i].vertexNormals[1] = pMesh->faces[i].vertexNormals[2];
+		pMesh->faces[i].vertexNormals[2] = tmpVec;
 
-			tmp = pMesh->faces[i].tVertexNum[1];
-			pMesh->faces[i].tVertexNum[1] = pMesh->faces[i].tVertexNum[2];
-			pMesh->faces[i].tVertexNum[2] = tmp;
+		tmp = pMesh->faces[i].tVertexNum[1];
+		pMesh->faces[i].tVertexNum[1] = pMesh->faces[i].tVertexNum[2];
+		pMesh->faces[i].tVertexNum[2] = tmp;
 
-			tmp = pMesh->faces[i].vertexColors[1];
-			pMesh->faces[i].vertexColors[1] = pMesh->faces[i].vertexColors[2];
-			pMesh->faces[i].vertexColors[2] = tmp;
+		tmp = pMesh->faces[i].vertexColors[1];
+		pMesh->faces[i].vertexColors[1] = pMesh->faces[i].vertexColors[2];
+		pMesh->faces[i].vertexColors[2] = tmp;
 	}
 
 	//Now apply the pt transformations
 	for(int i = 0; i < pMesh->numVertTransforms; i++) {
 		int idx = (int)pMesh->vertTransforms[i].w;
-		if(idx < 0 || idx >= pMesh->numVertexes)
-		{
+		if(idx < 0 || idx >= pMesh->numVertexes) {
 			// this happens with d3xp/models/david/hell_h7.ma in the d3xp hell level
 			// TODO: if it happens for other models, too, maybe it's intended and the .ma parsing is broken
 			common->Warning( "Model %s tried to set an out-of-bounds vertex transform (%d, but max vert. index is %d)!",
-							 parser.GetFileName(), idx, pMesh->numVertexes-1 );
+			                 parser.GetFileName(), idx, pMesh->numVertexes-1 );
 			continue;
 		}
 		pMesh->vertexes[idx] +=  pMesh->vertTransforms[i].ToVec3();

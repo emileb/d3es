@@ -157,9 +157,9 @@ idRenderWorldLocal::~idRenderWorldLocal() {
 	FreeWorld();
 
 	// free up the debug lines, polys, and text
-	RB_ClearDebugPolygons( 0 );
-	RB_ClearDebugLines( 0 );
-	RB_ClearDebugText( 0 );
+	//RB_ClearDebugPolygons( 0 );
+	//RB_ClearDebugLines( 0 );
+	//RB_ClearDebugText( 0 );
 }
 
 /*
@@ -180,7 +180,7 @@ void idRenderWorldLocal::ResizeInteractionTable() {
 AddEntityDef
 ===================
 */
-qhandle_t idRenderWorldLocal::AddEntityDef( const renderEntity_t *re ){
+qhandle_t idRenderWorldLocal::AddEntityDef( const renderEntity_t *re ) {
 	// try and reuse a free spot
 	int entityHandle = entityDefs.FindNull();
 	if ( entityHandle == -1 ) {
@@ -404,12 +404,12 @@ void idRenderWorldLocal::UpdateLightDef( qhandle_t lightHandle, const renderLigh
 		// if the shape of the light stays the same, we don't need to dump
 		// any of our derived data, because shader parms are calculated every frame
 		if ( rlight->axis == light->parms.axis && rlight->end == light->parms.end &&
-			 rlight->lightCenter == light->parms.lightCenter && rlight->lightRadius == light->parms.lightRadius &&
-			 rlight->noShadows == light->parms.noShadows && rlight->origin == light->parms.origin &&
-			 rlight->parallel == light->parms.parallel && rlight->pointLight == light->parms.pointLight &&
-			 rlight->right == light->parms.right && rlight->start == light->parms.start &&
-			 rlight->target == light->parms.target && rlight->up == light->parms.up &&
-			 rlight->shader == light->lightShader && rlight->prelightModel == light->parms.prelightModel ) {
+		        rlight->lightCenter == light->parms.lightCenter && rlight->lightRadius == light->parms.lightRadius &&
+		        rlight->noShadows == light->parms.noShadows && rlight->origin == light->parms.origin &&
+		        rlight->parallel == light->parms.parallel && rlight->pointLight == light->parms.pointLight &&
+		        rlight->right == light->parms.right && rlight->start == light->parms.start &&
+		        rlight->target == light->parms.target && rlight->up == light->parms.up &&
+		        rlight->shader == light->lightShader && rlight->prelightModel == light->parms.prelightModel ) {
 			justUpdate = true;
 		} else {
 			// if we are updating shadows, the prelight model is no longer valid
@@ -676,7 +676,6 @@ to handle mirrors,
 ====================
 */
 void idRenderWorldLocal::RenderScene( const renderView_t *renderView ) {
-#ifndef	ID_DEDICATED
 	renderView_t	copy;
 
 	if ( !glConfig.isInitialized ) {
@@ -783,7 +782,6 @@ void idRenderWorldLocal::RenderScene( const renderView_t *renderView ) {
 
 	// prepare for any 2D drawing after this
 	tr.guiModel->Clear();
-#endif
 }
 
 /*
@@ -921,11 +919,9 @@ void idRenderWorldLocal::BoundsInAreas_r( int nodeNum, const idBounds &bounds, i
 		side = bounds.PlaneSide( node->plane );
 		if ( side == PLANESIDE_FRONT ) {
 			nodeNum = node->children[0];
-		}
-		else if ( side == PLANESIDE_BACK ) {
+		} else if ( side == PLANESIDE_BACK ) {
 			nodeNum = node->children[1];
-		}
-		else {
+		} else {
 			if ( node->children[1] != 0 ) {
 				BoundsInAreas_r( node->children[1], bounds, areas, numAreas, maxAreas );
 				if ( (*numAreas) >= maxAreas ) {
@@ -1539,7 +1535,7 @@ We might alternatively choose to do this with an area flow.
 ==================
 */
 void idRenderWorldLocal::PushVolumeIntoTree_r( idRenderEntityLocal *def, idRenderLightLocal *light, const idSphere *sphere, int numPoints, const idVec3 (*points),
-								 int nodeNum ) {
+        int nodeNum ) {
 	int			i;
 	areaNode_t	*node;
 	bool	front, back;
@@ -1569,7 +1565,7 @@ void idRenderWorldLocal::PushVolumeIntoTree_r( idRenderEntityLocal *def, idRende
 	// if we know that all possible children nodes only touch an area
 	// we have already marked, we can early out
 	if ( r_useNodeCommonChildren.GetBool() &&
-		node->commonChildrenArea != CHILDREN_HAVE_MULTIPLE_AREAS ) {
+	        node->commonChildrenArea != CHILDREN_HAVE_MULTIPLE_AREAS ) {
 		// note that we do NOT try to set a reference in this area
 		// yet, because the test volume may yet wind up being in the
 		// solid part, which would cause bounds slightly poked into
@@ -1599,56 +1595,6 @@ void idRenderWorldLocal::PushVolumeIntoTree_r( idRenderEntityLocal *def, idRende
 
 	// exact check all the points against the node plane
 	front = back = false;
-#ifdef MACOS_X	//loop unrolling & pre-fetching for performance
-	const idVec3 norm = node->plane.Normal();
-	const float plane3 = node->plane[3];
-	float D0, D1, D2, D3;
-
-	for ( i = 0 ; i < numPoints - 4; i+=4 ) {
-		D0 = points[i+0] * norm + plane3;
-		D1 = points[i+1] * norm + plane3;
-		if ( !front && D0 >= 0.0f ) {
-			front = true;
-		} else if ( !back && D0 <= 0.0f ) {
-			back = true;
-		}
-		D2 = points[i+1] * norm + plane3;
-		if ( !front && D1 >= 0.0f ) {
-			front = true;
-		} else if ( !back && D1 <= 0.0f ) {
-			back = true;
-		}
-		D3 = points[i+1] * norm + plane3;
-		if ( !front && D2 >= 0.0f ) {
-			front = true;
-		} else if ( !back && D2 <= 0.0f ) {
-			back = true;
-		}
-
-		if ( !front && D3 >= 0.0f ) {
-			front = true;
-		} else if ( !back && D3 <= 0.0f ) {
-			back = true;
-		}
-		if ( back && front ) {
-			break;
-		}
-	}
-	if(!(back && front)) {
-		for (; i < numPoints ; i++ ) {
-			float d;
-			d = points[i] * node->plane.Normal() + node->plane[3];
-			if ( d >= 0.0f ) {
-				front = true;
-			} else if ( d <= 0.0f ) {
-				back = true;
-			}
-			if ( back && front ) {
-				break;
-			}
-		}
-	}
-#else
 	for ( i = 0 ; i < numPoints ; i++ ) {
 		float d;
 
@@ -1662,7 +1608,6 @@ void idRenderWorldLocal::PushVolumeIntoTree_r( idRenderEntityLocal *def, idRende
 			break;
 		}
 	}
-#endif
 	if ( front ) {
 		nodeNum = node->children[0];
 		if ( nodeNum ) {	// 0 = solid
@@ -1721,8 +1666,8 @@ idRenderWorldLocal::DebugClearLines
 ====================
 */
 void idRenderWorldLocal::DebugClearLines( int time ) {
-	RB_ClearDebugLines( time );
-	RB_ClearDebugText( time );
+	//RB_ClearDebugLines( time );
+	//RB_ClearDebugText( time );
 }
 
 /*
@@ -1731,7 +1676,7 @@ idRenderWorldLocal::DebugLine
 ====================
 */
 void idRenderWorldLocal::DebugLine( const idVec4 &color, const idVec3 &start, const idVec3 &end, const int lifetime, const bool depthTest ) {
-	RB_AddDebugLine( color, start, end, lifetime, depthTest );
+	//RB_AddDebugLine( color, start, end, lifetime, depthTest );
 }
 
 /*
@@ -2005,7 +1950,7 @@ idRenderWorldLocal::DebugClearPolygons
 ====================
 */
 void idRenderWorldLocal::DebugClearPolygons( int time ) {
-	RB_ClearDebugPolygons( time );
+	//RB_ClearDebugPolygons( time );
 }
 
 /*
@@ -2014,7 +1959,7 @@ idRenderWorldLocal::DebugPolygon
 ====================
 */
 void idRenderWorldLocal::DebugPolygon( const idVec4 &color, const idWinding &winding, const int lifeTime, const bool depthTest ) {
-	RB_AddDebugPolygon( color, winding, lifeTime, depthTest );
+	//RB_AddDebugPolygon( color, winding, lifeTime, depthTest );
 }
 
 /*
@@ -2060,7 +2005,8 @@ idRenderWorldLocal::DrawTextLength
 ================
 */
 float idRenderWorldLocal::DrawTextLength( const char *text, float scale, int len ) {
-	return RB_DrawTextLength( text, scale, len );
+	//return RB_DrawTextLength( text, scale, len );
+	return 0;
 }
 
 /*
@@ -2072,7 +2018,7 @@ idRenderWorldLocal::DrawText
 ================
 */
 void idRenderWorldLocal::DrawText( const char *text, const idVec3 &origin, float scale, const idVec4 &color, const idMat3 &viewAxis, const int align, const int lifetime, const bool depthTest ) {
-	RB_AddDebugText( text, origin, scale, color, viewAxis, align, lifetime, depthTest );
+	//RB_AddDebugText( text, origin, scale, color, viewAxis, align, lifetime, depthTest );
 }
 
 /*

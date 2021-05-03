@@ -26,9 +26,6 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#if defined(__ppc__) && defined(__APPLE__)
-#include <vecLib/vecLib.h>
-#endif
 #if defined(__GNUC__) && defined(__SSE2__)
 #include <xmmintrin.h>
 #endif
@@ -41,6 +38,10 @@ If you have questions concerning this license or the applicable additional terms
 
 //====================================================================
 
+extern const unsigned int      NUM_FRAME_DATA = 2;
+extern frameData_t	           *smpFrameData[NUM_FRAME_DATA];
+extern volatile unsigned int   smpFrame;
+
 /*
 ======================
 idScreenRect::Clear
@@ -49,7 +50,8 @@ idScreenRect::Clear
 void idScreenRect::Clear() {
 	x1 = y1 = 32000;
 	x2 = y2 = -32000;
-	zmin = 0.0f; zmax = 1.0f;
+	zmin = 0.0f;
+	zmax = 1.0f;
 }
 
 /*
@@ -158,11 +160,6 @@ idScreenRect R_ScreenRectFromViewFrustumBounds( const idBounds &bounds ) {
 	screenRect.y1 = idMath::FtoiFast( 0.5f * ( 1.0f + bounds[0].z ) * ( tr.viewDef->viewport.y2 - tr.viewDef->viewport.y1 ) );
 	screenRect.y2 = idMath::FtoiFast( 0.5f * ( 1.0f + bounds[1].z ) * ( tr.viewDef->viewport.y2 - tr.viewDef->viewport.y1 ) );
 
-	if ( r_useDepthBoundsTest.GetInteger() ) {
-		R_TransformEyeZToWin( -bounds[0].x, tr.viewDef->projectionMatrix, screenRect.zmin );
-		R_TransformEyeZToWin( -bounds[1].x, tr.viewDef->projectionMatrix, screenRect.zmax );
-	}
-
 	return screenRect;
 }
 
@@ -187,6 +184,10 @@ void R_ToggleSmpFrame( void ) {
 	if ( r_lockSurfaces.GetBool() ) {
 		return;
 	}
+
+	smpFrame++;
+    frameData = smpFrameData[smpFrame % NUM_FRAME_DATA];
+
 	R_FreeDeferredTriSurfs( frameData );
 
 	// clear frame-temporary data
@@ -223,20 +224,24 @@ void R_ShutdownFrameData( void ) {
 	frameData_t *frame;
 	frameMemoryBlock_t *block;
 
-	// free any current data
-	frame = frameData;
-	if ( !frame ) {
-		return;
-	}
+	for (int n = 0; n < NUM_FRAME_DATA; n++)
+	{
+		// free any current data
+		frame = smpFrameData[n];
+		if ( !frame ) {
+			continue;
+		}
 
-	R_FreeDeferredTriSurfs( frame );
+		R_FreeDeferredTriSurfs( frame );
 
-	frameMemoryBlock_t *nextBlock;
-	for ( block = frame->memory ; block ; block = nextBlock ) {
-		nextBlock = block->next;
-		Mem_Free( block );
+		frameMemoryBlock_t *nextBlock;
+		for ( block = frame->memory ; block ; block = nextBlock ) {
+			nextBlock = block->next;
+			Mem_Free( block );
+		}
+		Mem_Free( frame );
+		smpFrameData[n] = NULL;
 	}
-	Mem_Free( frame );
 	frameData = NULL;
 }
 
@@ -252,18 +257,24 @@ void R_InitFrameData( void ) {
 
 	R_ShutdownFrameData();
 
-	frameData = (frameData_t *)Mem_ClearedAlloc( sizeof( *frameData ));
-	frame = frameData;
-	size = MEMORY_BLOCK_SIZE;
-	block = (frameMemoryBlock_t *)Mem_Alloc( size + sizeof( *block ) );
-	if ( !block ) {
-		common->FatalError( "R_InitFrameData: Mem_Alloc() failed" );
+	for (int n = 0; n < NUM_FRAME_DATA; n++)
+	{
+		smpFrameData[n] = (frameData_t *)Mem_ClearedAlloc( sizeof( frameData_t ));
+		frame = smpFrameData[n];
+		size = MEMORY_BLOCK_SIZE;
+		block = (frameMemoryBlock_t *)Mem_Alloc( size + sizeof( *block ) );
+		if ( !block ) {
+			common->FatalError( "R_InitFrameData: Mem_Alloc() failed" );
+		}
+		block->size = size;
+		block->used = 0;
+		block->next = NULL;
+		frame->memory = block;
+		frame->memoryHighwater = 0;
 	}
-	block->size = size;
-	block->used = 0;
-	block->next = NULL;
-	frame->memory = block;
-	frame->memoryHighwater = 0;
+
+	smpFrame = 0;
+	frameData = smpFrameData[0];
 
 	R_ToggleSmpFrame();
 }
@@ -401,7 +412,7 @@ void *R_FrameAlloc( int bytes ) {
 	// we could fix this if we needed to...
 	if ( bytes > block->size ) {
 		common->FatalError( "R_FrameAlloc of %i exceeded MEMORY_BLOCK_SIZE",
-			bytes );
+		                    bytes );
 	}
 
 	frame->alloc = block;
@@ -502,23 +513,23 @@ void R_LocalPointToGlobal( const float modelMatrix[16], const idVec3 &in, idVec3
 	_mm_store_ss(&out[2], m2);
 #else
 	out[0] = in[0] * modelMatrix[0] + in[1] * modelMatrix[4]
-		+ in[2] * modelMatrix[8] + modelMatrix[12];
+	         + in[2] * modelMatrix[8] + modelMatrix[12];
 	out[1] = in[0] * modelMatrix[1] + in[1] * modelMatrix[5]
-		+ in[2] * modelMatrix[9] + modelMatrix[13];
+	         + in[2] * modelMatrix[9] + modelMatrix[13];
 	out[2] = in[0] * modelMatrix[2] + in[1] * modelMatrix[6]
-		+ in[2] * modelMatrix[10] + modelMatrix[14];
+	         + in[2] * modelMatrix[10] + modelMatrix[14];
 #endif
 }
 
 void R_PointTimesMatrix( const float modelMatrix[16], const idVec4 &in, idVec4 &out ) {
 	out[0] = in[0] * modelMatrix[0] + in[1] * modelMatrix[4]
-		+ in[2] * modelMatrix[8] + modelMatrix[12];
+	         + in[2] * modelMatrix[8] + modelMatrix[12];
 	out[1] = in[0] * modelMatrix[1] + in[1] * modelMatrix[5]
-		+ in[2] * modelMatrix[9] + modelMatrix[13];
+	         + in[2] * modelMatrix[9] + modelMatrix[13];
 	out[2] = in[0] * modelMatrix[2] + in[1] * modelMatrix[6]
-		+ in[2] * modelMatrix[10] + modelMatrix[14];
+	         + in[2] * modelMatrix[10] + modelMatrix[14];
 	out[3] = in[0] * modelMatrix[3] + in[1] * modelMatrix[7]
-		+ in[2] * modelMatrix[11] + modelMatrix[15];
+	         + in[2] * modelMatrix[11] + modelMatrix[15];
 }
 
 void R_GlobalPointToLocal( const float modelMatrix[16], const idVec3 &in, idVec3 &out ) {
@@ -533,11 +544,11 @@ void R_GlobalPointToLocal( const float modelMatrix[16], const idVec3 &in, idVec3
 
 void R_LocalVectorToGlobal( const float modelMatrix[16], const idVec3 &in, idVec3 &out ) {
 	out[0] = in[0] * modelMatrix[0] + in[1] * modelMatrix[4]
-		+ in[2] * modelMatrix[8];
+	         + in[2] * modelMatrix[8];
 	out[1] = in[0] * modelMatrix[1] + in[1] * modelMatrix[5]
-		+ in[2] * modelMatrix[9];
+	         + in[2] * modelMatrix[9];
 	out[2] = in[0] * modelMatrix[2] + in[1] * modelMatrix[6]
-		+ in[2] * modelMatrix[10];
+	         + in[2] * modelMatrix[10];
 }
 
 void R_GlobalVectorToLocal( const float modelMatrix[16], const idVec3 &in, idVec3 &out ) {
@@ -691,18 +702,18 @@ void R_TransformModelToClip( const idVec3 &src, const float *modelMatrix, const 
 
 	for ( i = 0 ; i < 4 ; i++ ) {
 		eye[i] =
-			src[0] * modelMatrix[ i + 0 * 4 ] +
-			src[1] * modelMatrix[ i + 1 * 4 ] +
-			src[2] * modelMatrix[ i + 2 * 4 ] +
-			1 * modelMatrix[ i + 3 * 4 ];
+		    src[0] * modelMatrix[ i + 0 * 4 ] +
+		    src[1] * modelMatrix[ i + 1 * 4 ] +
+		    src[2] * modelMatrix[ i + 2 * 4 ] +
+		    1 * modelMatrix[ i + 3 * 4 ];
 	}
 
 	for ( i = 0 ; i < 4 ; i++ ) {
 		dst[i] =
-			eye[0] * projectionMatrix[ i + 0 * 4 ] +
-			eye[1] * projectionMatrix[ i + 1 * 4 ] +
-			eye[2] * projectionMatrix[ i + 2 * 4 ] +
-			eye[3] * projectionMatrix[ i + 3 * 4 ];
+		    eye[0] * projectionMatrix[ i + 0 * 4 ] +
+		    eye[1] * projectionMatrix[ i + 1 * 4 ] +
+		    eye[2] * projectionMatrix[ i + 2 * 4 ] +
+		    eye[3] * projectionMatrix[ i + 3 * 4 ];
 	}
 }
 
@@ -723,37 +734,37 @@ void R_GlobalToNormalizedDeviceCoordinates( const idVec3 &global, idVec3 &ndc ) 
 
 		for ( i = 0 ; i < 4 ; i ++ ) {
 			view[i] =
-				global[0] * tr.primaryView->worldSpace.modelViewMatrix[ i + 0 * 4 ] +
-				global[1] * tr.primaryView->worldSpace.modelViewMatrix[ i + 1 * 4 ] +
-				global[2] * tr.primaryView->worldSpace.modelViewMatrix[ i + 2 * 4 ] +
-					tr.primaryView->worldSpace.modelViewMatrix[ i + 3 * 4 ];
+			    global[0] * tr.primaryView->worldSpace.modelViewMatrix[ i + 0 * 4 ] +
+			    global[1] * tr.primaryView->worldSpace.modelViewMatrix[ i + 1 * 4 ] +
+			    global[2] * tr.primaryView->worldSpace.modelViewMatrix[ i + 2 * 4 ] +
+			    tr.primaryView->worldSpace.modelViewMatrix[ i + 3 * 4 ];
 		}
 
 		for ( i = 0 ; i < 4 ; i ++ ) {
 			clip[i] =
-				view[0] * tr.primaryView->projectionMatrix[ i + 0 * 4 ] +
-				view[1] * tr.primaryView->projectionMatrix[ i + 1 * 4 ] +
-				view[2] * tr.primaryView->projectionMatrix[ i + 2 * 4 ] +
-				view[3] * tr.primaryView->projectionMatrix[ i + 3 * 4 ];
+			    view[0] * tr.primaryView->projectionMatrix[ i + 0 * 4 ] +
+			    view[1] * tr.primaryView->projectionMatrix[ i + 1 * 4 ] +
+			    view[2] * tr.primaryView->projectionMatrix[ i + 2 * 4 ] +
+			    view[3] * tr.primaryView->projectionMatrix[ i + 3 * 4 ];
 		}
 
 	} else {
 
 		for ( i = 0 ; i < 4 ; i ++ ) {
 			view[i] =
-				global[0] * tr.viewDef->worldSpace.modelViewMatrix[ i + 0 * 4 ] +
-				global[1] * tr.viewDef->worldSpace.modelViewMatrix[ i + 1 * 4 ] +
-				global[2] * tr.viewDef->worldSpace.modelViewMatrix[ i + 2 * 4 ] +
-				tr.viewDef->worldSpace.modelViewMatrix[ i + 3 * 4 ];
+			    global[0] * tr.viewDef->worldSpace.modelViewMatrix[ i + 0 * 4 ] +
+			    global[1] * tr.viewDef->worldSpace.modelViewMatrix[ i + 1 * 4 ] +
+			    global[2] * tr.viewDef->worldSpace.modelViewMatrix[ i + 2 * 4 ] +
+			    tr.viewDef->worldSpace.modelViewMatrix[ i + 3 * 4 ];
 		}
 
 
 		for ( i = 0 ; i < 4 ; i ++ ) {
 			clip[i] =
-				view[0] * tr.viewDef->projectionMatrix[ i + 0 * 4 ] +
-				view[1] * tr.viewDef->projectionMatrix[ i + 1 * 4 ] +
-				view[2] * tr.viewDef->projectionMatrix[ i + 2 * 4 ] +
-				view[3] * tr.viewDef->projectionMatrix[ i + 3 * 4 ];
+			    view[0] * tr.viewDef->projectionMatrix[ i + 0 * 4 ] +
+			    view[1] * tr.viewDef->projectionMatrix[ i + 1 * 4 ] +
+			    view[2] * tr.viewDef->projectionMatrix[ i + 2 * 4 ] +
+			    view[3] * tr.viewDef->projectionMatrix[ i + 3 * 4 ];
 		}
 
 	}
@@ -789,10 +800,10 @@ void myGlMultMatrix( const float a[16], const float b[16], float out[16] ) {
 	for ( i = 0 ; i < 4 ; i++ ) {
 		for ( j = 0 ; j < 4 ; j++ ) {
 			out[ i * 4 + j ] =
-				a [ i * 4 + 0 ] * b [ 0 * 4 + j ]
-				+ a [ i * 4 + 1 ] * b [ 1 * 4 + j ]
-				+ a [ i * 4 + 2 ] * b [ 2 * 4 + j ]
-				+ a [ i * 4 + 3 ] * b [ 3 * 4 + j ];
+			    a [ i * 4 + 0 ] * b [ 0 * 4 + j ]
+			    + a [ i * 4 + 1 ] * b [ 1 * 4 + j ]
+			    + a [ i * 4 + 2 ] * b [ 2 * 4 + j ]
+			    + a [ i * 4 + 3 ] * b [ 3 * 4 + j ];
 		}
 	}
 #else
@@ -898,6 +909,7 @@ void R_SetupProjection( void ) {
 	float	xmin, xmax, ymin, ymax;
 	float	width, height;
 	float	zNear;
+	float   zFar;
 	float	jitterx, jittery;
 	static	idRandom random;
 
@@ -914,10 +926,17 @@ void R_SetupProjection( void ) {
 	//
 	// set up projection matrix
 	//
+#if Z_HACK
+	zNear = 8;
+#else
 	zNear	= r_znear.GetFloat();
+#endif
+
 	if ( tr.viewDef->renderView.cramZNear ) {
 		zNear *= 0.25;
 	}
+
+	zFar = 4000;
 
 	ymax = zNear * tan( tr.viewDef->renderView.fov_y * idMath::PI / 360.0f );
 	ymin = -ymax;
@@ -950,8 +969,13 @@ void R_SetupProjection( void ) {
 	// rasterize right at the wraparound point
 	tr.viewDef->projectionMatrix[2] = 0;
 	tr.viewDef->projectionMatrix[6] = 0;
+#if Z_HACK
+	tr.viewDef->projectionMatrix[10] = (-zFar-zNear)/(zFar-zNear);//-0.999f;
+	tr.viewDef->projectionMatrix[14] = -2.0f*zFar*zNear/(zFar-zNear);
+#else
 	tr.viewDef->projectionMatrix[10] = -0.999f;
 	tr.viewDef->projectionMatrix[14] = -2.0f * zNear;
+#endif
 
 	tr.viewDef->projectionMatrix[3] = 0;
 	tr.viewDef->projectionMatrix[7] = 0;
@@ -1072,7 +1096,7 @@ R_SortDrawSurfs
 static void R_SortDrawSurfs( void ) {
 	// sort the drawsurfs by sort type, then orientation, then shader
 	qsort( tr.viewDef->drawSurfs, tr.viewDef->numDrawSurfs, sizeof( tr.viewDef->drawSurfs[0] ),
-		R_QsortSurfaces );
+	       R_QsortSurfaces );
 }
 
 
