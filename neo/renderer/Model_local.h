@@ -45,7 +45,7 @@ public:
 	// the inherited public interface
 	static idRenderModel *		Alloc();
 
-								idRenderModelStatic();
+	idRenderModelStatic();
 	virtual						~idRenderModelStatic();
 
 	virtual void				InitFromFile( const char *fileName );
@@ -142,8 +142,8 @@ class idMD5Mesh {
 	friend class				idRenderModelMD5;
 
 public:
-								idMD5Mesh();
-								~idMD5Mesh();
+	idMD5Mesh();
+	~idMD5Mesh();
 
 	void						ParseMesh( idLexer &parser, int numJoints, const idJointMat *joints );
 	void						UpdateSurface( const struct renderEntity_s *ent, const idJointMat *joints, modelSurface_t *surf );
@@ -234,7 +234,7 @@ private:
 
 class idRenderModelLiquid : public idRenderModelStatic {
 public:
-								idRenderModelLiquid();
+	idRenderModelLiquid();
 
 	virtual void				InitFromFile( const char *fileName );
 	virtual dynamicModel_t		IsDynamicModel() const;
@@ -262,7 +262,7 @@ private:
 
 	const idMaterial *			shader;
 	struct deformInfo_s	*		deformInfo;		// used to create srfTriangles_t from base frames
-											// and new vertexes
+	// and new vertexes
 
 	float						density;
 	float						drop_height;
@@ -289,7 +289,7 @@ private:
 
 class idRenderModelPrt : public idRenderModelStatic {
 public:
-								idRenderModelPrt();
+	idRenderModelPrt();
 
 	virtual void				InitFromFile( const char *fileName );
 	virtual void				TouchData();
@@ -342,7 +342,7 @@ class idRenderModelTrail : public idRenderModelStatic {
 	idBounds					trailBounds;
 
 public:
-								idRenderModelTrail();
+	idRenderModelTrail();
 
 	virtual dynamicModel_t		IsDynamicModel() const;
 	virtual bool				IsLoaded() const;

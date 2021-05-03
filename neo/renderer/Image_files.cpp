@@ -181,8 +181,7 @@ BMP LOADING
 
 =========================================================
 */
-typedef struct
-{
+typedef struct {
 	char id[2];
 	unsigned int fileSize;
 	unsigned int reserved0;
@@ -206,8 +205,7 @@ typedef struct
 LoadBMP
 ==============
 */
-static void LoadBMP( const char *name, byte **pic, int *width, int *height, ID_TIME_T *timestamp )
-{
+static void LoadBMP( const char *name, byte **pic, int *width, int *height, ID_TIME_T *timestamp ) {
 	int		columns, rows, numPixels;
 	byte	*pixbuf;
 	int		row, column;
@@ -270,20 +268,16 @@ static void LoadBMP( const char *name, byte **pic, int *width, int *height, ID_T
 	if ( bmpHeader.bitsPerPixel == 8 )
 		buf_p += 1024;
 
-	if ( bmpHeader.id[0] != 'B' && bmpHeader.id[1] != 'M' )
-	{
+	if ( bmpHeader.id[0] != 'B' && bmpHeader.id[1] != 'M' ) {
 		common->Error( "LoadBMP: only Windows-style BMP files supported (%s)\n", name );
 	}
-	if ( bmpHeader.fileSize != length )
-	{
+	if ( bmpHeader.fileSize != length ) {
 		common->Error( "LoadBMP: header size does not match file size (%u vs. %d) (%s)\n", bmpHeader.fileSize, length, name );
 	}
-	if ( bmpHeader.compression != 0 )
-	{
+	if ( bmpHeader.compression != 0 ) {
 		common->Error( "LoadBMP: only uncompressed BMP files supported (%s)\n", name );
 	}
-	if ( bmpHeader.bitsPerPixel < 8 )
-	{
+	if ( bmpHeader.bitsPerPixel < 8 ) {
 		common->Error( "LoadBMP: monochrome and 4-bit BMP files not supported (%s)\n", name );
 	}
 
@@ -302,18 +296,15 @@ static void LoadBMP( const char *name, byte **pic, int *width, int *height, ID_T
 	*pic = bmpRGBA;
 
 
-	for ( row = rows-1; row >= 0; row-- )
-	{
+	for ( row = rows-1; row >= 0; row-- ) {
 		pixbuf = bmpRGBA + row*columns*4;
 
-		for ( column = 0; column < columns; column++ )
-		{
+		for ( column = 0; column < columns; column++ ) {
 			unsigned char red, green, blue, alpha;
 			int palIndex;
 			unsigned short shortPixel;
 
-			switch ( bmpHeader.bitsPerPixel )
-			{
+			switch ( bmpHeader.bitsPerPixel ) {
 			case 8:
 				palIndex = *buf_p++;
 				*pixbuf++ = bmpHeader.palette[palIndex][2];
@@ -376,7 +367,7 @@ LoadPCX
 ==============
 */
 static void LoadPCX ( const char *filename, byte **pic, byte **palette, int *width, int *height,
-					 ID_TIME_T *timestamp ) {
+                      ID_TIME_T *timestamp ) {
 	byte	*raw;
 	pcx_t	*pcx;
 	int		x, y;
@@ -411,12 +402,11 @@ static void LoadPCX ( const char *filename, byte **pic, byte **palette, int *wid
 	ymax = LittleShort(pcx->ymax);
 
 	if (pcx->manufacturer != 0x0a
-		|| pcx->version != 5
-		|| pcx->encoding != 1
-		|| pcx->bits_per_pixel != 8
-		|| xmax >= 1024
-		|| ymax >= 1024)
-	{
+	        || pcx->version != 5
+	        || pcx->encoding != 1
+	        || pcx->bits_per_pixel != 8
+	        || xmax >= 1024
+	        || ymax >= 1024) {
 		common->Printf( "Bad pcx file %s (%i x %i) (%i x %i)\n", filename, xmax+1, ymax+1, pcx->xmax, pcx->ymax);
 		return;
 	}
@@ -427,8 +417,7 @@ static void LoadPCX ( const char *filename, byte **pic, byte **palette, int *wid
 
 	pix = out;
 
-	if (palette)
-	{
+	if (palette) {
 		*palette = (byte *)R_StaticAlloc(768);
 		memcpy (*palette, (byte *)pcx + len - 768, 768);
 	}
@@ -439,18 +428,14 @@ static void LoadPCX ( const char *filename, byte **pic, byte **palette, int *wid
 		*height = ymax+1;
 // FIXME: use bytes_per_line here?
 
-	for (y=0 ; y<=ymax ; y++, pix += xmax+1)
-	{
-		for (x=0 ; x<=xmax ; )
-		{
+	for (y=0 ; y<=ymax ; y++, pix += xmax+1) {
+		for (x=0 ; x<=xmax ; ) {
 			dataByte = *raw++;
 
-			if((dataByte & 0xC0) == 0xC0)
-			{
+			if((dataByte & 0xC0) == 0xC0) {
 				runLength = dataByte & 0x3F;
 				dataByte = *raw++;
-			}
-			else
+			} else
 				runLength = 1;
 
 			while(runLength-- > 0)
@@ -459,8 +444,7 @@ static void LoadPCX ( const char *filename, byte **pic, byte **palette, int *wid
 
 	}
 
-	if ( raw - (byte *)pcx > len)
-	{
+	if ( raw - (byte *)pcx > len) {
 		common->Printf( "PCX file %s was malformed", filename );
 		R_StaticFree (*pic);
 		*pic = NULL;
@@ -602,17 +586,13 @@ static void LoadTGA( const char *name, byte **pic, int *width, int *height, ID_T
 		buf_p += targa_header.id_length;  // skip TARGA image comment
 	}
 
-	if ( targa_header.image_type == 2 || targa_header.image_type == 3 )
-	{
+	if ( targa_header.image_type == 2 || targa_header.image_type == 3 ) {
 		// Uncompressed RGB or gray scale image
-		for( row = rows - 1; row >= 0; row-- )
-		{
+		for( row = rows - 1; row >= 0; row-- ) {
 			pixbuf = targa_rgba + row*columns*4;
-			for( column = 0; column < columns; column++)
-			{
+			for( column = 0; column < columns; column++) {
 				unsigned char red,green,blue,alphabyte;
-				switch( targa_header.pixel_size )
-				{
+				switch( targa_header.pixel_size ) {
 
 				case 8:
 					blue = *buf_p++;
@@ -649,8 +629,7 @@ static void LoadTGA( const char *name, byte **pic, int *width, int *height, ID_T
 				}
 			}
 		}
-	}
-	else if ( targa_header.image_type == 10 ) {   // Runlength encoded RGB images
+	} else if ( targa_header.image_type == 10 ) { // Runlength encoded RGB images
 		unsigned char red,green,blue,alphabyte,packetHeader,packetSize,j;
 
 		red = 0;
@@ -665,21 +644,21 @@ static void LoadTGA( const char *name, byte **pic, int *width, int *height, ID_T
 				packetSize = 1 + (packetHeader & 0x7f);
 				if ( packetHeader & 0x80 ) {        // run-length packet
 					switch( targa_header.pixel_size ) {
-						case 24:
-								blue = *buf_p++;
-								green = *buf_p++;
-								red = *buf_p++;
-								alphabyte = 255;
-								break;
-						case 32:
-								blue = *buf_p++;
-								green = *buf_p++;
-								red = *buf_p++;
-								alphabyte = *buf_p++;
-								break;
-						default:
-							common->Error( "LoadTGA( %s ): illegal pixel_size '%d'\n", name, targa_header.pixel_size );
-							break;
+					case 24:
+						blue = *buf_p++;
+						green = *buf_p++;
+						red = *buf_p++;
+						alphabyte = 255;
+						break;
+					case 32:
+						blue = *buf_p++;
+						green = *buf_p++;
+						red = *buf_p++;
+						alphabyte = *buf_p++;
+						break;
+					default:
+						common->Error( "LoadTGA( %s ): illegal pixel_size '%d'\n", name, targa_header.pixel_size );
+						break;
 					}
 
 					for( j = 0; j < packetSize; j++ ) {
@@ -692,47 +671,44 @@ static void LoadTGA( const char *name, byte **pic, int *width, int *height, ID_T
 							column = 0;
 							if ( row > 0) {
 								row--;
-							}
-							else {
+							} else {
 								goto breakOut;
 							}
 							pixbuf = targa_rgba + row*columns*4;
 						}
 					}
-				}
-				else {                            // non run-length packet
+				} else {                          // non run-length packet
 					for( j = 0; j < packetSize; j++ ) {
 						switch( targa_header.pixel_size ) {
-							case 24:
-									blue = *buf_p++;
-									green = *buf_p++;
-									red = *buf_p++;
-									*pixbuf++ = red;
-									*pixbuf++ = green;
-									*pixbuf++ = blue;
-									*pixbuf++ = 255;
-									break;
-							case 32:
-									blue = *buf_p++;
-									green = *buf_p++;
-									red = *buf_p++;
-									alphabyte = *buf_p++;
-									*pixbuf++ = red;
-									*pixbuf++ = green;
-									*pixbuf++ = blue;
-									*pixbuf++ = alphabyte;
-									break;
-							default:
-								common->Error( "LoadTGA( %s ): illegal pixel_size '%d'\n", name, targa_header.pixel_size );
-								break;
+						case 24:
+							blue = *buf_p++;
+							green = *buf_p++;
+							red = *buf_p++;
+							*pixbuf++ = red;
+							*pixbuf++ = green;
+							*pixbuf++ = blue;
+							*pixbuf++ = 255;
+							break;
+						case 32:
+							blue = *buf_p++;
+							green = *buf_p++;
+							red = *buf_p++;
+							alphabyte = *buf_p++;
+							*pixbuf++ = red;
+							*pixbuf++ = green;
+							*pixbuf++ = blue;
+							*pixbuf++ = alphabyte;
+							break;
+						default:
+							common->Error( "LoadTGA( %s ): illegal pixel_size '%d'\n", name, targa_header.pixel_size );
+							break;
 						}
 						column++;
 						if ( column == columns ) { // pixel packet run spans across rows
 							column = 0;
 							if ( row > 0 ) {
 								row--;
-							}
-							else {
+							} else {
 								goto breakOut;
 							}
 							pixbuf = targa_rgba + row*columns*4;
@@ -740,7 +716,8 @@ static void LoadTGA( const char *name, byte **pic, int *width, int *height, ID_T
 					}
 				}
 			}
-			breakOut: ;
+breakOut:
+			;
 		}
 	}
 
@@ -757,41 +734,41 @@ LoadJPG
 =============
 */
 static void LoadJPG( const char *filename, unsigned char **pic, int *width, int *height, ID_TIME_T *timestamp ) {
-  /* This struct contains the JPEG decompression parameters and pointers to
-   * working space (which is allocated as needed by the JPEG library).
-   */
-  struct jpeg_decompress_struct cinfo;
-  /* We use our private extension JPEG error handler.
-   * Note that this struct must live as long as the main JPEG parameter
-   * struct, to avoid dangling-pointer problems.
-   */
-  /* This struct represents a JPEG error handler.  It is declared separately
-   * because applications often want to supply a specialized error handler
-   * (see the second half of this file for an example).  But here we just
-   * take the easy way out and use the standard error handler, which will
-   * print a message on stderr and call exit() if compression fails.
-   * Note that this struct must live as long as the main JPEG parameter
-   * struct, to avoid dangling-pointer problems.
-   */
-  struct jpeg_error_mgr jerr;
-  /* More stuff */
-  JSAMPARRAY buffer;		/* Output row buffer */
-  int row_stride;		/* physical row width in output buffer */
-  unsigned char *out;
-  byte	*fbuffer;
-  byte  *bbuf;
+	/* This struct contains the JPEG decompression parameters and pointers to
+	 * working space (which is allocated as needed by the JPEG library).
+	 */
+	struct jpeg_decompress_struct cinfo;
+	/* We use our private extension JPEG error handler.
+	 * Note that this struct must live as long as the main JPEG parameter
+	 * struct, to avoid dangling-pointer problems.
+	 */
+	/* This struct represents a JPEG error handler.  It is declared separately
+	 * because applications often want to supply a specialized error handler
+	 * (see the second half of this file for an example).  But here we just
+	 * take the easy way out and use the standard error handler, which will
+	 * print a message on stderr and call exit() if compression fails.
+	 * Note that this struct must live as long as the main JPEG parameter
+	 * struct, to avoid dangling-pointer problems.
+	 */
+	struct jpeg_error_mgr jerr;
+	/* More stuff */
+	JSAMPARRAY buffer;		/* Output row buffer */
+	int row_stride;		/* physical row width in output buffer */
+	unsigned char *out;
+	byte	*fbuffer;
+	byte  *bbuf;
 
-  /* In this example we want to open the input file before doing anything else,
-   * so that the setjmp() error recovery below can assume the file is open.
-   * VERY IMPORTANT: use "b" option to fopen() if you are on a machine that
-   * requires it in order to read binary files.
-   */
+	/* In this example we want to open the input file before doing anything else,
+	 * so that the setjmp() error recovery below can assume the file is open.
+	 * VERY IMPORTANT: use "b" option to fopen() if you are on a machine that
+	 * requires it in order to read binary files.
+	 */
 
 	// JDC: because fill_input_buffer() blindly copies INPUT_BUF_SIZE bytes,
 	// we need to make sure the file buffer is padded or it may crash
-  if ( pic ) {
-	*pic = NULL;		// until proven otherwise
-  }
+	if ( pic ) {
+		*pic = NULL;		// until proven otherwise
+	}
 
 	int len;
 	idFile *f;
@@ -812,116 +789,116 @@ static void LoadJPG( const char *filename, unsigned char **pic, int *width, int 
 	f->Read( fbuffer, len );
 	fileSystem->CloseFile( f );
 
-  /* Step 1: allocate and initialize JPEG decompression object */
+	/* Step 1: allocate and initialize JPEG decompression object */
 
-  /* We have to set up the error handler first, in case the initialization
-   * step fails.  (Unlikely, but it could happen if you are out of memory.)
-   * This routine fills in the contents of struct jerr, and returns jerr's
-   * address which we place into the link field in cinfo.
-   */
-  cinfo.err = jpeg_std_error(&jerr);
-
-  /* Now we can initialize the JPEG decompression object. */
-  jpeg_create_decompress(&cinfo);
-
-  /* Step 2: specify data source (eg, a file) */
-
-  jpeg_mem_src(&cinfo, fbuffer, len);
-
-  /* Step 3: read file parameters with jpeg_read_header() */
-
-  (void) jpeg_read_header(&cinfo, (boolean)true);
-  /* We can ignore the return value from jpeg_read_header since
-   *   (a) suspension is not possible with the stdio data source, and
-   *   (b) we passed TRUE to reject a tables-only JPEG file as an error.
-   * See libjpeg.doc for more info.
-   */
-
-  /* Step 4: set parameters for decompression */
-
-  /* In this example, we don't need to change any of the defaults set by
-   * jpeg_read_header(), so we do nothing here.
-   */
-
-  /* Step 5: Start decompressor */
-
-  (void) jpeg_start_decompress(&cinfo);
-  /* We can ignore the return value since suspension is not possible
-   * with the stdio data source.
-   */
-
-  /* We may need to do some setup of our own at this point before reading
-   * the data.  After jpeg_start_decompress() we have the correct scaled
-   * output image dimensions available, as well as the output colormap
-   * if we asked for color quantization.
-   * In this example, we need to make an output work buffer of the right size.
-   */
-  /* JSAMPLEs per row in output buffer */
-  row_stride = cinfo.output_width * cinfo.output_components;
-
-  if (cinfo.output_components!=4) {
-		common->DWarning( "JPG %s is unsupported color depth (%d)",
-			filename, cinfo.output_components);
-  }
-  out = (byte *)R_StaticAlloc(cinfo.output_width*cinfo.output_height*4);
-
-  *pic = out;
-  *width = cinfo.output_width;
-  *height = cinfo.output_height;
-
-  /* Step 6: while (scan lines remain to be read) */
-  /*           jpeg_read_scanlines(...); */
-
-  /* Here we use the library's state variable cinfo.output_scanline as the
-   * loop counter, so that we don't have to keep track ourselves.
-   */
-  while (cinfo.output_scanline < cinfo.output_height) {
-	/* jpeg_read_scanlines expects an array of pointers to scanlines.
-	 * Here the array is only one element long, but you could ask for
-	 * more than one scanline at a time if that's more convenient.
+	/* We have to set up the error handler first, in case the initialization
+	 * step fails.  (Unlikely, but it could happen if you are out of memory.)
+	 * This routine fills in the contents of struct jerr, and returns jerr's
+	 * address which we place into the link field in cinfo.
 	 */
-	bbuf = ((out+(row_stride*cinfo.output_scanline)));
-	buffer = &bbuf;
-	(void) jpeg_read_scanlines(&cinfo, buffer, 1);
-  }
+	cinfo.err = jpeg_std_error(&jerr);
 
-  // clear all the alphas to 255
-  {
-	  int	i, j;
+	/* Now we can initialize the JPEG decompression object. */
+	jpeg_create_decompress(&cinfo);
+
+	/* Step 2: specify data source (eg, a file) */
+
+	jpeg_mem_src(&cinfo, fbuffer, len);
+
+	/* Step 3: read file parameters with jpeg_read_header() */
+
+	(void) jpeg_read_header(&cinfo, (boolean)true);
+	/* We can ignore the return value from jpeg_read_header since
+	 *   (a) suspension is not possible with the stdio data source, and
+	 *   (b) we passed TRUE to reject a tables-only JPEG file as an error.
+	 * See libjpeg.doc for more info.
+	 */
+
+	/* Step 4: set parameters for decompression */
+
+	/* In this example, we don't need to change any of the defaults set by
+	 * jpeg_read_header(), so we do nothing here.
+	 */
+
+	/* Step 5: Start decompressor */
+
+	(void) jpeg_start_decompress(&cinfo);
+	/* We can ignore the return value since suspension is not possible
+	 * with the stdio data source.
+	 */
+
+	/* We may need to do some setup of our own at this point before reading
+	 * the data.  After jpeg_start_decompress() we have the correct scaled
+	 * output image dimensions available, as well as the output colormap
+	 * if we asked for color quantization.
+	 * In this example, we need to make an output work buffer of the right size.
+	 */
+	/* JSAMPLEs per row in output buffer */
+	row_stride = cinfo.output_width * cinfo.output_components;
+
+	if (cinfo.output_components!=4) {
+		common->DWarning( "JPG %s is unsupported color depth (%d)",
+		                  filename, cinfo.output_components);
+	}
+	out = (byte *)R_StaticAlloc(cinfo.output_width*cinfo.output_height*4);
+
+	*pic = out;
+	*width = cinfo.output_width;
+	*height = cinfo.output_height;
+
+	/* Step 6: while (scan lines remain to be read) */
+	/*           jpeg_read_scanlines(...); */
+
+	/* Here we use the library's state variable cinfo.output_scanline as the
+	 * loop counter, so that we don't have to keep track ourselves.
+	 */
+	while (cinfo.output_scanline < cinfo.output_height) {
+		/* jpeg_read_scanlines expects an array of pointers to scanlines.
+		 * Here the array is only one element long, but you could ask for
+		 * more than one scanline at a time if that's more convenient.
+		 */
+		bbuf = ((out+(row_stride*cinfo.output_scanline)));
+		buffer = &bbuf;
+		(void) jpeg_read_scanlines(&cinfo, buffer, 1);
+	}
+
+	// clear all the alphas to 255
+	{
+		int	i, j;
 		byte	*buf;
 
 		buf = *pic;
 
-	  j = cinfo.output_width * cinfo.output_height * 4;
-	  for ( i = 3 ; i < j ; i+=4 ) {
-		  buf[i] = 255;
-	  }
-  }
+		j = cinfo.output_width * cinfo.output_height * 4;
+		for ( i = 3 ; i < j ; i+=4 ) {
+			buf[i] = 255;
+		}
+	}
 
-  /* Step 7: Finish decompression */
+	/* Step 7: Finish decompression */
 
-  (void) jpeg_finish_decompress(&cinfo);
-  /* We can ignore the return value since suspension is not possible
-   * with the stdio data source.
-   */
+	(void) jpeg_finish_decompress(&cinfo);
+	/* We can ignore the return value since suspension is not possible
+	 * with the stdio data source.
+	 */
 
-  /* Step 8: Release JPEG decompression object */
+	/* Step 8: Release JPEG decompression object */
 
-  /* This is an important step since it will release a good deal of memory. */
-  jpeg_destroy_decompress(&cinfo);
+	/* This is an important step since it will release a good deal of memory. */
+	jpeg_destroy_decompress(&cinfo);
 
-  /* After finish_decompress, we can close the input file.
-   * Here we postpone it until after no more JPEG errors are possible,
-   * so as to simplify the setjmp error logic above.  (Actually, I don't
-   * think that jpeg_destroy can do an error exit, but why assume anything...)
-   */
-  Mem_Free( fbuffer );
+	/* After finish_decompress, we can close the input file.
+	 * Here we postpone it until after no more JPEG errors are possible,
+	 * so as to simplify the setjmp error logic above.  (Actually, I don't
+	 * think that jpeg_destroy can do an error exit, but why assume anything...)
+	 */
+	Mem_Free( fbuffer );
 
-  /* At this point you may want to check to see whether any corrupt-data
-   * warnings occurred (test whether jerr.pub.num_warnings is nonzero).
-   */
+	/* At this point you may want to check to see whether any corrupt-data
+	 * warnings occurred (test whether jerr.pub.num_warnings is nonzero).
+	 */
 
-  /* And we're done! */
+	/* And we're done! */
 }
 
 //===================================================================
@@ -957,7 +934,7 @@ void R_LoadImage( const char *cname, byte **pic, int *width, int *height, ID_TIM
 		*pic = NULL;
 	}
 	if ( timestamp ) {
-		*timestamp = FILE_NOT_FOUND_TIMESTAMP;
+		*timestamp = 0xFFFFFFFF;
 	}
 	if ( width ) {
 		*width = 0;
@@ -978,7 +955,7 @@ void R_LoadImage( const char *cname, byte **pic, int *width, int *height, ID_TIM
 
 	if ( ext == "tga" ) {
 		LoadTGA( name.c_str(), pic, width, height, timestamp );            // try tga first
-		if ( ( pic && *pic == 0 ) || ( timestamp && *timestamp == FILE_NOT_FOUND_TIMESTAMP ) ) {
+		if ( ( pic && *pic == 0 ) || ( timestamp && *timestamp == -1 ) ) {
 			name.StripFileExtension();
 			name.DefaultFileExtension( ".jpg" );
 			LoadJPG( name.c_str(), pic, width, height, timestamp );
@@ -1042,9 +1019,11 @@ Loads six files with proper extensions
 bool R_LoadCubeImages( const char *imgName, cubeFiles_t extensions, byte *pics[6], int *outSize, ID_TIME_T *timestamp ) {
 	int		i, j;
 	const char	*cameraSides[6] =  { "_forward.tga", "_back.tga", "_left.tga", "_right.tga",
-		"_up.tga", "_down.tga" };
+	                                 "_up.tga", "_down.tga"
+	                              };
 	const char	*axisSides[6] =  { "_px.tga", "_nx.tga", "_py.tga", "_ny.tga",
-		"_pz.tga", "_nz.tga" };
+	                               "_pz.tga", "_nz.tga"
+	                            };
 	const char	**sides;
 	char	fullName[MAX_IMAGE_NAME];
 	int		width, height, size = 0;
@@ -1055,7 +1034,6 @@ bool R_LoadCubeImages( const char *imgName, cubeFiles_t extensions, byte *pics[6
 		sides = axisSides;
 	}
 
-	// FIXME: precompressed cube map files
 	if ( pics ) {
 		memset( pics, 0, 6*sizeof(pics[0]) );
 	}

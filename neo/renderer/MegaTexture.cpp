@@ -77,7 +77,7 @@ static void R_EmptyLevelImage( idImage *image ) {
 
 	// FIXME: this won't live past vid mode changes
 	image->GenerateImage( data, MAX_LEVEL_WIDTH, MAX_LEVEL_WIDTH,
-		TF_DEFAULT, false, TR_REPEAT, TD_HIGH_QUALITY );
+	                      TF_DEFAULT, false, TR_REPEAT, TD_HIGH_QUALITY );
 }
 
 
@@ -237,7 +237,7 @@ void idMegaTexture::BindForViewOrigin( const idVec3 viewOrigin ) {
 			globalImages->whiteImage->Bind();
 
 			static float	parms[4] = { -2, -2, 0, 1 };	// no contribution
-			qglProgramLocalParameter4fvARB( GL_VERTEX_PROGRAM_ARB, i, parms );
+			//qglProgramLocalParameter4fvARB( GL_VERTEX_PROGRAM_ARB, i, parms );
 		} else {
 			idTextureLevel	*level = &levels[ numLevels-1-i ];
 
@@ -250,7 +250,7 @@ void idMegaTexture::BindForViewOrigin( const idVec3 viewOrigin ) {
 			} else {
 				level->image->Bind();
 			}
-			qglProgramLocalParameter4fvARB( GL_VERTEX_PROGRAM_ARB, i, level->parms );
+			//qglProgramLocalParameter4fvARB( GL_VERTEX_PROGRAM_ARB, i, level->parms );
 		}
 	}
 
@@ -259,13 +259,13 @@ void idMegaTexture::BindForViewOrigin( const idVec3 viewOrigin ) {
 	parms[1] = 0;
 	parms[2] = 0;
 	parms[3] = 1;
-	qglProgramLocalParameter4fvARB( GL_VERTEX_PROGRAM_ARB, 7, parms );
+	//qglProgramLocalParameter4fvARB( GL_VERTEX_PROGRAM_ARB, 7, parms );
 
 	parms[0] = 1;
 	parms[1] = 1;
 	parms[2] = r_terrainScale.GetFloat();
 	parms[3] = 1;
-	qglProgramLocalParameter4fvARB( GL_VERTEX_PROGRAM_ARB, 8, parms );
+	//qglProgramLocalParameter4fvARB( GL_VERTEX_PROGRAM_ARB, 8, parms );
 }
 
 /*
@@ -313,10 +313,10 @@ void idMegaTexture::SetViewOrigin( const idVec3 viewOrigin ) {
 	// be a different conversion for each megaTexture
 	for ( int i = 0 ; i < 2 ; i++ ) {
 		texCenter[i] =
-			viewOrigin[0] * localViewToTextureCenter[i][0] +
-			viewOrigin[1] * localViewToTextureCenter[i][1] +
-			viewOrigin[2] * localViewToTextureCenter[i][2] +
-			localViewToTextureCenter[i][3];
+		    viewOrigin[0] * localViewToTextureCenter[i][0] +
+		    viewOrigin[1] * localViewToTextureCenter[i][1] +
+		    viewOrigin[2] * localViewToTextureCenter[i][2] +
+		    localViewToTextureCenter[i][3];
 	}
 
 	for ( int i = 0 ; i < numLevels ; i++ ) {
@@ -463,7 +463,7 @@ void idTextureLevel::Invalidate() {
 	for ( int x = 0 ; x < TILE_PER_LEVEL ; x++ ) {
 		for ( int y = 0 ; y < TILE_PER_LEVEL ; y++ ) {
 			tileMap[x][y].x =
-			tileMap[x][y].y = -99999;
+			    tileMap[x][y].y = -99999;
 		}
 	}
 }
@@ -632,7 +632,7 @@ void	idMegaTexture::GenerateMegaPreview( const char *fileName ) {
 
 			for ( int yy = 0 ; yy < tileSize ; yy++ ) {
 				memcpy( pic + ( ( y * tileSize + yy ) * width * tileSize + x * tileSize  ) * 4,
-					oldBlock + yy * tileSize * 4, tileSize * 4 );
+				        oldBlock + yy * tileSize * 4, tileSize * 4 );
 			}
 		}
 	}
@@ -652,7 +652,7 @@ MakeMegaTexture_f
 Incrementally load a giant tga file and process into the mega texture block format
 ====================
 */
-void idMegaTexture::MakeMegaTexture_f( const idCmdArgs &args ) {
+/*void idMegaTexture::MakeMegaTexture_f( const idCmdArgs &args ) {
 	int		columns, fileSize, numBytes;
 	byte	*pixbuf;
 	int		row, column;
@@ -909,4 +909,4 @@ void idMegaTexture::MakeMegaTexture_f( const idCmdArgs &args ) {
 		R_VerticalFlip( *pic, *width, *height );
 	}
 #endif
-}
+}*/

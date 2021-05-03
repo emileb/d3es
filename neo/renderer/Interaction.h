@@ -115,7 +115,7 @@ public:
 	idInteraction *			entityPrev;
 
 public:
-							idInteraction( void );
+	idInteraction( void );
 
 	// because these are generated and freed each game tic for active elements all
 	// over the world, we use a custom pool allocater to avoid memory allocation overhead
@@ -134,10 +134,14 @@ public:
 	void					MakeEmpty( void );
 
 	// returns true if the interaction is empty
-	bool					IsEmpty( void ) const { return ( numSurfaces == 0 ); }
+	bool					IsEmpty( void ) const {
+		return ( numSurfaces == 0 );
+	}
 
 	// returns true if the interaction is not yet completely created
-	bool					IsDeferred( void ) const { return ( numSurfaces == -1 ); }
+	bool					IsDeferred( void ) const {
+		return ( numSurfaces == -1 );
+	}
 
 	// returns true if the interaction has shadows
 	bool					HasShadows( void ) const;

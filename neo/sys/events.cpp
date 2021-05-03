@@ -37,6 +37,10 @@ If you have questions concerning this license or the applicable additional terms
 #include "renderer/RenderSystem.h"
 #include "renderer/tr_local.h"
 
+#ifdef __ANDROID__
+#include "sound/snd_local.h"
+#endif
+
 #include "sys/sys_public.h"
 
 #if !SDL_VERSION_ATLEAST(2, 0, 0)
@@ -380,7 +384,9 @@ void Sys_GrabMouseCursor(bool grabIt) {
 
 	GLimp_GrabInput(flags);
 }
-
+#ifdef __ANDROID__
+extern idSoundSystemLocal	soundSystemLocal;
+#endif
 /*
 ================
 Sys_GetEvent
@@ -441,16 +447,23 @@ sysEvent_t Sys_GetEvent() {
 						SDL_SetModState((SDL_Keymod)newmod);
 					} // new context because visual studio complains about newmod and currentmod not initialized because of the case SDL_WINDOWEVENT_FOCUS_LOST
 
-					
+					GLimp_WindowActive(true);
+
 					common->ActivateTool( false );
 					GLimp_GrabInput(GRAB_ENABLE | GRAB_REENABLE | GRAB_HIDECURSOR); // FIXME: not sure this is still needed after the ActivateTool()-call
 
 					// start playing the game sound world again (when coming from editor)
 					session->SetPlayingSoundWorld();
-
+#ifdef __ANDROID__
+					soundSystemLocal.Pause( false );
+#endif
 					break;
 				case SDL_WINDOWEVENT_FOCUS_LOST:
 					GLimp_GrabInput(0);
+					GLimp_WindowActive(false);
+#ifdef __ANDROID__
+					soundSystemLocal.Pause( true );
+#endif
 					break;
 			}
 
@@ -693,6 +706,7 @@ void Sys_ClearEvents() {
 	mouse_polls.SetNum(0, false);
 }
 
+extern "C" 	const char * Android_GetCommand();
 /*
 ================
 Sys_GenerateEvents
@@ -703,6 +717,13 @@ void Sys_GenerateEvents() {
 
 	if (s)
 		PushConsoleEvent(s);
+
+	const char * cmd = Android_GetCommand();
+	if(cmd)
+	{
+		cmdSystem->BufferCommandText( CMD_EXEC_NOW, cmd );
+	}
+
 
 	SDL_PumpEvents();
 }

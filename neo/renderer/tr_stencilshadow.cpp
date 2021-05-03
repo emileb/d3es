@@ -202,8 +202,6 @@ idPlane	pointLightFrustums[6][6] = {
 
 int	c_caps, c_sils;
 
-static bool	callOptimizer;			// call the preprocessor optimizer after clipping occluders
-
 typedef struct {
 	int		frontCapStart;
 	int		rearCapStart;
@@ -296,8 +294,8 @@ that is on the far light clip plane
 ===================
 */
 static void R_ProjectPointsToFarPlane( const idRenderEntityLocal *ent, const idRenderLightLocal *light,
-									const idPlane &lightPlaneLocal,
-									int firstShadowVert, int numShadowVerts ) {
+                                       const idPlane &lightPlaneLocal,
+                                       int firstShadowVert, int numShadowVerts ) {
 	idVec3		lv;
 	idVec4		mat[4];
 	int			i;
@@ -421,7 +419,7 @@ static int R_ChopWinding( clipTri_t clipTris[2], int inNum, const idPlane &plane
 		}
 
 		if ( (sides[i] == SIDE_FRONT && sides[i+1] == SIDE_BACK)
-			|| (sides[i] == SIDE_BACK && sides[i+1] == SIDE_FRONT) ) {
+		        || (sides[i] == SIDE_BACK && sides[i+1] == SIDE_FRONT) ) {
 			// generate a split point
 			p2 = &in->verts[i+1];
 
@@ -454,7 +452,7 @@ Returns false if nothing is left after clipping
 ===================
 */
 static bool	R_ClipTriangleToLight( const idVec3 &a, const idVec3 &b, const idVec3 &c, int planeBits,
-							  const idPlane frustum[6] ) {
+                                   const idPlane frustum[6] ) {
 	int			i;
 	int			base;
 	clipTri_t	pingPong[2], *ct;
@@ -536,7 +534,7 @@ other point is on the plane, it will be completely removed.
 ===================
 */
 static bool R_ClipLineToLight(	const idVec3 &a, const idVec3 &b, const idPlane frustum[6],
-						   idVec3 &p1, idVec3 &p2 ) {
+                                idVec3 &p1, idVec3 &p2 ) {
 	float	*clip;
 	int		j;
 	float	d1, d2;
@@ -680,7 +678,7 @@ static void R_AddSilEdges( const srfTriangles_t *tri, unsigned short *pointCull,
 			v1 = numShadowVerts;
 			v2 = v1 + 2;
 			if ( !R_ClipLineToLight( tri->verts[ sil->v1 ].xyz, tri->verts[ sil->v2 ].xyz,
-				frustum, shadowVerts[v1].ToVec3(), shadowVerts[v2].ToVec3() ) ) {
+			                         frustum, shadowVerts[v1].ToVec3(), shadowVerts[v2].ToVec3() ) ) {
 				continue;	// clipped away
 			}
 
@@ -808,12 +806,12 @@ need to be added.
 =================
 */
 static void R_CreateShadowVolumeInFrustum( const idRenderEntityLocal *ent,
-										  const srfTriangles_t *tri,
-										  const idRenderLightLocal *light,
-										  const idVec3 lightOrigin,
-										  const idPlane frustum[6],
-										  const idPlane &farPlane,
-										  bool makeClippedPlanes ) {
+        const srfTriangles_t *tri,
+        const idRenderLightLocal *light,
+        const idVec3 lightOrigin,
+        const idPlane frustum[6],
+        const idPlane &farPlane,
+        bool makeClippedPlanes ) {
 	int		i;
 	int		numTris;
 	unsigned short		*pointCull;
@@ -888,7 +886,7 @@ static void R_CreateShadowVolumeInFrustum( const idRenderEntityLocal *ent,
 			// this will also define clip edges that will become
 			// silhouette planes
 			if ( R_ClipTriangleToLight( tri->verts[i1].xyz, tri->verts[i2].xyz,
-				tri->verts[i3].xyz, cullBits, frustum ) ) {
+			                            tri->verts[i3].xyz, cullBits, frustum ) ) {
 				faceCastsShadow[i] = 1;
 			}
 		} else {
@@ -917,62 +915,6 @@ static void R_CreateShadowVolumeInFrustum( const idRenderEntityLocal *ent,
 		return;
 	}
 
-	//--------------- off-line processing ------------------
-
-	// if we are running from dmap, perform the (very) expensive shadow optimizations
-	// to remove internal sil edges and optimize the caps
-	if ( callOptimizer ) {
-		optimizedShadow_t opt;
-
-		// project all of the vertexes to the shadow plane, generating
-		// an equal number of back vertexes
-//		R_ProjectPointsToFarPlane( ent, light, farPlane, firstShadowVert, numShadowVerts );
-
-		opt = SuperOptimizeOccluders( shadowVerts, shadowIndexes + firstShadowIndex, numCapIndexes, farPlane, lightOrigin );
-
-		// pull off the non-optimized data
-		numShadowIndexes = firstShadowIndex;
-		numShadowVerts = firstShadowVert;
-
-		// add the optimized data
-		if ( numShadowIndexes + opt.totalIndexes > MAX_SHADOW_INDEXES
-			|| numShadowVerts + opt.numVerts > MAX_SHADOW_VERTS ) {
-			overflowed = true;
-			common->Printf( "WARNING: overflowed MAX_SHADOW tables, shadow discarded\n" );
-			Mem_Free( opt.verts );
-			Mem_Free( opt.indexes );
-			return;
-		}
-
-		for ( i = 0 ; i < opt.numVerts ; i++ ) {
-			shadowVerts[numShadowVerts+i][0] = opt.verts[i][0];
-			shadowVerts[numShadowVerts+i][1] = opt.verts[i][1];
-			shadowVerts[numShadowVerts+i][2] = opt.verts[i][2];
-			shadowVerts[numShadowVerts+i][3] = 1;
-		}
-		for ( i = 0 ; i < opt.totalIndexes ; i++ ) {
-			int	index = opt.indexes[i];
-			if ( index < 0 || index > opt.numVerts ) {
-				common->Error( "optimized shadow index out of range" );
-			}
-			shadowIndexes[numShadowIndexes+i] = index + numShadowVerts;
-		}
-
-		numShadowVerts += opt.numVerts;
-		numShadowIndexes += opt.totalIndexes;
-
-		// note the index distribution so we can sort all the caps after all the sils
-		indexRef[indexFrustumNumber].frontCapStart = firstShadowIndex;
-		indexRef[indexFrustumNumber].rearCapStart = firstShadowIndex+opt.numFrontCapIndexes;
-		indexRef[indexFrustumNumber].silStart = firstShadowIndex+opt.numFrontCapIndexes+opt.numRearCapIndexes;
-		indexRef[indexFrustumNumber].end = numShadowIndexes;
-		indexFrustumNumber++;
-
-		Mem_Free( opt.verts );
-		Mem_Free( opt.indexes );
-		return;
-	}
-
 	//--------------- real-time processing ------------------
 
 	// the dangling edge "face" is never considered to cast a shadow,
@@ -993,9 +935,9 @@ static void R_CreateShadowVolumeInFrustum( const idRenderEntityLocal *ent,
 	}
 	numShadowIndexes += numCapIndexes;
 
-c_caps += numCapIndexes * 2;
+	c_caps += numCapIndexes * 2;
 
-int preSilIndexes = numShadowIndexes;
+	int preSilIndexes = numShadowIndexes;
 
 	// if any triangles were clipped, we will have a list of edges
 	// on the frustum which must now become sil edges
@@ -1007,7 +949,7 @@ int preSilIndexes = numShadowIndexes;
 	// non-shadowing triangle will cast a silhouette edge
 	R_AddSilEdges( tri, pointCull, frustum );
 
-c_sils += numShadowIndexes - preSilIndexes;
+	c_sils += numShadowIndexes - preSilIndexes;
 
 	// project all of the vertexes to the shadow plane, generating
 	// an equal number of back vertexes
@@ -1089,8 +1031,8 @@ void R_MakeShadowFrustums( idRenderLightLocal *light ) {
 		// if the light center of projection is outside the light bounds,
 		// we will need to build the planes a little differently
 		if ( fabs( light->parms.lightCenter[0] ) > light->parms.lightRadius[0]
-			|| fabs( light->parms.lightCenter[1] ) > light->parms.lightRadius[1]
-			|| fabs( light->parms.lightCenter[2] ) > light->parms.lightRadius[2] ) {
+		        || fabs( light->parms.lightCenter[1] ) > light->parms.lightRadius[1]
+		        || fabs( light->parms.lightCenter[2] ) > light->parms.lightRadius[2] ) {
 			centerOutside = true;
 		}
 
@@ -1214,8 +1156,8 @@ generated by the triangle irregardless of if it actually was a sil edge.
 =================
 */
 srfTriangles_t *R_CreateShadowVolume( const idRenderEntityLocal *ent,
-									 const srfTriangles_t *tri, const idRenderLightLocal *light,
-									 shadowGen_t optimize, srfCullInfo_t &cullInfo ) {
+                                      const srfTriangles_t *tri, const idRenderLightLocal *light,
+                                      shadowGen_t optimize, srfCullInfo_t &cullInfo ) {
 	int		i, j;
 	idVec3	lightOrigin;
 	srfTriangles_t	*newTri;
@@ -1243,11 +1185,7 @@ srfTriangles_t *R_CreateShadowVolume( const idRenderEntityLocal *ent,
 	// trades somewhat more overdraw and no cap optimizations for
 	// a very simple generation process
 	if ( optimize == SG_DYNAMIC && r_useTurboShadow.GetBool() ) {
-		if ( tr.backEndRendererHasVertexPrograms && r_useShadowVertexProgram.GetBool() ) {
-			return R_CreateVertexProgramTurboShadowVolume( ent, tri, light, cullInfo );
-		} else {
-			return R_CreateTurboShadowVolume( ent, tri, light, cullInfo );
-		}
+		return R_CreateVertexProgramTurboShadowVolume(ent, tri, light, cullInfo);
 	}
 
 	R_CalcInteractionFacing( ent, tri, light, cullInfo );
@@ -1268,7 +1206,6 @@ srfTriangles_t *R_CreateShadowVolume( const idRenderEntityLocal *ent,
 	overflowed = false;
 	indexFrustumNumber = 0;
 	capPlaneBits = 0;
-	callOptimizer = (optimize == SG_OFFLINE);
 
 	// the facing information will be the same for all six projections
 	// from a point light, as well as for any directed lights
@@ -1353,7 +1290,7 @@ srfTriangles_t *R_CreateShadowVolume( const idRenderEntityLocal *ent,
 
 	R_AllocStaticTriSurfIndexes( newTri, newTri->numIndexes );
 
-	if ( 1 /* sortCapIndexes */ ) {
+	if ( 1 ) {
 		newTri->shadowCapPlaneBits = capPlaneBits;
 
 		// copy the sil indexes first
@@ -1361,7 +1298,7 @@ srfTriangles_t *R_CreateShadowVolume( const idRenderEntityLocal *ent,
 		for ( i = 0 ; i < indexFrustumNumber ; i++ ) {
 			int	c = indexRef[i].end - indexRef[i].silStart;
 			SIMDProcessor->Memcpy( newTri->indexes+newTri->numShadowIndexesNoCaps,
-									shadowIndexes+indexRef[i].silStart, c * sizeof( newTri->indexes[0] ) );
+			                       shadowIndexes+indexRef[i].silStart, c * sizeof( newTri->indexes[0] ) );
 			newTri->numShadowIndexesNoCaps += c;
 		}
 		// copy rear cap indexes next
@@ -1369,7 +1306,7 @@ srfTriangles_t *R_CreateShadowVolume( const idRenderEntityLocal *ent,
 		for ( i = 0 ; i < indexFrustumNumber ; i++ ) {
 			int	c = indexRef[i].silStart - indexRef[i].rearCapStart;
 			SIMDProcessor->Memcpy( newTri->indexes+newTri->numShadowIndexesNoFrontCaps,
-									shadowIndexes+indexRef[i].rearCapStart, c * sizeof( newTri->indexes[0] ) );
+			                       shadowIndexes+indexRef[i].rearCapStart, c * sizeof( newTri->indexes[0] ) );
 			newTri->numShadowIndexesNoFrontCaps += c;
 		}
 		// copy front cap indexes last
@@ -1377,17 +1314,13 @@ srfTriangles_t *R_CreateShadowVolume( const idRenderEntityLocal *ent,
 		for ( i = 0 ; i < indexFrustumNumber ; i++ ) {
 			int	c = indexRef[i].rearCapStart - indexRef[i].frontCapStart;
 			SIMDProcessor->Memcpy( newTri->indexes+newTri->numIndexes,
-									shadowIndexes+indexRef[i].frontCapStart, c * sizeof( newTri->indexes[0] ) );
+			                       shadowIndexes+indexRef[i].frontCapStart, c * sizeof( newTri->indexes[0] ) );
 			newTri->numIndexes += c;
 		}
 
 	} else {
 		newTri->shadowCapPlaneBits = 63;	// we don't have optimized index lists
 		SIMDProcessor->Memcpy( newTri->indexes, shadowIndexes, newTri->numIndexes * sizeof( newTri->indexes[0] ) );
-	}
-
-	if ( optimize == SG_OFFLINE ) {
-		CleanupOptimizedShadowTris( newTri );
 	}
 
 	return newTri;

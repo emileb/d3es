@@ -83,6 +83,10 @@ int idSoundSystemLocal::EFXAvailable = -1;
 idSoundSystemLocal	soundSystemLocal;
 idSoundSystem	*soundSystem  = &soundSystemLocal;
 
+#ifdef __ANDROID__
+extern "C" void OpenSL_android_set_pause( ALCdevice_struct *Device, int pause );
+#endif
+
 /*
 ===============
 SoundReloadSounds_f
@@ -593,8 +597,13 @@ bool idSoundSystemLocal::ShutdownHW() {
 
 	return true;
 }
-
-
+#ifdef __ANDROID__
+void idSoundSystemLocal::Pause( bool pause )
+{
+	if( openalDevice )
+		OpenSL_android_set_pause( openalDevice, pause );
+}
+#endif
 /*
 ===============
 idSoundSystemLocal::CheckDeviceAndRecoverIfNeeded

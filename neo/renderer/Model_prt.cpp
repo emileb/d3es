@@ -188,7 +188,7 @@ idRenderModel *idRenderModelPrt::InstantiateDynamicModel( const struct renderEnt
 			int	inCycleTime = particleAge - particleCycle * stage->cycleMsec;
 
 			if ( renderEntity->shaderParms[SHADERPARM_PARTICLE_STOPTIME] &&
-				g.renderView->time - inCycleTime >= renderEntity->shaderParms[SHADERPARM_PARTICLE_STOPTIME]*1000 ) {
+			        g.renderView->time - inCycleTime >= renderEntity->shaderParms[SHADERPARM_PARTICLE_STOPTIME]*1000 ) {
 				// don't fire any more particles
 				continue;
 			}

@@ -97,288 +97,71 @@ bool GLimp_Init(glimpParms_t parms) {
 
 	Uint32 flags = SDL_WINDOW_OPENGL;
 
-	if (parms.fullScreen == 1)
+	if (parms.fullScreen)
+		flags |= SDL_WINDOW_FULLSCREEN;
+
+	SDL_GL_SetAttribute( SDL_GL_RED_SIZE,  8 );
+	SDL_GL_SetAttribute( SDL_GL_GREEN_SIZE,  8 );
+	SDL_GL_SetAttribute( SDL_GL_BLUE_SIZE,  8 );
+	SDL_GL_SetAttribute( SDL_GL_ALPHA_SIZE,  8 );
+	SDL_GL_SetAttribute( SDL_GL_DEPTH_SIZE, 16 ); // Defaults to 24 which is not needed and fails on old Tegras
+	SDL_GL_SetAttribute( SDL_GL_STENCIL_SIZE,  8 );
+	SDL_GL_SetAttribute( SDL_GL_DOUBLEBUFFER,  1 );
+
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+
+	//SDL_GL_SetAttribute(SDL_GL_STEREO, parms.stereo ? 1 : 0);
+	common->Printf("multiSamples = %d", parms.multiSamples);
+
+	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, parms.multiSamples ? 1 : 0);
+	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, parms.multiSamples);
+
+	window = SDL_CreateWindow(ENGINE_VERSION,
+								SDL_WINDOWPOS_UNDEFINED,
+								SDL_WINDOWPOS_UNDEFINED,
+								parms.width, parms.height, flags);
+
+	if (!window) {
+		common->Printf("FAILED TO CREATE WINDOWS");
+	}
+	else
 	{
-#if SDL_VERSION_ATLEAST(2, 0, 0)
-		if(r_fullscreenDesktop.GetBool())
-			flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
-		else
-#endif
-			flags |= SDL_WINDOW_FULLSCREEN;
+		common->Printf("WINDOW CREATED OK");
 	}
 
-	int colorbits = 24;
-	int depthbits = 24;
-	int stencilbits = 8;
+	context = SDL_GL_CreateContext(window);
 
-	for (int i = 0; i < 16; i++) {
-		// 0 - default
-		// 1 - minus colorbits
-		// 2 - minus depthbits
-		// 3 - minus stencil
-		if ((i % 4) == 0 && i) {
-			// one pass, reduce
-			switch (i / 4) {
-			case 2 :
-				if (colorbits == 24)
-					colorbits = 16;
-				break;
-			case 1 :
-				if (depthbits == 24)
-					depthbits = 16;
-				else if (depthbits == 16)
-					depthbits = 8;
-			case 3 :
-				if (stencilbits == 24)
-					stencilbits = 16;
-				else if (stencilbits == 16)
-					stencilbits = 8;
-			}
-		}
-
-		int tcolorbits = colorbits;
-		int tdepthbits = depthbits;
-		int tstencilbits = stencilbits;
-
-		if ((i % 4) == 3) {
-			// reduce colorbits
-			if (tcolorbits == 24)
-				tcolorbits = 16;
-		}
-
-		if ((i % 4) == 2) {
-			// reduce depthbits
-			if (tdepthbits == 24)
-				tdepthbits = 16;
-			else if (tdepthbits == 16)
-				tdepthbits = 8;
-		}
-
-		if ((i % 4) == 1) {
-			// reduce stencilbits
-			if (tstencilbits == 24)
-				tstencilbits = 16;
-			else if (tstencilbits == 16)
-				tstencilbits = 8;
-			else
-				tstencilbits = 0;
-		}
-
-		int channelcolorbits = 4;
-		if (tcolorbits == 24)
-			channelcolorbits = 8;
-
-		SDL_GL_SetAttribute(SDL_GL_RED_SIZE, channelcolorbits);
-		SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, channelcolorbits);
-		SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, channelcolorbits);
-		SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-		SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, tdepthbits);
-		SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, tstencilbits);
-
-		if (r_waylandcompat.GetBool())
-			SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 0);
-		else
-			SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, channelcolorbits);
-
-		SDL_GL_SetAttribute(SDL_GL_STEREO, parms.stereo ? 1 : 0);
-
-		SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, parms.multiSamples ? 1 : 0);
-		SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, parms.multiSamples);
-
-#if SDL_VERSION_ATLEAST(2, 0, 0)
-		int displayIndex = 0;
-
-		// try to put the window on the display the mousecursor currently is on
-		{
-			int x, y;
-			SDL_GetGlobalMouseState(&x, &y);
-
-			int numDisplays = SDL_GetNumVideoDisplays();
-			for (i=0; i<numDisplays; ++i) {
-				SDL_Rect rect;
-				if (SDL_GetDisplayBounds(i, &rect) == 0) {
-					if (   x >= rect.x && x < rect.x + rect.w
-						&& y >= rect.y && y < rect.y + rect.h )
-					{
-						displayIndex = i;
-						break;
-					}
-				}
-			}
-		}
-
-		window = SDL_CreateWindow(ENGINE_VERSION,
-									SDL_WINDOWPOS_UNDEFINED_DISPLAY(displayIndex),
-									SDL_WINDOWPOS_UNDEFINED_DISPLAY(displayIndex),
-									parms.width, parms.height, flags);
-
-		if (!window) {
-			common->DPrintf("Couldn't set GL mode %d/%d/%d: %s",
-							channelcolorbits, tdepthbits, tstencilbits, SDL_GetError());
-			continue;
-		}
-
-		/* Check if we're really in the requested display mode. There is
-		   (or was) an SDL bug were SDL switched into the wrong mode
-		   without giving an error code. See the bug report for details:
-		   https://bugzilla.libsdl.org/show_bug.cgi?id=4700 */
-		if ((flags & (SDL_WINDOW_FULLSCREEN | SDL_WINDOW_FULLSCREEN_DESKTOP)) == SDL_WINDOW_FULLSCREEN)
-		{
-			SDL_DisplayMode real_mode;
-			if (SDL_GetWindowDisplayMode(window, &real_mode) != 0)
-			{
-				SDL_DestroyWindow(window);
-				window = NULL;
-				common->Warning("Can't get display mode: %s\n", SDL_GetError());
-				return false; // trying other color depth etc is unlikely to help with this issue
-			}
-			if ((real_mode.w != parms.width) || (real_mode.h != parms.height))
-			{
-				common->Warning("Current display mode isn't requested display mode\n");
-				common->Warning("Likely SDL bug #4700, trying to work around it..\n");
-
-				/* Mkay, try to hack around that. */
-				SDL_DisplayMode wanted_mode = {};
-
-				wanted_mode.w = parms.width;
-				wanted_mode.h = parms.height;
-
-				if (SDL_SetWindowDisplayMode(window, &wanted_mode) != 0)
-				{
-					SDL_DestroyWindow(window);
-					window = NULL;
-
-					common->Warning("Can't force resolution to %ix%i: %s\n", parms.width, parms.height, SDL_GetError());
-
-					return false; // trying other color depth etc is unlikely to help with this issue
-				}
-
-				/* The SDL doku says, that SDL_SetWindowSize() shouldn't be
-				   used on fullscreen windows. But at least in my test with
-				   SDL 2.0.9 the subsequent SDL_GetWindowDisplayMode() fails
-				   if I don't call it. */
-				SDL_SetWindowSize(window, wanted_mode.w, wanted_mode.h);
-
-				if (SDL_GetWindowDisplayMode(window, &real_mode) != 0)
-				{
-					SDL_DestroyWindow(window);
-					window = NULL;
-
-					common->Warning("Can't get display mode: %s\n", SDL_GetError());
-
-					return false; // trying other color depth etc is unlikely to help with this issue
-				}
-
-				if ((real_mode.w != parms.width) || (real_mode.h != parms.height))
-				{
-					SDL_DestroyWindow(window);
-					window = NULL;
-
-					common->Warning("Still in wrong display mode: %ix%i instead of %ix%i\n",
-					                real_mode.w, real_mode.h, parms.width, parms.height);
-
-					return false; // trying other color depth etc is unlikely to help with this issue
-				}
-				common->Warning("Now we have the requested resolution (%d x %d)\n", parms.width, parms.height);
-			}
-		}
-
-		context = SDL_GL_CreateContext(window);
-
-		if (SDL_GL_SetSwapInterval(r_swapInterval.GetInteger()) < 0)
-			common->Warning("SDL_GL_SWAP_CONTROL not supported");
-
-		SDL_GetWindowSize(window, &glConfig.vidWidth, &glConfig.vidHeight);
-
-		SetSDLIcon(); // for SDL2  this must be done after creating the window
-
-		glConfig.isFullscreen = (SDL_GetWindowFlags(window) & SDL_WINDOW_FULLSCREEN) == SDL_WINDOW_FULLSCREEN;
-#else
-		SDL_WM_SetCaption(ENGINE_VERSION, ENGINE_VERSION);
-
-		SetSDLIcon(); // for SDL1.2  this must be done before creating the window
-
-		if (SDL_GL_SetAttribute(SDL_GL_SWAP_CONTROL, r_swapInterval.GetInteger()) < 0)
-			common->Warning("SDL_GL_SWAP_CONTROL not supported");
-
-		window = SDL_SetVideoMode(parms.width, parms.height, colorbits, flags);
-		if (!window) {
-			common->DPrintf("Couldn't set GL mode %d/%d/%d: %s",
-							channelcolorbits, tdepthbits, tstencilbits, SDL_GetError());
-			continue;
-		}
-
-		glConfig.vidWidth = window->w;
-		glConfig.vidHeight = window->h;
-
-		glConfig.isFullscreen = (window->flags & SDL_FULLSCREEN) == SDL_FULLSCREEN;
-#endif
-
-#if defined(_WIN32) && defined(ID_ALLOW_TOOLS)
-
-#ifndef SDL_VERSION_ATLEAST(2, 0, 0)
-	#error "dhewm3 only supports the tools with SDL2, not SDL1!"
-#endif
-
-		// The tools are Win32 specific.  If building the tools
-		// then we know we are win32 and we have to include this
-		// config to get the editors to work.
-
-		// Get the HWND for later use.
-		SDL_SysWMinfo sdlinfo;
-		SDL_version sdlver;
-		SDL_VERSION(&sdlver);
-		sdlinfo.version = sdlver;
-		if (SDL_GetWindowWMInfo(window, &sdlinfo) && sdlinfo.subsystem == SDL_SYSWM_WINDOWS) {
-			win32.hWnd = sdlinfo.info.win.window;
-			win32.hDC = sdlinfo.info.win.hdc;
-			// NOTE: hInstance is set in main()
-			win32.hGLRC = qwglGetCurrentContext();
-
-			PIXELFORMATDESCRIPTOR src =
-			{
-				sizeof(PIXELFORMATDESCRIPTOR),	// size of this pfd
-				1,								// version number
-				PFD_DRAW_TO_WINDOW |			// support window
-				PFD_SUPPORT_OPENGL |			// support OpenGL
-				PFD_DOUBLEBUFFER,				// double buffered
-				PFD_TYPE_RGBA,					// RGBA type
-				32,								// 32-bit color depth
-				0, 0, 0, 0, 0, 0,				// color bits ignored
-				8,								// 8 bit destination alpha
-				0,								// shift bit ignored
-				0,								// no accumulation buffer
-				0, 0, 0, 0, 					// accum bits ignored
-				24,								// 24-bit z-buffer	
-				8,								// 8-bit stencil buffer
-				0,								// no auxiliary buffer
-				PFD_MAIN_PLANE,					// main layer
-				0,								// reserved
-				0, 0, 0							// layer masks ignored
-			};
-			memcpy(&win32.pfd, &src, sizeof(PIXELFORMATDESCRIPTOR));
-		} else {
-			// TODO: can we just disable them?
-			common->Error("SDL_GetWindowWMInfo(), which is needed for Tools to work, failed!");
-		}		
-#endif // defined(_WIN32) && defined(ID_ALLOW_TOOLS)
-
-		common->Printf("Using %d color bits, %d depth, %d stencil display\n",
-						channelcolorbits, tdepthbits, tstencilbits);
-
-		glConfig.colorBits = tcolorbits;
-		glConfig.depthBits = tdepthbits;
-		glConfig.stencilBits = tstencilbits;
-
-		glConfig.displayFrequency = 0;
-
-		break;
+	if (!context) {
+		common->Printf("FAILED TO CREATE CONTEXT");
 	}
+	else
+	{
+		common->Printf("CONTEXT CREATED OK");
+	}
+
+	SDL_GetWindowSize(window, &glConfig.vidWidthReal, &glConfig.vidHeightReal);
+
+	glConfig.isFullscreen = (SDL_GetWindowFlags(window) & SDL_WINDOW_FULLSCREEN) == SDL_WINDOW_FULLSCREEN;
+
+
+	//common->Printf("Using %d color bits, %d depth, %d stencil display\n",
+	//				channelcolorbits, tdepthbits, tstencilbits);
+
+	glConfig.colorBits = 24;
+	glConfig.depthBits = 16;
+	glConfig.stencilBits = 8;
+
+	glConfig.displayFrequency = 0;
+
 
 	if (!window) {
 		common->Warning("No usable GL mode found: %s", SDL_GetError());
 		return false;
 	}
+
+	GLimp_WindowActive(true);
 
 	return true;
 }
@@ -452,7 +235,8 @@ GLimp_ActivateContext
 =================
 */
 void GLimp_ActivateContext() {
-	common->DPrintf("TODO: GLimp_ActivateContext\n");
+	//common->DPrintf("TODO: GLimp_ActivateContext\n");
+	SDL_GL_MakeCurrent(window, context);
 }
 
 /*
@@ -461,7 +245,8 @@ GLimp_DeactivateContext
 =================
 */
 void GLimp_DeactivateContext() {
-	common->DPrintf("TODO: GLimp_DeactivateContext\n");
+	//common->DPrintf("TODO: GLimp_DeactivateContext\n");
+	SDL_GL_MakeCurrent(window, NULL);
 }
 
 /*
@@ -469,10 +254,44 @@ void GLimp_DeactivateContext() {
 GLimp_ExtensionPointer
 ===================
 */
+#ifdef __ANDROID__
+#include <dlfcn.h>
+#endif
 GLExtension_t GLimp_ExtensionPointer(const char *name) {
 	assert(SDL_WasInit(SDL_INIT_VIDEO));
 
+#ifdef __ANDROID__
+	static void *glesLib = NULL;
+
+	if( !glesLib )
+	{
+	    int flags = RTLD_LOCAL | RTLD_NOW;
+		glesLib = dlopen("libGLESv2_CM.so", flags);
+		//glesLib = dlopen("libGLESv3.so", flags);
+		if( !glesLib )
+		{
+			glesLib = dlopen("libGLESv2.so", flags);
+		}
+	}
+
+	GLExtension_t ret =  (GLExtension_t)dlsym(glesLib, name);
+	//common->Printf("GLimp_ExtensionPointer %s  %p\n",name,ret);
+	return ret;
+#endif
+
 	return (GLExtension_t)SDL_GL_GetProcAddress(name);
+}
+
+void GLimp_WindowActive(bool active)
+{
+	LOGI( "GLimp_WindowActive %d", active );
+
+	tr.windowActive = active;
+
+	if(!active)
+	{
+		tr.BackendThreadShutdown();
+	}
 }
 
 void GLimp_GrabInput(int flags) {

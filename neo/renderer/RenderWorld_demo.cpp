@@ -118,7 +118,7 @@ bool		idRenderWorldLocal::ProcessDemoCommand( idDemoFile *readDemo, renderView_t
 			readDemo->ReadChar( header.mapname[i] );
 		// the internal version value got replaced by DS_VERSION at toplevel
 		if ( header.version != 4 ) {
-				common->Error( "Demo version mismatch.\n" );
+			common->Error( "Demo version mismatch.\n" );
 		}
 
 		if ( r_showDemo.GetBool() ) {
@@ -153,8 +153,8 @@ bool		idRenderWorldLocal::ProcessDemoCommand( idDemoFile *readDemo, renderView_t
 
 		renderView->globalMaterial = NULL;
 		if ( !readDemo->ReadInt( i ) ) {
-			 return false;
-		 }
+			return false;
+		}
 
 		if ( r_showDemo.GetBool() ) {
 			common->Printf( "DC_RENDERVIEW: %i\n", renderView->time );
@@ -223,8 +223,7 @@ bool		idRenderWorldLocal::ProcessDemoCommand( idDemoFile *readDemo, renderView_t
 		tr.demoGuiModel->ReadFromDemo( readDemo );
 		break;
 
-	case DC_DEFINE_MODEL:
-		{
+	case DC_DEFINE_MODEL: {
 		idRenderModel	*model = renderModelManager->AllocModel();
 		model->ReadFromDemoFile( session->readDemo );
 		// add to model manager, so we can find it
@@ -237,19 +236,18 @@ bool		idRenderWorldLocal::ProcessDemoCommand( idDemoFile *readDemo, renderView_t
 			common->Printf( "DC_DEFINE_MODEL\n" );
 		}
 		break;
+	}
+	case DC_SET_PORTAL_STATE: {
+		int		data[2];
+		readDemo->ReadInt( data[0] );
+		readDemo->ReadInt( data[1] );
+		SetPortalState( data[0], data[1] );
+		if ( r_showDemo.GetBool() ) {
+			common->Printf( "DC_SET_PORTAL_STATE: %i %i\n", data[0], data[1] );
 		}
-	case DC_SET_PORTAL_STATE:
-		{
-			int		data[2];
-			readDemo->ReadInt( data[0] );
-			readDemo->ReadInt( data[1] );
-			SetPortalState( data[0], data[1] );
-			if ( r_showDemo.GetBool() ) {
-				common->Printf( "DC_SET_PORTAL_STATE: %i %i\n", data[0], data[1] );
-			}
-		}
+	}
 
-		break;
+	break;
 	case DC_END_FRAME:
 		return true;
 

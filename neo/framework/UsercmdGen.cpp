@@ -34,6 +34,7 @@ If you have questions concerning this license or the applicable additional terms
 #include "framework/async/AsyncNetwork.h"
 
 #include "framework/UsercmdGen.h"
+#include "framework/Game.h"
 
 /*
 ================
@@ -354,6 +355,10 @@ private:
 	void			MouseMove( void );
 	void			CmdButtons( void );
 
+#ifdef AIM_ASSIST
+	void			AimAssist();
+#endif
+
 	void			Mouse( void );
 	void			Keyboard( void );
 	void			Joystick( void );
@@ -456,6 +461,7 @@ void idUsercmdGenLocal::InhibitUsercmd( inhibit_t subsystem, bool inhibit ) {
 	}
 }
 
+extern "C" int Android_GetButton( int key );
 /*
 ===============
 idUsercmdGenLocal::ButtonState
@@ -467,7 +473,8 @@ int	idUsercmdGenLocal::ButtonState( int key ) {
 	if ( key<0 || key>=UB_MAX_BUTTONS ) {
 		return -1;
 	}
-	return ( buttonState[key] > 0 ) ? 1 : 0;
+
+	return ( (buttonState[key] > 0) || Android_GetButton(key) ) ? 1 : 0;
 }
 
 /*
@@ -756,6 +763,8 @@ void idUsercmdGenLocal::InitCurrent( void ) {
 	cmd.buttons |= in_freeLook.GetBool() ? BUTTON_MLOOK : 0;
 }
 
+extern "C" void Android_GetMovement(int frameTime, int *forward, int *strafe, float *yaw, float *pitch);
+
 /*
 ================
 idUsercmdGenLocal::MakeCurrent
@@ -790,6 +799,26 @@ void idUsercmdGenLocal::MakeCurrent( void ) {
 		// get basic movement from joystick
 		JoystickMove();
 
+		int forward,strafe;
+		float yaw = 0;
+		float pitch = 0;
+
+		static int previous = 0;
+		int t = Sys_Milliseconds();
+       	int frameTime = t - previous;
+       	previous = t;
+		if(frameTime > 100)
+			frameTime = 100;
+
+		Android_GetMovement( frameTime, &forward, &strafe, &yaw, &pitch );
+		cmd.rightmove = idMath::ClampChar( cmd.rightmove + strafe );
+		cmd.forwardmove = idMath::ClampChar( cmd.forwardmove + forward );
+		viewangles[YAW] += yaw;
+		viewangles[PITCH] += pitch;
+
+#ifdef AIM_ASSIST
+		AimAssist();
+#endif
 		// check to make sure the angles haven't wrapped
 		if ( viewangles[PITCH] - oldAngles[PITCH] > 90 ) {
 			viewangles[PITCH] = oldAngles[PITCH] + 90;
@@ -813,6 +842,26 @@ void idUsercmdGenLocal::MakeCurrent( void ) {
 
 }
 
+#ifdef AIM_ASSIST
+/*
+================
+idUsercmdGenLocal::AimAssist
+================
+*/
+void idUsercmdGenLocal::AimAssist() {
+	// callback to the game to update the aim assist for the current device
+	idAngles aimAssistAngles( 0.0f, 0.0f, 0.0f );
+
+	idGame * game = common->Game();
+	if ( game != NULL ) {
+		game->GetAimAssistAngles( aimAssistAngles );
+	}
+
+	viewangles[YAW] += aimAssistAngles.yaw;
+	viewangles[PITCH] += aimAssistAngles.pitch;
+	viewangles[ROLL] += aimAssistAngles.roll;
+}
+#endif
 //=====================================================================
 
 
@@ -1088,6 +1137,8 @@ void idUsercmdGenLocal::MouseState( int *x, int *y, int *button, bool *down ) {
 	*down = mouseDown;
 }
 
+extern "C" int Android_GetNextImpulse();
+
 /*
 ================
 idUsercmdGenLocal::GetDirectUsercmd
@@ -1106,6 +1157,17 @@ usercmd_t idUsercmdGenLocal::GetDirectUsercmd( void ) {
 
 	// process the system joystick events
 	Joystick();
+
+	int imp = Android_GetNextImpulse();
+	if( imp )
+	{
+		if ( !Inhibited()  ) {
+			if ( imp >= UB_IMPULSE0 && imp <= UB_IMPULSE61 ) {
+				cmd.impulse = imp - UB_IMPULSE0;
+				cmd.flags ^= UCF_IMPULSE_SEQUENCE;
+			}
+		}
+	}
 
 	// create the usercmd
 	MakeCurrent();

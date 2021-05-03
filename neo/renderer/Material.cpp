@@ -254,9 +254,9 @@ static const infoParm_t	infoParms[] = {
 	{"qer_nocarve",	1,	0,	CONTENTS_NOCSG},		// don't cut brushes in editor
 
 	{"discrete",	1,	SURF_DISCRETE,	0 },		// surfaces should not be automatically merged together or
-													// clipped to the world,
-													// because they represent discrete objects like gui shaders
-													// mirrors, or autosprites
+	// clipped to the world,
+	// because they represent discrete objects like gui shaders
+	// mirrors, or autosprites
 	{"noFragment",	0,	SURF_NOFRAGMENT,	0 },
 
 	{"slick",		0,	SURF_SLICK,		0 },
@@ -348,7 +348,7 @@ void idMaterial::ParseSort( idLexer &src ) {
 		sort = SS_SUBVIEW;
 	} else if ( !token.Icmp( "opaque" ) ) {
 		sort = SS_OPAQUE;
-	}else if ( !token.Icmp( "decal" ) ) {
+	} else if ( !token.Icmp( "decal" ) ) {
 		sort = SS_DECAL;
 	} else if ( !token.Icmp( "far" ) ) {
 		sort = SS_FAR;
@@ -607,7 +607,7 @@ int idMaterial::ParseTerm( idLexer &src ) {
 		return EXP_REG_GLOBAL7;
 	}
 	if ( !token.Icmp( "fragmentPrograms" ) ) {
-		return GetExpressionConstant( (float) glConfig.ARBFragmentProgramAvailable );
+		return GetExpressionConstant( (float) false );
 	}
 
 	if ( !token.Icmp( "sound" ) ) {
@@ -745,9 +745,9 @@ void idMaterial::ClearStage( shaderStage_t *ss ) {
 	ss->drawStateBits = 0;
 	ss->conditionRegister = GetExpressionConstant( 1 );
 	ss->color.registers[0] =
-	ss->color.registers[1] =
-	ss->color.registers[2] =
-	ss->color.registers[3] = GetExpressionConstant( 1 );
+	    ss->color.registers[1] =
+	        ss->color.registers[2] =
+	            ss->color.registers[3] = GetExpressionConstant( 1 );
 }
 
 /*
@@ -895,8 +895,8 @@ void idMaterial::ParseVertexParm( idLexer &src, newShaderStage_t *newStage ) {
 	src.ReadTokenOnLine( &token );
 	if ( !token[0] || token.Icmp( "," ) ) {
 		newStage->vertexParms[parm][1] =
-		newStage->vertexParms[parm][2] =
-		newStage->vertexParms[parm][3] = newStage->vertexParms[parm][0];
+		    newStage->vertexParms[parm][2] =
+		        newStage->vertexParms[parm][3] = newStage->vertexParms[parm][0];
 		return;
 	}
 
@@ -999,9 +999,7 @@ void idMaterial::ParseFragmentMap( idLexer &src, newShaderStage_t *newStage ) {
 		}
 
 		if ( !token.Icmp( "uncompressed" ) || !token.Icmp( "highquality" ) ) {
-			if ( !globalImages->image_ignoreHighQuality.GetInteger() ) {
-				td = TD_HIGH_QUALITY;
-			}
+			td = TD_HIGH_QUALITY;
 			continue;
 		}
 		if ( !token.Icmp( "nopicmip" ) ) {
@@ -1016,7 +1014,7 @@ void idMaterial::ParseFragmentMap( idLexer &src, newShaderStage_t *newStage ) {
 	str = R_ParsePastImageProgram( src );
 
 	newStage->fragmentProgramImages[unit] =
-		globalImages->ImageFromFile( str, tf, allowPicmip, trp, td, cubeMap );
+	    globalImages->ImageFromFile( str, tf, allowPicmip, trp, td, cubeMap );
 	if ( !newStage->fragmentProgramImages[unit] ) {
 		newStage->fragmentProgramImages[unit] = globalImages->defaultImage;
 	}
@@ -1040,28 +1038,28 @@ void idMaterial::MultiplyTextureMatrix( textureStage_t *ts, int registers[2][3] 
 
 	// multiply the two maticies
 	ts->matrix[0][0] = EmitOp(
-							EmitOp( old[0][0], registers[0][0], OP_TYPE_MULTIPLY ),
-							EmitOp( old[0][1], registers[1][0], OP_TYPE_MULTIPLY ), OP_TYPE_ADD );
+	                       EmitOp( old[0][0], registers[0][0], OP_TYPE_MULTIPLY ),
+	                       EmitOp( old[0][1], registers[1][0], OP_TYPE_MULTIPLY ), OP_TYPE_ADD );
 	ts->matrix[0][1] = EmitOp(
-							EmitOp( old[0][0], registers[0][1], OP_TYPE_MULTIPLY ),
-							EmitOp( old[0][1], registers[1][1], OP_TYPE_MULTIPLY ), OP_TYPE_ADD );
+	                       EmitOp( old[0][0], registers[0][1], OP_TYPE_MULTIPLY ),
+	                       EmitOp( old[0][1], registers[1][1], OP_TYPE_MULTIPLY ), OP_TYPE_ADD );
 	ts->matrix[0][2] = EmitOp(
-							EmitOp(
-								EmitOp( old[0][0], registers[0][2], OP_TYPE_MULTIPLY ),
-								EmitOp( old[0][1], registers[1][2], OP_TYPE_MULTIPLY ), OP_TYPE_ADD ),
-							old[0][2], OP_TYPE_ADD );
+	                       EmitOp(
+	                           EmitOp( old[0][0], registers[0][2], OP_TYPE_MULTIPLY ),
+	                           EmitOp( old[0][1], registers[1][2], OP_TYPE_MULTIPLY ), OP_TYPE_ADD ),
+	                       old[0][2], OP_TYPE_ADD );
 
 	ts->matrix[1][0] = EmitOp(
-							EmitOp( old[1][0], registers[0][0], OP_TYPE_MULTIPLY ),
-							EmitOp( old[1][1], registers[1][0], OP_TYPE_MULTIPLY ), OP_TYPE_ADD );
+	                       EmitOp( old[1][0], registers[0][0], OP_TYPE_MULTIPLY ),
+	                       EmitOp( old[1][1], registers[1][0], OP_TYPE_MULTIPLY ), OP_TYPE_ADD );
 	ts->matrix[1][1] = EmitOp(
-							EmitOp( old[1][0], registers[0][1], OP_TYPE_MULTIPLY ),
-							EmitOp( old[1][1], registers[1][1], OP_TYPE_MULTIPLY ), OP_TYPE_ADD );
+	                       EmitOp( old[1][0], registers[0][1], OP_TYPE_MULTIPLY ),
+	                       EmitOp( old[1][1], registers[1][1], OP_TYPE_MULTIPLY ), OP_TYPE_ADD );
 	ts->matrix[1][2] = EmitOp(
-							EmitOp(
-								EmitOp( old[1][0], registers[0][2], OP_TYPE_MULTIPLY ),
-								EmitOp( old[1][1], registers[1][2], OP_TYPE_MULTIPLY ), OP_TYPE_ADD ),
-							old[1][2], OP_TYPE_ADD );
+	                       EmitOp(
+	                           EmitOp( old[1][0], registers[0][2], OP_TYPE_MULTIPLY ),
+	                           EmitOp( old[1][1], registers[1][2], OP_TYPE_MULTIPLY ), OP_TYPE_ADD ),
+	                       old[1][2], OP_TYPE_ADD );
 
 }
 
@@ -1200,6 +1198,10 @@ void idMaterial::ParseStage( idLexer &src, const textureRepeat_t trpDefault ) {
 			}
 			ts->cinematic = idCinematic::Alloc();
 			ts->cinematic->InitFromFile( token.c_str(), loop );
+
+			// Due to multithreading we create an image for each cinematic so they can be updated cleanly
+			ts->image = globalImages->AllocImage("cinematic_temp");
+			ts->image->cinematic = ts->cinematic;
 			continue;
 		}
 
@@ -1256,9 +1258,7 @@ void idMaterial::ParseStage( idLexer &src, const textureRepeat_t trpDefault ) {
 			continue;
 		}
 		if ( !token.Icmp( "uncompressed" ) || !token.Icmp( "highquality" ) ) {
-			if ( !globalImages->image_ignoreHighQuality.GetInteger() ) {
-				td = TD_HIGH_QUALITY;
-			}
+			td = TD_HIGH_QUALITY;
 			continue;
 		}
 		if ( !token.Icmp( "forceHighQuality" ) ) {
@@ -1396,14 +1396,14 @@ void idMaterial::ParseStage( idLexer &src, const textureRepeat_t trpDefault ) {
 			matrix[0][0] = cosReg;
 			matrix[0][1] = EmitOp( GetExpressionConstant( 0 ), sinReg, OP_TYPE_SUBTRACT );
 			matrix[0][2] = EmitOp( EmitOp( EmitOp( GetExpressionConstant( -0.5 ), cosReg, OP_TYPE_MULTIPLY ),
-										EmitOp( GetExpressionConstant( 0.5 ), sinReg, OP_TYPE_MULTIPLY ), OP_TYPE_ADD ),
-										GetExpressionConstant( 0.5 ), OP_TYPE_ADD );
+			                               EmitOp( GetExpressionConstant( 0.5 ), sinReg, OP_TYPE_MULTIPLY ), OP_TYPE_ADD ),
+			                       GetExpressionConstant( 0.5 ), OP_TYPE_ADD );
 
 			matrix[1][0] = sinReg;
 			matrix[1][1] = cosReg;
 			matrix[1][2] = EmitOp( EmitOp( EmitOp( GetExpressionConstant( -0.5 ), sinReg, OP_TYPE_MULTIPLY ),
-										EmitOp( GetExpressionConstant( -0.5 ), cosReg, OP_TYPE_MULTIPLY ), OP_TYPE_ADD ),
-										GetExpressionConstant( 0.5 ), OP_TYPE_ADD );
+			                               EmitOp( GetExpressionConstant( -0.5 ), cosReg, OP_TYPE_MULTIPLY ), OP_TYPE_ADD ),
+			                       GetExpressionConstant( 0.5 ), OP_TYPE_ADD );
 
 			MultiplyTextureMatrix( ts, matrix );
 			continue;
@@ -1479,12 +1479,12 @@ void idMaterial::ParseStage( idLexer &src, const textureRepeat_t trpDefault ) {
 		}
 		if ( !token.Icmp( "rgb" ) ) {
 			ss->color.registers[0] = ss->color.registers[1] =
-				ss->color.registers[2] = ParseExpression( src );
+			                             ss->color.registers[2] = ParseExpression( src );
 			continue;
 		}
 		if ( !token.Icmp( "rgba" ) ) {
 			ss->color.registers[0] = ss->color.registers[1] =
-				ss->color.registers[2] = ss->color.registers[3] = ParseExpression( src );
+			                             ss->color.registers[2] = ss->color.registers[3] = ParseExpression( src );
 			continue;
 		}
 
@@ -1494,20 +1494,20 @@ void idMaterial::ParseStage( idLexer &src, const textureRepeat_t trpDefault ) {
 		}
 		if ( !token.Icmp( "program" ) ) {
 			if ( src.ReadTokenOnLine( &token ) ) {
-				newStage.vertexProgram = R_FindARBProgram( GL_VERTEX_PROGRAM_ARB, token.c_str() );
-				newStage.fragmentProgram = R_FindARBProgram( GL_FRAGMENT_PROGRAM_ARB, token.c_str() );
+				newStage.vertexProgram = -1;
+				newStage.fragmentProgram = -1;
 			}
 			continue;
 		}
 		if ( !token.Icmp( "fragmentProgram" ) ) {
 			if ( src.ReadTokenOnLine( &token ) ) {
-				newStage.fragmentProgram = R_FindARBProgram( GL_FRAGMENT_PROGRAM_ARB, token.c_str() );
+				newStage.fragmentProgram = -1;
 			}
 			continue;
 		}
 		if ( !token.Icmp( "vertexProgram" ) ) {
 			if ( src.ReadTokenOnLine( &token ) ) {
-				newStage.vertexProgram = R_FindARBProgram( GL_VERTEX_PROGRAM_ARB, token.c_str() );
+				newStage.vertexProgram = -1;
 			}
 			continue;
 		}
@@ -1519,8 +1519,8 @@ void idMaterial::ParseStage( idLexer &src, const textureRepeat_t trpDefault ) {
 					SetMaterialFlag( MF_DEFAULTED );
 					continue;
 				}
-				newStage.vertexProgram = R_FindARBProgram( GL_VERTEX_PROGRAM_ARB, "megaTexture.vfp" );
-				newStage.fragmentProgram = R_FindARBProgram( GL_FRAGMENT_PROGRAM_ARB, "megaTexture.vfp" );
+				newStage.vertexProgram = -1;
+				newStage.fragmentProgram = -1;
 				continue;
 			}
 		}
@@ -1814,8 +1814,7 @@ void idMaterial::ParseMaterial( idLexer &src ) {
 		// end of material definition
 		if ( token == "}" ) {
 			break;
-		}
-		else if ( !token.Icmp( "qer_editorimage") ) {
+		} else if ( !token.Icmp( "qer_editorimage") ) {
 			src.ReadTokenOnLine( &token );
 			editorImageName = token.c_str();
 			src.SkipRestOfLine();
@@ -1848,12 +1847,10 @@ void idMaterial::ParseMaterial( idLexer &src ) {
 		else if ( !token.Icmp( "noShadows" ) ) {
 			SetMaterialFlag( MF_NOSHADOWS );
 			continue;
-		}
-		else if ( !token.Icmp( "suppressInSubview" ) ) {
+		} else if ( !token.Icmp( "suppressInSubview" ) ) {
 			suppressInSubview = true;
 			continue;
-		}
-		else if ( !token.Icmp( "portalSky" ) ) {
+		} else if ( !token.Icmp( "portalSky" ) ) {
 			portalSky = true;
 			continue;
 		}
@@ -2053,13 +2050,11 @@ void idMaterial::ParseMaterial( idLexer &src ) {
 			// noShadows
 			SetMaterialFlag( MF_NOSHADOWS );
 			continue;
-		}
-		else if ( token == "{" ) {
+		} else if ( token == "{" ) {
 			// create the new stage
 			ParseStage( src, trpDefault );
 			continue;
-		}
-		else {
+		} else {
 			common->Warning( "unknown general material parameter '%s' in '%s'", token.c_str(), GetName() );
 			SetMaterialFlag( MF_DEFAULTED );
 			return;
@@ -2178,14 +2173,14 @@ bool idMaterial::Parse( const char *text, const int textLength ) {
 			// we have an interaction draw
 			coverage = MC_OPAQUE;
 		} else if (
-			( pd->parseStages[0].drawStateBits & GLS_DSTBLEND_BITS ) != GLS_DSTBLEND_ZERO ||
-			( pd->parseStages[0].drawStateBits & GLS_SRCBLEND_BITS ) == GLS_SRCBLEND_DST_COLOR ||
-			( pd->parseStages[0].drawStateBits & GLS_SRCBLEND_BITS ) == GLS_SRCBLEND_ONE_MINUS_DST_COLOR ||
-			( pd->parseStages[0].drawStateBits & GLS_SRCBLEND_BITS ) == GLS_SRCBLEND_DST_ALPHA ||
-			( pd->parseStages[0].drawStateBits & GLS_SRCBLEND_BITS ) == GLS_SRCBLEND_ONE_MINUS_DST_ALPHA
-			) {
+		    ( pd->parseStages[0].drawStateBits & GLS_DSTBLEND_BITS ) != GLS_DSTBLEND_ZERO ||
+		    ( pd->parseStages[0].drawStateBits & GLS_SRCBLEND_BITS ) == GLS_SRCBLEND_DST_COLOR ||
+		    ( pd->parseStages[0].drawStateBits & GLS_SRCBLEND_BITS ) == GLS_SRCBLEND_ONE_MINUS_DST_COLOR ||
+		    ( pd->parseStages[0].drawStateBits & GLS_SRCBLEND_BITS ) == GLS_SRCBLEND_DST_ALPHA ||
+		    ( pd->parseStages[0].drawStateBits & GLS_SRCBLEND_BITS ) == GLS_SRCBLEND_ONE_MINUS_DST_ALPHA
+		) {
 			// blended with the destination
-				coverage = MC_TRANSLUCENT;
+			coverage = MC_TRANSLUCENT;
 		} else {
 			coverage = MC_OPAQUE;
 		}
@@ -2277,21 +2272,44 @@ bool idMaterial::Parse( const char *text, const int textLength ) {
 		}
 	}
 
+#ifdef NO_LIGHT
+	if (r_noLight.GetBool() )
+	{
+		int bumpcnt=0;
+
+		for (i = 0 ; i < numStages ; i++) {
+			if (pd->parseStages[i].lighting == SL_BUMP) {
+				bumpcnt++;
+				break;
+			}
+		}
+
+		if (bumpcnt!=0)
+		for (i = 0 ; i < numStages ; i++) {
+			if (pd->parseStages[i].lighting == SL_DIFFUSE) {
+				pd->parseStages[i].lighting = SL_AMBIENT;
+				pd->parseStages[i].drawStateBits=9000;
+				numAmbientStages++;
+				break;
+			}
+		}
+	}
+#endif
 	// add a tiny offset to the sort orders, so that different materials
 	// that have the same sort value will at least sort consistantly, instead
 	// of flickering back and forth
-/* this messed up in-game guis
-	if ( sort != SS_SUBVIEW ) {
-		int	hash, l;
+	/* this messed up in-game guis
+		if ( sort != SS_SUBVIEW ) {
+			int	hash, l;
 
-		l = name.Length();
-		hash = 0;
-		for ( int i = 0 ; i < l ; i++ ) {
-			hash ^= name[i];
+			l = name.Length();
+			hash = 0;
+			for ( int i = 0 ; i < l ; i++ ) {
+				hash ^= name[i];
+			}
+			sort += hash * 0.01;
 		}
-		sort += hash * 0.01;
-	}
-*/
+	*/
 
 	if (numStages) {
 		stages = (shaderStage_t *)R_StaticAlloc( numStages * sizeof( stages[0] ) );
@@ -2397,7 +2415,7 @@ set to their apropriate values.
 ===============
 */
 void idMaterial::EvaluateRegisters( float *registers, const float shaderParms[MAX_ENTITY_SHADER_PARMS],
-									const viewDef_t *view, idSoundEmitter *soundEmitter ) const {
+                                    const viewDef_t *view, idSoundEmitter *soundEmitter ) const {
 	int		i, b;
 	expOp_t	*op;
 
@@ -2449,12 +2467,11 @@ void idMaterial::EvaluateRegisters( float *registers, const float shaderParms[MA
 			b = b != 0 ? b : 1;
 			registers[op->c] = (int)registers[op->a] % b;
 			break;
-		case OP_TYPE_TABLE:
-			{
-				const idDeclTable *table = static_cast<const idDeclTable *>( declManager->DeclByIndex( DECL_TABLE, op->a ) );
-				registers[op->c] = table->TableLookup( registers[op->b] );
-			}
-			break;
+		case OP_TYPE_TABLE: {
+			const idDeclTable *table = static_cast<const idDeclTable *>( declManager->DeclByIndex( DECL_TABLE, op->a ) );
+			registers[op->c] = table->TableLookup( registers[op->b] );
+		}
+		break;
 		case OP_TYPE_SOUND:
 			if ( soundEmitter ) {
 				registers[op->c] = soundEmitter->CurrentAmplitude();
@@ -2548,10 +2565,13 @@ idMaterial::UpdateCinematic
 =============
 */
 void idMaterial::UpdateCinematic( int time ) const {
+// Do not update cinematics from front end, just wait until the back uses it and update form there (fix MT)
+/*
 	if ( !stages || !stages[0].texture.cinematic || !backEnd.viewDef ) {
 		return;
 	}
 	stages[0].texture.cinematic->ImageForTime( tr.primaryRenderView.time );
+*/
 }
 
 /*
@@ -2670,15 +2690,15 @@ bool idMaterial::SetDefaultText( void ) {
 	if ( 1 ) { //fileSystem->ReadFile( GetName(), NULL ) != -1 ) {
 		char generated[2048];
 		idStr::snPrintf( generated, sizeof( generated ),
-						"material %s // IMPLICITLY GENERATED\n"
-						"{\n"
-						"{\n"
-						"blend blend\n"
-						"colored\n"
-						"map \"%s\"\n"
-						"clamp\n"
-						"}\n"
-						"}\n", GetName(), GetName() );
+		                 "material %s // IMPLICITLY GENERATED\n"
+		                 "{\n"
+		                 "{\n"
+		                 "blend blend\n"
+		                 "colored\n"
+		                 "map \"%s\"\n"
+		                 "clamp\n"
+		                 "}\n"
+		                 "}\n", GetName(), GetName() );
 		SetText( generated );
 		return true;
 	} else {
@@ -2693,12 +2713,12 @@ idMaterial::DefaultDefinition
 */
 const char *idMaterial::DefaultDefinition() const {
 	return
-		"{\n"
-	"\t"	"{\n"
-	"\t\t"		"blend\tblend\n"
-	"\t\t"		"map\t\t_default\n"
-	"\t"	"}\n"
-		"}";
+	    "{\n"
+	    "\t"	"{\n"
+	    "\t\t"		"blend\tblend\n"
+	    "\t\t"		"map\t\t_default\n"
+	    "\t"	"}\n"
+	    "}";
 }
 
 
@@ -2721,17 +2741,16 @@ const shaderStage_t *idMaterial::GetBumpStage( void ) const {
 idMaterial::ReloadImages
 ===================
 */
-void idMaterial::ReloadImages( bool force ) const
-{
+void idMaterial::ReloadImages( bool force ) const {
 	for ( int i = 0 ; i < numStages ; i++ ) {
 		if ( stages[i].newStage ) {
 			for ( int j = 0 ; j < stages[i].newStage->numFragmentProgramImages ; j++ ) {
 				if ( stages[i].newStage->fragmentProgramImages[j] ) {
-					stages[i].newStage->fragmentProgramImages[j]->Reload( false, force );
+					stages[i].newStage->fragmentProgramImages[j]->Reload( force );
 				}
 			}
 		} else if ( stages[i].texture.image ) {
-			stages[i].texture.image->Reload( false, force );
+			stages[i].texture.image->Reload( force );
 		}
 	}
 }
