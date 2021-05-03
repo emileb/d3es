@@ -118,45 +118,10 @@ bool GLimp_Init(glimpParms_t parms) {
 	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, parms.multiSamples ? 1 : 0);
 	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, parms.multiSamples);
 
-<<<<<<< HEAD
-		if ((i % 4) == 1) {
-			// reduce stencilbits
-			if (tstencilbits == 24)
-				tstencilbits = 16;
-			else if (tstencilbits == 16)
-				tstencilbits = 8;
-			else
-				tstencilbits = 0;
-		}
-
-		int channelcolorbits = 4;
-		if (tcolorbits == 24)
-			channelcolorbits = 8;
-
-		int talphabits = r_waylandcompat.GetBool() ? 0 : channelcolorbits;
-
-		SDL_GL_SetAttribute(SDL_GL_RED_SIZE, channelcolorbits);
-		SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, channelcolorbits);
-		SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, channelcolorbits);
-		SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-		SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, tdepthbits);
-		SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, tstencilbits);
-
-		SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, talphabits);
-
-		SDL_GL_SetAttribute(SDL_GL_STEREO, parms.stereo ? 1 : 0);
-
-		SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, parms.multiSamples ? 1 : 0);
-		SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, parms.multiSamples);
-
-#if SDL_VERSION_ATLEAST(2, 0, 0)
-		int displayIndex = 0;
-=======
 	window = SDL_CreateWindow(ENGINE_VERSION,
 								SDL_WINDOWPOS_UNDEFINED,
 								SDL_WINDOWPOS_UNDEFINED,
 								parms.width, parms.height, flags);
->>>>>>> Manually rebased all Android and new renderer changed on 1.5.1
 
 	if (!window) {
 		common->Printf("FAILED TO CREATE WINDOWS");
@@ -190,76 +155,6 @@ bool GLimp_Init(glimpParms_t parms) {
 
 	glConfig.displayFrequency = 0;
 
-<<<<<<< HEAD
-		// The tools are Win32 specific.  If building the tools
-		// then we know we are win32 and we have to include this
-		// config to get the editors to work.
-
-		// Get the HWND for later use.
-		SDL_SysWMinfo sdlinfo;
-		SDL_version sdlver;
-		SDL_VERSION(&sdlver);
-		sdlinfo.version = sdlver;
-		if (SDL_GetWindowWMInfo(window, &sdlinfo) && sdlinfo.subsystem == SDL_SYSWM_WINDOWS) {
-			win32.hWnd = sdlinfo.info.win.window;
-			win32.hDC = sdlinfo.info.win.hdc;
-			// NOTE: hInstance is set in main()
-			win32.hGLRC = qwglGetCurrentContext();
-
-			PIXELFORMATDESCRIPTOR src =
-			{
-				sizeof(PIXELFORMATDESCRIPTOR),	// size of this pfd
-				1,								// version number
-				PFD_DRAW_TO_WINDOW |			// support window
-				PFD_SUPPORT_OPENGL |			// support OpenGL
-				PFD_DOUBLEBUFFER,				// double buffered
-				PFD_TYPE_RGBA,					// RGBA type
-				32,								// 32-bit color depth
-				0, 0, 0, 0, 0, 0,				// color bits ignored
-				8,								// 8 bit destination alpha
-				0,								// shift bit ignored
-				0,								// no accumulation buffer
-				0, 0, 0, 0, 					// accum bits ignored
-				24,								// 24-bit z-buffer	
-				8,								// 8-bit stencil buffer
-				0,								// no auxiliary buffer
-				PFD_MAIN_PLANE,					// main layer
-				0,								// reserved
-				0, 0, 0							// layer masks ignored
-			};
-			memcpy(&win32.pfd, &src, sizeof(PIXELFORMATDESCRIPTOR));
-		} else {
-			// TODO: can we just disable them?
-			common->Error("SDL_GetWindowWMInfo(), which is needed for Tools to work, failed!");
-		}		
-#endif // defined(_WIN32) && defined(ID_ALLOW_TOOLS)
-
-		common->Printf("Requested %d color bits per chan, %d alpha %d depth, %d stencil\n",
-						channelcolorbits, talphabits, tdepthbits, tstencilbits);
-
-		{
-			int r, g, b, a, d, s;
-			SDL_GL_GetAttribute(SDL_GL_RED_SIZE, &r);
-			SDL_GL_GetAttribute(SDL_GL_GREEN_SIZE, &g);
-			SDL_GL_GetAttribute(SDL_GL_BLUE_SIZE, &b);
-			SDL_GL_GetAttribute(SDL_GL_ALPHA_SIZE, &a);
-			SDL_GL_GetAttribute(SDL_GL_DEPTH_SIZE, &d);
-			SDL_GL_GetAttribute(SDL_GL_STENCIL_SIZE, &s);
-
-			common->Printf("Got %d stencil bits, %d depth bits, color bits: r%d g%d b%d a%d\n", s, d, r, g, b, a);
-
-			glConfig.colorBits = r+g+b; // a bit imprecise, but seems to be used only in GfxInfo_f()
-			glConfig.alphabits = a;
-			glConfig.depthBits = d;
-			glConfig.stencilBits = s;
-		}
-
-		glConfig.displayFrequency = 0;
-
-		break;
-	}
-=======
->>>>>>> Manually rebased all Android and new renderer changed on 1.5.1
 
 	if (!window) {
 		common->Warning("No usable GL mode found: %s", SDL_GetError());
