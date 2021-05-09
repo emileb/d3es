@@ -24,7 +24,7 @@ ifeq ($(TARGET_ARCH_ABI),arm64-v8a)
     LOCAL_CPPFLAGS += -DD3_SIZEOFPTR=8
 endif
 ifeq ($(TARGET_ARCH_ABI),armeabi-v7a)
-    LOCAL_CPPFLAGS += -DD3_SIZEOFPTR=8
+    LOCAL_CPPFLAGS += -DD3_SIZEOFPTR=4
 endif
 
 

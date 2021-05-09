@@ -799,7 +799,8 @@ void idUsercmdGenLocal::MakeCurrent( void ) {
 		// get basic movement from joystick
 		JoystickMove();
 
-		int forward,strafe;
+		int forward = 0;
+		int strafe = 0;
 		float yaw = 0;
 		float pitch = 0;
 
