@@ -18,7 +18,16 @@ $(TOP_DIR)/Clibs_OpenTouch/idtech1 \
 
 
 
-LOCAL_CPPFLAGS := -DUSE_GLES2 -DAIM_ASSIST
+LOCAL_CPPFLAGS := -DUSE_GLES2 -DAIM_ASSIST -DD3_OSTYPE=\"ANDROID\" -DD3_ARCH=\"ARM\"
+
+ifeq ($(TARGET_ARCH_ABI),arm64-v8a)
+    LOCAL_CPPFLAGS += -DD3_SIZEOFPTR=8
+endif
+ifeq ($(TARGET_ARCH_ABI),armeabi-v7a)
+    LOCAL_CPPFLAGS += -DD3_SIZEOFPTR=4
+endif
+
+
 LOCAL_CPPFLAGS += -std=gnu++11 -D__DOOM_DLL__ -frtti -fexceptions  -Wno-error=format-security
 
 

@@ -722,7 +722,6 @@ void Sys_GenerateEvents() {
 	if(cmd)
 	{
 		cmdSystem->BufferCommandText( CMD_EXEC_NOW, cmd );
-		//cmdSystem->BufferCommandText( CMD_EXEC_NOW, "\n" );
 	}
 
 

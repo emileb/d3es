@@ -202,6 +202,7 @@ private:
 	dword			mulDataSize;
 
 	void *			ogg;			// only !NULL when !s_realTimeDecoding
+	byte*			oggData; // the contents of the .ogg for stbi_vorbis (it doesn't support custom reading callbacks)
 	bool			isOgg;
 
 private:
@@ -386,6 +387,8 @@ public:
 	ALuint				lastopenalStreamingBuffer[3];
 	bool				stopped;
 
+	bool				paused;					// DG: currently paused, but generally still playing - for when menu is open etc
+
 	bool				disallowSlow;
 
 };
@@ -427,6 +430,9 @@ public:
 	//----------------------------------------------
 
 	void				Clear( void );
+
+	void				PauseAll( void );   // DG: to pause active OpenAL sources when entering menu etc
+	void				UnPauseAll( void ); // DG: to resume active OpenAL sources when leaving menu etc
 
 	void				OverrideParms( const soundShaderParms_t *base, const soundShaderParms_t *over, soundShaderParms_t *out );
 	void				CheckForCompletion( int current44kHzTime );
@@ -593,7 +599,9 @@ public:
 	idStr					listenerAreaName;
 	ALuint					listenerEffect;
 	ALuint					listenerSlot;
-	ALuint					listenerFilter;
+	bool					listenerAreFiltersInitialized;
+	ALuint					listenerFilters[2]; // 0 - direct; 1 - send.
+	float					listenerSlotReverbGain;
 
 	int						gameMsec;
 	int						game44kHz;
@@ -746,6 +754,7 @@ public:
 	LPALDELETEAUXILIARYEFFECTSLOTS	alDeleteAuxiliaryEffectSlots;
 	LPALISAUXILIARYEFFECTSLOT		alIsAuxiliaryEffectSlot;
 	LPALAUXILIARYEFFECTSLOTI		alAuxiliaryEffectSloti;
+	LPALAUXILIARYEFFECTSLOTF		alAuxiliaryEffectSlotf;
 
 	idEFXFile				EFXDatabase;
 	bool					efxloaded;
@@ -790,6 +799,8 @@ public:
 	static idCVar			s_realTimeDecoding;
 	static idCVar			s_useEAXReverb;
 	static idCVar			s_decompressionLimit;
+
+	static idCVar			s_alReverbGain;
 
 	static idCVar			s_slowAttenuate;
 

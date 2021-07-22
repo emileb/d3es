@@ -368,7 +368,7 @@ void PortableAction(int state, int action)
 
 // =================== FORWARD and SIDE MOVMENT ==============
 
-float forwardmove_android, sidemove_android; //Joystick mode
+static float forwardmove_android, sidemove_android; //Joystick mode
 
 void PortableMoveFwd(float fwd)
 {

@@ -690,7 +690,6 @@ void idTrigger_EntityName::Event_Trigger( idEntity *activator ) {
 		}
 	}
 
-
 	if ( triggerFirst ) {
 		triggerFirst = false;
 		return;
