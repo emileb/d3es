@@ -45,9 +45,10 @@ If you have questions concerning this license or the applicable additional terms
 #define DRAWVERT_TANGENT1_OFFSET	(11*4)
 #define DRAWVERT_COLOR_OFFSET		(14*4)
 
-#if defined(__GNUC__) && defined(__SSE__)
+#if defined(__GNUC__) && (defined(__SSE__) || defined(__ANDROID__))
 
-#include <xmmintrin.h>
+//#include <xmmintrin.h>
+#include "sse2neon.h"
 
 #define SHUFFLEPS( x, y, z, w )		(( (x) & 3 ) << 6 | ( (y) & 3 ) << 4 | ( (z) & 3 ) << 2 | ( (w) & 3 ))
 #define R_SHUFFLEPS( x, y, z, w )	(( (w) & 3 ) << 6 | ( (z) & 3 ) << 4 | ( (y) & 3 ) << 2 | ( (x) & 3 ))

@@ -41,7 +41,7 @@ If you have questions concerning this license or the applicable additional terms
 
 class idSIMD_SSE3 : public idSIMD_SSE2 {
 public:
-#if defined(__GNUC__) && defined(__SSE3__)
+#if defined(__GNUC__) && (defined(__SSE3__) || defined(__ANDROID__))
 	virtual const char * VPCALL GetName( void ) const;
 
 #elif defined(_MSC_VER) && defined(_M_IX86)

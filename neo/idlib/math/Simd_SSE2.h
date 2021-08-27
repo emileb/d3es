@@ -41,7 +41,7 @@ If you have questions concerning this license or the applicable additional terms
 
 class idSIMD_SSE2 : public idSIMD_SSE {
 public:
-#if defined(__GNUC__) && defined(__SSE2__)
+#if defined(__GNUC__) && (defined(__SSE2__) || defined(__ANDROID__))
 	using idSIMD_SSE::CmpLT;
 
 	virtual const char * VPCALL GetName( void ) const;

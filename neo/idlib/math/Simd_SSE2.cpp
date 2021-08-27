@@ -35,9 +35,10 @@ If you have questions concerning this license or the applicable additional terms
 //	SSE2 implementation of idSIMDProcessor
 //
 //===============================================================
-#if defined(__GNUC__) && defined(__SSE2__)
+#if defined(__GNUC__) && (defined(__SSE2__) || defined(__ANDROID__))
 
-#include <emmintrin.h>
+//#include <emmintrin.h>
+#include "sse2neon.h"
 
 #define SHUFFLEPS( x, y, z, w )		(( (x) & 3 ) << 6 | ( (y) & 3 ) << 4 | ( (z) & 3 ) << 2 | ( (w) & 3 ))
 #define R_SHUFFLEPS( x, y, z, w )	(( (w) & 3 ) << 6 | ( (z) & 3 ) << 4 | ( (y) & 3 ) << 2 | ( (x) & 3 ))

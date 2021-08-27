@@ -219,6 +219,10 @@ int Sys_GetProcessorId( void ) {
 	if (SDL_HasAltiVec())
 		flags |= CPUID_ALTIVEC;
 
+#ifdef __ANDROID__
+	flags |= CPUID_MMX | CPUID_SSE | CPUID_SSE2 | CPUID_SSE3;
+#endif
+
 	return flags;
 }
 

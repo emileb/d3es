@@ -36,7 +36,7 @@ If you have questions concerning this license or the applicable additional terms
 //
 //===============================================================
 
-#if defined(__GNUC__) && defined(__SSE3__)
+#if defined(__GNUC__) && (defined(__SSE3__) || defined(__ANDROID__))
 
 /*
 ============
@@ -49,7 +49,8 @@ const char * idSIMD_SSE3::GetName( void ) const {
 
 #elif defined(_MSC_VER) && defined(_M_IX86)
 
-#include <xmmintrin.h>
+//#include <xmmintrin.h>
+#include "sse2neon.h"
 
 #include "idlib/geometry/JointTransform.h"
 #include "idlib/geometry/DrawVert.h"

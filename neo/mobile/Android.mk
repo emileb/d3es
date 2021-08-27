@@ -44,6 +44,7 @@ LOCAL_CFLAGS := -DIOAPI_NO_64
 
 LOCAL_CFLAGS += -fno-unsafe-math-optimizations -fno-strict-aliasing -fno-math-errno -fno-trapping-math  -fsigned-char
 
+#LOCAL_CFLAGS += -D__SSE__  -D__SSE2__ -D__SSE3__
 
 
 SRC_ANDROID = mobile/game_interface.cpp \
