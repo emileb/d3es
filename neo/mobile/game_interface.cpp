@@ -62,7 +62,9 @@ void PortableBackButton()
 static const char *cmd_to_run = NULL;
 void PortableCommand(const char * cmd)
 {
-	cmd_to_run = cmd;
+	static char cmdBuffer[256];
+	idStr::snPrintf(cmdBuffer, 256, "%s\n", cmd);
+	cmd_to_run = cmdBuffer;
 }
 
 // Can only set one impulse per frame, this should be fine
