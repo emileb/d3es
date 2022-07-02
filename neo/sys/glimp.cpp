@@ -268,6 +268,11 @@ try_again:
 		SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, (multisamples > 1) ? 1 : 0);
 		SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, multisamples);
 
+		// Get GLES2 context
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_ES);
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+
 #if SDL_VERSION_ATLEAST(2, 0, 0)
 
 		const char* windowMode = "";
@@ -444,6 +449,18 @@ try_again:
 
 		glConfig.isFullscreen = (window->flags & SDL_FULLSCREEN) == SDL_FULLSCREEN;
 #endif
+
+		glConfig.vidWidthReal = glConfig.vidWidth;
+		glConfig.vidHeightReal = glConfig.vidHeight;
+
+		// If vidWidthReal and vidWidth are different then the framebuffer will automatically be used
+		if (r_framebufferWidth.GetInteger() !=0 && r_framebufferHeight.GetInteger() !=0)
+		{
+			glConfig.vidWidth = r_framebufferWidth.GetInteger();
+			glConfig.vidHeight = r_framebufferHeight.GetInteger();
+
+			common->Printf("Rendering in to framebuffer [%d,%d]\n", glConfig.vidWidth, glConfig.vidHeight);
+		}
 
 #if defined(_WIN32) && defined(ID_ALLOW_TOOLS)
 
@@ -690,7 +707,7 @@ GLimp_ActivateContext
 =================
 */
 void GLimp_ActivateContext() {
-	common->DPrintf("TODO: GLimp_ActivateContext\n");
+	SDL_GL_MakeCurrent(window, context);
 }
 
 /*
@@ -699,7 +716,7 @@ GLimp_DeactivateContext
 =================
 */
 void GLimp_DeactivateContext() {
-	common->DPrintf("TODO: GLimp_DeactivateContext\n");
+	SDL_GL_MakeCurrent(window, NULL);
 }
 
 /*

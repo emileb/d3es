@@ -49,7 +49,7 @@ If you have questions concerning this license or the applicable additional terms
 
 // using shorts for triangle indexes can save a significant amount of traffic, but
 // to support the large models that renderBump loads, they need to be 32 bits
-#if 1
+#if 0
 
 #define GL_INDEX_TYPE		GL_UNSIGNED_INT
 typedef int glIndex_t;
@@ -73,11 +73,6 @@ typedef struct dominantTri_s {
 	glIndex_t					v2, v3;
 	float						normalizationScale[3];
 } dominantTri_t;
-
-typedef struct lightingCache_s {
-	idVec3						localLightVector;		// this is the statically computed vector to the light
-														// in texture space for cards without vertex programs
-} lightingCache_t;
 
 typedef struct shadowCache_s {
 	idVec4						xyz;					// we use homogenous coordinate tricks
@@ -138,7 +133,6 @@ typedef struct srfTriangles_s {
 	// data in vertex object space, not directly readable by the CPU
 	struct vertCache_s *		indexCache;				// int
 	struct vertCache_s *		ambientCache;			// idDrawVert
-	struct vertCache_s *		lightingCache;			// lightingCache_t
 	struct vertCache_s *		shadowCache;			// shadowCache_t
 } srfTriangles_t;
 

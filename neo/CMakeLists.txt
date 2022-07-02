@@ -506,8 +506,8 @@ set(src_renderer
 	renderer/RenderWorld_load.cpp
 	renderer/RenderWorld_portals.cpp
 	renderer/VertexCache.cpp
-	renderer/draw_arb2.cpp
 	renderer/draw_common.cpp
+	renderer/draw_gles2.cpp
 	renderer/tr_backend.cpp
 	renderer/tr_deform.cpp
 	renderer/tr_font.cpp
@@ -518,13 +518,37 @@ set(src_renderer
 	renderer/tr_orderIndexes.cpp
 	renderer/tr_polytope.cpp
 	renderer/tr_render.cpp
-	renderer/tr_rendertools.cpp
 	renderer/tr_shadowbounds.cpp
 	renderer/tr_stencilshadow.cpp
 	renderer/tr_subview.cpp
 	renderer/tr_trace.cpp
 	renderer/tr_trisurf.cpp
 	renderer/tr_turboshadow.cpp
+	renderer/framebuffer.cpp
+	renderer/etc_android.cpp
+)
+
+
+set(src_renderer_glsl
+    renderer/glsl/cubeMapShaderFP.cpp
+    renderer/glsl/diffuseMapShaderVP.cpp
+    renderer/glsl/diffuseCubeShaderVP.cpp
+    renderer/glsl/diffuseMapShaderFP.cpp
+    renderer/glsl/fogShaderFP.cpp
+    renderer/glsl/fogShaderVP.cpp
+    renderer/glsl/blendLightShaderVP.cpp
+    renderer/glsl/interactionPhongShaderFP.cpp
+    renderer/glsl/interactionPhongShaderVP.cpp
+    renderer/glsl/interactionShaderFP.cpp
+    renderer/glsl/interactionShaderVP.cpp
+    renderer/glsl/reflectionCubeShaderVP.cpp
+    renderer/glsl/skyboxCubeShaderVP.cpp
+    renderer/glsl/stencilShadowShaderFP.cpp
+    renderer/glsl/stencilShadowShaderVP.cpp
+    renderer/glsl/zfillClipShaderFP.cpp
+    renderer/glsl/zfillClipShaderVP.cpp
+    renderer/glsl/zfillShaderFP.cpp
+    renderer/glsl/zfillShaderVP.cpp
 )
 
 # I'm a bit sloppy with headers and just glob them in..
@@ -891,12 +915,11 @@ set(src_debuggerServer
 
 set(src_core
 	${src_renderer}
+	${src_renderer_glsl}
 	${src_framework}
 	${src_cm}
-	${src_dmap}
 	${src_aas}
 	${src_roq}
-	${src_renderbump}
 	${src_snd}
 	${src_ui}
 	${src_tools}
@@ -1163,6 +1186,7 @@ endif()
 		${ZLIB_LIBRARY}
 		${SDLx_LIBRARY}
 		${sys_libs}
+		"GLESv2"
 	)
 
 	if(NOT APPLE AND NOT WIN32)

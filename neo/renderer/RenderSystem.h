@@ -50,42 +50,25 @@ typedef struct glconfig_s {
 	const char			*version_string;
 	const char			*extensions_string;
 
-	float				glVersion;				// atof( version_string )
-
-
 	int					maxTextureSize;			// queried from GL
 	int					maxTextureUnits;
-	int					maxTextureCoords;
-	int					maxTextureImageUnits;
 	float				maxTextureAnisotropy;
 
 	int					colorBits, alphabits, depthBits, stencilBits;
 
-	bool				multitextureAvailable;
-	bool				textureCompressionAvailable;
 	bool				anisotropicAvailable;
-	bool				textureLODBiasAvailable;
-	bool				textureEnvAddAvailable;
-	bool				textureEnvCombineAvailable;
-	bool				registerCombinersAvailable;
-	bool				cubeMapAvailable;
-	bool				envDot3Available;
-	bool				texture3DAvailable;
-	bool				sharedTexturePaletteAvailable;
-	bool				ARBVertexBufferObjectAvailable;
-	bool				ARBVertexProgramAvailable;
-	bool				ARBFragmentProgramAvailable;
-	bool				twoSidedStencilAvailable;
-	bool				textureNonPowerOfTwoAvailable;
-	bool				depthBoundsTestAvailable;
+
+	bool				npotAvailable;
+
+	bool				depthStencilAvailable;
 
 	int					vidWidth, vidHeight;	// passed to R_BeginFrame
+
+	int					vidWidthReal, vidHeightReal; // The real resolution of the screen, uses framebuffer if not the same as vidWidth
 
 	int					displayFrequency;
 
 	bool				isFullscreen;
-
-	bool				allowARB2Path;
 
 	bool				isInitialized;
 

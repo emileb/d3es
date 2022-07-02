@@ -49,87 +49,64 @@ VERTEX CACHE GENERATORS
 ==================
 R_CreateAmbientCache
 
-Create it if needed
+Create it if needed, or return the existing one
 ==================
 */
-bool R_CreateAmbientCache( srfTriangles_t *tri, bool needsLighting ) {
-	if ( tri->ambientCache ) {
-		return true;
-	}
-	// we are going to use it for drawing, so make sure we have the tangents and normals
-	if ( needsLighting && !tri->tangentsCalculated ) {
-		R_DeriveTangents( tri );
-	}
-
-	vertexCache.Alloc( tri->verts, tri->numVerts * sizeof( tri->verts[0] ), &tri->ambientCache );
-	if ( !tri->ambientCache ) {
+bool R_CreateAmbientCache(srfTriangles_t* tri, bool needsLighting) {
+	// Check for errors
+	if ( !tri->verts ) {
+		common->Error("R_CreateAmbientCache: Tri have no vertices\n");
 		return false;
 	}
+	// If there is no ambient cache, let's compute it
+	else if ( !tri->ambientCache ) {
+		// we are going to use it for drawing, so make sure we have the tangents and normals
+		if ( needsLighting && !tri->tangentsCalculated ) {
+			R_DeriveTangents(tri);
+		}
+
+		// Build the ambient cache
+		vertexCache.Alloc(tri->verts, tri->numVerts * sizeof(tri->verts[0]), &tri->ambientCache, false);
+
+		// Check for errors
+		if ( !tri->ambientCache ) {
+			common->Error("R_CreateAmbientCache: Unable to create an ambient cache\n");
+			return false;
+		}
+	} else {
+		// There is already an ambiant cache. Let's reuse it.
+	}
+
 	return true;
 }
 
 /*
 ==================
-R_CreateLightingCache
+R_CreateIndexCache
 
-Returns false if the cache couldn't be allocated, in which case the surface should be skipped.
+This is used only for a specific light
 ==================
 */
-bool R_CreateLightingCache( const idRenderEntityLocal *ent, const idRenderLightLocal *light, srfTriangles_t *tri ) {
-	idVec3		localLightOrigin;
-
-	// fogs and blends don't need light vectors
-	if ( light->lightShader->IsFogLight() || light->lightShader->IsBlendLight() ) {
-		return true;
-	}
-
-	// not needed if we have vertex programs
-	if ( tr.backEndRendererHasVertexPrograms ) {
-		return true;
-	}
-
-	R_GlobalPointToLocal( ent->modelMatrix, light->globalLightOrigin, localLightOrigin );
-
-	int	size = tri->ambientSurface->numVerts * sizeof( lightingCache_t );
-	lightingCache_t *cache = (lightingCache_t *)_alloca16( size );
-
-#if 1
-
-	SIMDProcessor->CreateTextureSpaceLightVectors( &cache[0].localLightVector, localLightOrigin,
-												tri->ambientSurface->verts, tri->ambientSurface->numVerts, tri->indexes, tri->numIndexes );
-
-#else
-
-	bool *used = (bool *)_alloca16( tri->ambientSurface->numVerts * sizeof( used[0] ) );
-	memset( used, 0, tri->ambientSurface->numVerts * sizeof( used[0] ) );
-
-	// because the interaction may be a very small subset of the full surface,
-	// it makes sense to only deal with the verts used
-	for ( int j = 0; j < tri->numIndexes; j++ ) {
-		int i = tri->indexes[j];
-		if ( used[i] ) {
-			continue;
-		}
-		used[i] = true;
-
-		idVec3 lightDir;
-		const idDrawVert *v;
-
-		v = &tri->ambientSurface->verts[i];
-
-		lightDir = localLightOrigin - v->xyz;
-
-		cache[i].localLightVector[0] = lightDir * v->tangents[0];
-		cache[i].localLightVector[1] = lightDir * v->tangents[1];
-		cache[i].localLightVector[2] = lightDir * v->normal;
-	}
-
-#endif
-
-	vertexCache.Alloc( cache, size, &tri->lightingCache );
-	if ( !tri->lightingCache ) {
+bool R_CreateIndexCache(srfTriangles_t* tri) {
+	// Check for errors
+	if ( !tri->indexes ) {
+		common->Error("R_CreateIndexCache: Tri have no indices\n");
 		return false;
 	}
+	// If there is no index cache, let's compute it
+	else if ( !tri->indexCache ) {
+		// Build the index cache
+		vertexCache.Alloc(tri->indexes, tri->numIndexes * sizeof(glIndex_t), &tri->indexCache, true);
+
+		// Check for errors
+		if ( !tri->indexCache ) {
+			common->Error("R_CreateIndexCache: Unable to create an index cache\n");
+			return false;
+		}
+	} else {
+		// There is already an index cache. Let's reuse it.
+	}
+
 	return true;
 }
 
@@ -140,12 +117,27 @@ R_CreatePrivateShadowCache
 This is used only for a specific light
 ==================
 */
-void R_CreatePrivateShadowCache( srfTriangles_t *tri ) {
+bool R_CreatePrivateShadowCache(srfTriangles_t* tri) {
+	// Check for errors
 	if ( !tri->shadowVertexes ) {
-		return;
+		common->Error("R_CreatePrivateShadowCache: Tri have no shadow vertices\n");
+		return false;
+	}
+	// If there is no ambient cache, let's compute it
+	else if ( !tri->shadowCache ) {
+		// Build the shadow cache
+		vertexCache.Alloc(tri->shadowVertexes, tri->numVerts * sizeof(*tri->shadowVertexes), &tri->shadowCache, false);
+
+		// Check for errors
+		if ( !tri->shadowCache ) {
+			common->Error("R_CreatePrivateShadowCache: Unable to create a vertex cache\n");
+			return false;
+		}
+	} else {
+		// There is already a shadow cache. Let's reuse it.
 	}
 
-	vertexCache.Alloc( tri->shadowVertexes, tri->numVerts * sizeof( *tri->shadowVertexes ), &tri->shadowCache );
+	return true;
 }
 
 /*
@@ -156,61 +148,31 @@ This is constant for any number of lights, the vertex program
 takes care of projecting the verts to infinity.
 ==================
 */
-void R_CreateVertexProgramShadowCache( srfTriangles_t *tri ) {
-	if ( tri->verts == NULL ) {
-		return;
+bool R_CreateVertexProgramShadowCache(srfTriangles_t* tri) {
+	// Check for errors
+	if ( !tri->verts ) {
+		common->Error("R_CreateVertexProgramShadowCache: Tri have no vertices\n");
+		return false;
+	}
+	// If there is no shadow cache, let's compute it
+	else if ( !tri->shadowCache ) {
+		// Build the temporary precomputed shadow vertices
+		shadowCache_t* temp = (shadowCache_t*) _alloca16(tri->numVerts * 2 * sizeof(shadowCache_t));
+		SIMDProcessor->CreateVertexProgramShadowCache(&temp->xyz, tri->verts, tri->numVerts);
+
+		// Build the shadow cache
+		vertexCache.Alloc(temp, tri->numVerts * 2 * sizeof(shadowCache_t), &tri->shadowCache, false);
+
+		// Check for errors
+		if ( !tri->shadowCache ) {
+			common->Error("R_CreateVertexProgramShadowCache: Unable to create a vertex cache\n");
+			return false ;
+		}
+	} else {
+		// There is already a shadow cache. Let's reuse it.
 	}
 
-	shadowCache_t *temp = (shadowCache_t *)_alloca16( tri->numVerts * 2 * sizeof( shadowCache_t ) );
-
-#if 1
-
-	SIMDProcessor->CreateVertexProgramShadowCache( &temp->xyz, tri->verts, tri->numVerts );
-
-#else
-
-	int numVerts = tri->numVerts;
-	const idDrawVert *verts = tri->verts;
-	for ( int i = 0; i < numVerts; i++ ) {
-		const float *v = verts[i].xyz.ToFloatPtr();
-		temp[i*2+0].xyz[0] = v[0];
-		temp[i*2+1].xyz[0] = v[0];
-		temp[i*2+0].xyz[1] = v[1];
-		temp[i*2+1].xyz[1] = v[1];
-		temp[i*2+0].xyz[2] = v[2];
-		temp[i*2+1].xyz[2] = v[2];
-		temp[i*2+0].xyz[3] = 1.0f;		// on the model surface
-		temp[i*2+1].xyz[3] = 0.0f;		// will be projected to infinity
-	}
-
-#endif
-
-	vertexCache.Alloc( temp, tri->numVerts * 2 * sizeof( shadowCache_t ), &tri->shadowCache );
-}
-
-/*
-==================
-R_SkyboxTexGen
-==================
-*/
-void R_SkyboxTexGen( drawSurf_t *surf, const idVec3 &viewOrg ) {
-	int		i;
-	idVec3	localViewOrigin;
-
-	R_GlobalPointToLocal( surf->space->modelMatrix, viewOrg, localViewOrigin );
-
-	int numVerts = surf->geo->numVerts;
-	int size = numVerts * sizeof( idVec3 );
-	idVec3 *texCoords = (idVec3 *) _alloca16( size );
-
-	const idDrawVert *verts = surf->geo->verts;
-	for ( i = 0; i < numVerts; i++ ) {
-		texCoords[i][0] = verts[i].xyz[0] - localViewOrigin[0];
-		texCoords[i][1] = verts[i].xyz[1] - localViewOrigin[1];
-		texCoords[i][2] = verts[i].xyz[2] - localViewOrigin[2];
-	}
-
-	surf->dynamicTexCoords = vertexCache.AllocFrameTemp( texCoords, size );
+	return true;
 }
 
 /*
@@ -219,7 +181,7 @@ R_WobbleskyTexGen
 ==================
 */
 void R_WobbleskyTexGen( drawSurf_t *surf, const idVec3 &viewOrg ) {
-	int		i;
+
 	idVec3	localViewOrigin;
 
 	const int *parms = surf->material->GetTexGenRegisters();
@@ -233,7 +195,6 @@ void R_WobbleskyTexGen( drawSurf_t *surf, const idVec3 &viewOrg ) {
 	rotateSpeed = rotateSpeed * 2 * idMath::PI / 60;
 
 	// very ad-hoc "wobble" transform
-	float	transform[16];
 	float	a = tr.viewDef->floatTime * wobbleSpeed;
 	float	s = sin( a ) * sin( wobbleDegrees );
 	float	c = cos( a ) * sin( wobbleDegrees );
@@ -260,111 +221,21 @@ void R_WobbleskyTexGen( drawSurf_t *surf, const idVec3 &viewOrg ) {
 	s = sin( rotateSpeed * tr.viewDef->floatTime );
 	c = cos( rotateSpeed * tr.viewDef->floatTime );
 
-	transform[0] = axis[0][0] * c + axis[1][0] * s;
-	transform[4] = axis[0][1] * c + axis[1][1] * s;
-	transform[8] = axis[0][2] * c + axis[1][2] * s;
+	surf->wobbleTransform[0] = axis[0][0] * c + axis[1][0] * s;
+	surf->wobbleTransform[4] = axis[0][1] * c + axis[1][1] * s;
+	surf->wobbleTransform[8] = axis[0][2] * c + axis[1][2] * s;
 
-	transform[1] = axis[1][0] * c - axis[0][0] * s;
-	transform[5] = axis[1][1] * c - axis[0][1] * s;
-	transform[9] = axis[1][2] * c - axis[0][2] * s;
+	surf->wobbleTransform[1] = axis[1][0] * c - axis[0][0] * s;
+	surf->wobbleTransform[5] = axis[1][1] * c - axis[0][1] * s;
+	surf->wobbleTransform[9] = axis[1][2] * c - axis[0][2] * s;
 
-	transform[2] = axis[2][0];
-	transform[6] = axis[2][1];
-	transform[10] = axis[2][2];
+	surf->wobbleTransform[2] = axis[2][0];
+	surf->wobbleTransform[6] = axis[2][1];
+	surf->wobbleTransform[10] = axis[2][2];
 
-	transform[3] = transform[7] = transform[11] = 0.0f;
-	transform[12] = transform[13] = transform[14] = 0.0f;
-
-	R_GlobalPointToLocal( surf->space->modelMatrix, viewOrg, localViewOrigin );
-
-	int numVerts = surf->geo->numVerts;
-	int size = numVerts * sizeof( idVec3 );
-	idVec3 *texCoords = (idVec3 *) _alloca16( size );
-
-	const idDrawVert *verts = surf->geo->verts;
-	for ( i = 0; i < numVerts; i++ ) {
-		idVec3 v;
-
-		v[0] = verts[i].xyz[0] - localViewOrigin[0];
-		v[1] = verts[i].xyz[1] - localViewOrigin[1];
-		v[2] = verts[i].xyz[2] - localViewOrigin[2];
-
-		R_LocalPointToGlobal( transform, v, texCoords[i] );
-	}
-
-	surf->dynamicTexCoords = vertexCache.AllocFrameTemp( texCoords, size );
+	surf->wobbleTransform[3] = surf->wobbleTransform[7] = surf->wobbleTransform[11] = 0.0f;
+	surf->wobbleTransform[12] = surf->wobbleTransform[13] = surf->wobbleTransform[14] = 0.0f;
 }
-
-/*
-=================
-R_SpecularTexGen
-
-Calculates the specular coordinates for cards without vertex programs.
-=================
-*/
-static void R_SpecularTexGen( drawSurf_t *surf, const idVec3 &globalLightOrigin, const idVec3 &viewOrg ) {
-	const srfTriangles_t *tri;
-	idVec3	localLightOrigin;
-	idVec3	localViewOrigin;
-
-	R_GlobalPointToLocal( surf->space->modelMatrix, globalLightOrigin, localLightOrigin );
-	R_GlobalPointToLocal( surf->space->modelMatrix, viewOrg, localViewOrigin );
-
-	tri = surf->geo;
-
-	// FIXME: change to 3 component?
-	int	size = tri->numVerts * sizeof( idVec4 );
-	idVec4 *texCoords = (idVec4 *) _alloca16( size );
-
-#if 1
-
-	SIMDProcessor->CreateSpecularTextureCoords( texCoords, localLightOrigin, localViewOrigin,
-											tri->verts, tri->numVerts, tri->indexes, tri->numIndexes );
-
-#else
-
-	bool *used = (bool *)_alloca16( tri->numVerts * sizeof( used[0] ) );
-	memset( used, 0, tri->numVerts * sizeof( used[0] ) );
-
-	// because the interaction may be a very small subset of the full surface,
-	// it makes sense to only deal with the verts used
-	for ( int j = 0; j < tri->numIndexes; j++ ) {
-		int i = tri->indexes[j];
-		if ( used[i] ) {
-			continue;
-		}
-		used[i] = true;
-
-		float ilength;
-
-		const idDrawVert *v = &tri->verts[i];
-
-		idVec3 lightDir = localLightOrigin - v->xyz;
-		idVec3 viewDir = localViewOrigin - v->xyz;
-
-		ilength = idMath::RSqrt( lightDir * lightDir );
-		lightDir[0] *= ilength;
-		lightDir[1] *= ilength;
-		lightDir[2] *= ilength;
-
-		ilength = idMath::RSqrt( viewDir * viewDir );
-		viewDir[0] *= ilength;
-		viewDir[1] *= ilength;
-		viewDir[2] *= ilength;
-
-		lightDir += viewDir;
-
-		texCoords[i][0] = lightDir * v->tangents[0];
-		texCoords[i][1] = lightDir * v->tangents[1];
-		texCoords[i][2] = lightDir * v->normal;
-		texCoords[i][3] = 1;
-	}
-
-#endif
-
-	surf->dynamicTexCoords = vertexCache.AllocFrameTemp( texCoords, size );
-}
-
 
 //=======================================================================================================
 
@@ -668,7 +539,16 @@ void R_LinkLightSurf( const drawSurf_t **link, const srfTriangles_t *tri, const 
 
 	drawSurf = (drawSurf_t *)R_FrameAlloc( sizeof( *drawSurf ) );
 
-	drawSurf->geo = tri;
+	drawSurf->geoFrontEnd = tri;
+	drawSurf->ambientCache = tri->ambientCache;
+    drawSurf->indexCache = tri->indexCache;
+    drawSurf->shadowCache = tri->shadowCache;
+	drawSurf->numIndexes = tri->numIndexes;
+
+	drawSurf->numShadowIndexesNoFrontCaps = tri->numShadowIndexesNoFrontCaps;
+	drawSurf->numShadowIndexesNoCaps = tri->numShadowIndexesNoCaps;
+	drawSurf->shadowCapPlaneBits = tri->shadowCapPlaneBits;
+
 	drawSurf->space = space;
 	drawSurf->material = shader;
 	drawSurf->scissorRect = scissor;
@@ -690,16 +570,8 @@ void R_LinkLightSurf( const drawSurf_t **link, const srfTriangles_t *tri, const 
 			// FIXME: share with the ambient surface?
 			float *regs = (float *)R_FrameAlloc( shader->GetNumRegisters() * sizeof( float ) );
 			drawSurf->shaderRegisters = regs;
-			shader->EvaluateRegisters( regs, space->entityDef->parms.shaderParms, tr.viewDef, space->entityDef->parms.referenceSound );
-		}
-
-		// calculate the specular coordinates if we aren't using vertex programs
-		if ( !tr.backEndRendererHasVertexPrograms && !r_skipSpecular.GetBool() ) {
-			R_SpecularTexGen( drawSurf, light->globalLightOrigin, tr.viewDef->renderView.vieworg );
-			// if we failed to allocate space for the specular calculations, drop the surface
-			if ( !drawSurf->dynamicTexCoords ) {
-				return;
-			}
+			shader->EvaluateRegisters(regs, space->entityDef->parms.shaderParms, tr.viewDef,
+			                          space->entityDef->parms.referenceSound);
 		}
 	}
 
@@ -1001,14 +873,17 @@ void R_AddLightSurfaces( void ) {
 		// fog lights will need to draw the light frustum triangles, so make sure they
 		// are in the vertex cache
 		if ( lightShader->IsFogLight() ) {
-			if ( !light->frustumTris->ambientCache ) {
 				if ( !R_CreateAmbientCache( light->frustumTris, false ) ) {
 					// skip if we are out of vertex memory
 					continue;
 				}
+			if ( !R_CreateIndexCache(light->frustumTris)) {
+				// skip if we are out of vertex memory
+				continue;
 			}
 			// touch the surface so it won't get purged
 			vertexCache.Touch( light->frustumTris->ambientCache );
+			vertexCache.Touch(light->frustumTris->indexCache);
 		}
 
 		// add the prelight shadows for the static world geometry
@@ -1031,22 +906,18 @@ void R_AddLightSurfaces( void ) {
 			}
 
 			// if we have been purged, re-upload the shadowVertexes
-			if ( !tri->shadowCache ) {
-				R_CreatePrivateShadowCache( tri );
-				if ( !tri->shadowCache ) {
+			if ( !R_CreatePrivateShadowCache(tri) ) {
+				// skip if we are out of vertex memory
 					continue;
 				}
+			if ( !R_CreateIndexCache(tri)) {
+				// skip if we are out of vertex memory
+				continue;
 			}
 
 			// touch the shadow surface so it won't get purged
 			vertexCache.Touch( tri->shadowCache );
-
-			if ( !tri->indexCache && r_useIndexBuffers.GetBool() ) {
-				vertexCache.Alloc( tri->indexes, tri->numIndexes * sizeof( tri->indexes[0] ), &tri->indexCache, true );
-			}
-			if ( tri->indexCache ) {
 				vertexCache.Touch( tri->indexCache );
-			}
 
 			R_LinkLightSurf( &vLight->globalShadows, tri, NULL, light, NULL, vLight->scissorRect, true /* FIXME? */ );
 		}
@@ -1193,9 +1064,21 @@ void R_AddDrawSurf( const srfTriangles_t *tri, const viewEntity_t *space, const 
 	float			generatedShaderParms[MAX_ENTITY_SHADER_PARMS];
 
 	drawSurf = (drawSurf_t *)R_FrameAlloc( sizeof( *drawSurf ) );
-	drawSurf->geo = tri;
+
+	drawSurf->geoFrontEnd = tri;
+
+	drawSurf->ambientCache = tri->ambientCache;
+	drawSurf->indexCache = tri->indexCache;
+	drawSurf->shadowCache = tri->shadowCache;
+	drawSurf->numIndexes = tri->numIndexes;
+
+	drawSurf->numShadowIndexesNoFrontCaps = tri->numShadowIndexesNoFrontCaps;
+	drawSurf->numShadowIndexesNoCaps = tri->numShadowIndexesNoCaps;
+	drawSurf->shadowCapPlaneBits = tri->shadowCapPlaneBits;
+
 	drawSurf->space = space;
 	drawSurf->material = shader;
+
 	drawSurf->scissorRect = scissor;
 	drawSurf->sort = shader->GetSort() + tr.sortOffset;
 	drawSurf->dsFlags = 0;
@@ -1278,12 +1161,17 @@ void R_AddDrawSurf( const srfTriangles_t *tri, const viewEntity_t *space, const 
 
 	// skybox surfaces need a dynamic texgen
 	switch( shader->Texgen() ) {
-		case TG_SKYBOX_CUBE:
-			R_SkyboxTexGen( drawSurf, tr.viewDef->renderView.vieworg );
-			break;
 		case TG_WOBBLESKY_CUBE:
 			R_WobbleskyTexGen( drawSurf, tr.viewDef->renderView.vieworg );
 			break;
+	case TG_SKYBOX_CUBE:
+	case TG_DIFFUSE_CUBE:
+	case TG_REFLECT_CUBE:
+		// Be sure to init the wobbleTransform to identity for cube-map based surfaces that does not use it
+		// (it will be passed to the shader)
+		memcpy(&drawSurf->wobbleTransform, mat4_identity.ToFloatPtr(), sizeof(drawSurf->wobbleTransform));
+	default:
+		break;
 	}
 
 	// check for gui surfaces
@@ -1413,15 +1301,14 @@ static void R_AddAmbientDrawsurfs( viewEntity_t *vEntity ) {
 				// don't add anything if the vertex cache was too full to give us an ambient cache
 				return;
 			}
+			if ( !R_CreateIndexCache(tri)) {
+				// skip if we are out of vertex memory
+				continue;
+			}
+
 			// touch it so it won't get purged
 			vertexCache.Touch( tri->ambientCache );
-
-			if ( r_useIndexBuffers.GetBool() && !tri->indexCache ) {
-				vertexCache.Alloc( tri->indexes, tri->numIndexes * sizeof( tri->indexes[0] ), &tri->indexCache, true );
-			}
-			if ( tri->indexCache ) {
 				vertexCache.Touch( tri->indexCache );
-			}
 
 			// add the surface for drawing
 			R_AddDrawSurf( tri, vEntity, &vEntity->entityDef->parms, shader, vEntity->scissorRect );
