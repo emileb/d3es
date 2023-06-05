@@ -736,59 +736,62 @@ void idRenderSystemLocal::BackendThreadShutdown()
 void idRenderSystemLocal::RenderCommands(renderCrop_t *pc, byte *pix)
 {
 
-	//Wait for last backend rendering to finish
-	BackendThreadWait();
+	// Only do rendering if the app is actually active
+	if(windowActive) {
+		//Wait for last backend rendering to finish
+		BackendThreadWait();
 
-	// Limit maximum FPS
-	int maxFPS = r_maxFps.GetInteger();
-	if(maxFPS)
-	{
-		unsigned int limit = 1000 / maxFPS;
-		unsigned int currentTime = Sys_Milliseconds();
-		int timeTook = currentTime - lastRenderTime;
-		if(timeTook < limit)
+		// Limit maximum FPS
+		int maxFPS = r_maxFps.GetInteger();
+		if (maxFPS)
 		{
-			usleep((limit - timeTook) * 1000);
+			unsigned int limit = 1000 / maxFPS;
+			unsigned int currentTime = Sys_Milliseconds();
+			int timeTook = currentTime - lastRenderTime;
+			if (timeTook < limit)
+			{
+				usleep((limit - timeTook) * 1000);
+			}
+			lastRenderTime = Sys_Milliseconds();
 		}
-		lastRenderTime = Sys_Milliseconds();
-	}
 
-	// LOGI("---------------------NEW FRAME---------------------");
+		// LOGI("---------------------NEW FRAME---------------------");
 
-	// We have turned off multithreading, we need to shut it down
-	if(multithreadActive && !r_multithread.GetBool())
-	{
-		BackendThreadShutdown();
-		multithreadActive = false;
-	}
-	else if( !multithreadActive && r_multithread.GetBool() )
-	{
-		multithreadActive = true;
-	}
-
-	//Save the current vertexs and framedata to use for next render
-	vertListToRender = vertexCache.GetListNum();
-	fdToRender = frameData;
-
-	//Save the potential pixel
-	pixelsCrop = pc;
-	pixels = pix;
-
-	BackendThreadExecute();
-
-	// Wait for the backend to load any images, this only really happens at level load time
-	// Problem is image loading is not thread safe, hence the wait
-	if(useSpinLock)
-	{
-		while(!imagesFinished)
+		// We have turned off multithreading, we need to shut it down
+		if (multithreadActive && !r_multithread.GetBool())
 		{
-			if(spinLockDelay)
-				usleep(spinLockDelay);
+			BackendThreadShutdown();
+			multithreadActive = false;
 		}
-	}
-	else
-	{
-		Sys_WaitForEvent(TRIGGER_EVENT_IMAGES_PROCESSES);
+		else if (!multithreadActive && r_multithread.GetBool())
+		{
+			multithreadActive = true;
+		}
+
+		//Save the current vertexs and framedata to use for next render
+		vertListToRender = vertexCache.GetListNum();
+		fdToRender = frameData;
+
+		//Save the potential pixel
+		pixelsCrop = pc;
+		pixels = pix;
+
+		BackendThreadExecute();
+
+		// Wait for the backend to load any images, this only really happens at level load time
+		// Problem is image loading is not thread safe, hence the wait
+		if (useSpinLock)
+		{
+			while (!imagesFinished)
+			{
+				if (spinLockDelay)
+					usleep(spinLockDelay);
+			}
+		}
+		else
+		{
+			Sys_WaitForEvent(TRIGGER_EVENT_IMAGES_PROCESSES);
+		}
 	}
 
 	// If we are waiting for pixel data, make sure we wait for the backend to finish

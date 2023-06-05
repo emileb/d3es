@@ -725,6 +725,7 @@ public:
 
 	bool 					useSpinLock = true;
 	int						spinLockDelay = 1000;
+	bool					windowActive = false; // True when the app is at the foreground and not minimised
 
 	volatile bool			backendThreadRun = false;
 	volatile bool			backendFinished = true;
@@ -1113,6 +1114,7 @@ const int GRAB_HIDECURSOR	= (1 << 1);
 const int GRAB_RELATIVEMOUSE = (1 << 2);
 
 void GLimp_GrabInput(int flags);
+void GLimp_WindowActive(bool active);
 /*
 ====================================================================
 

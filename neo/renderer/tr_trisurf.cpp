@@ -793,8 +793,7 @@ R_CreateDupVerts
 void R_CreateDupVerts( srfTriangles_t *tri ) {
 	int i;
 
-	int *remap = (int *) _alloca16( tri->numVerts * sizeof( remap[0] ) );
-
+	int *remap = (int *)Mem_Alloc16( tri->numVerts * sizeof( remap[0] ) );
 	// initialize vertex remap in case there are unused verts
 	for ( i = 0; i < tri->numVerts; i++ ) {
 		remap[i] = i;
@@ -806,7 +805,8 @@ void R_CreateDupVerts( srfTriangles_t *tri ) {
 	}
 
 	// create duplicate vertex index based on the vertex remap
-	int * tempDupVerts = (int *) _alloca16( tri->numVerts * 2 * sizeof( tempDupVerts[0] ) );
+	int * tempDupVerts = (int *) Mem_Alloc16( tri->numVerts * 2 * sizeof( tempDupVerts[0] ) );
+
 	tri->numDupVerts = 0;
 	for ( i = 0; i < tri->numVerts; i++ ) {
 		if ( remap[i] != i ) {
@@ -816,12 +816,16 @@ void R_CreateDupVerts( srfTriangles_t *tri ) {
 		}
 	}
 
+
 	if(tri->numDupVerts > 0) {
 		tri->dupVerts = triDupVertAllocator.Alloc( tri->numDupVerts * 2 );
 		memcpy( tri->dupVerts, tempDupVerts, tri->numDupVerts * 2 * sizeof( tri->dupVerts[0] ) ); // runtime error: null pointer passed as argument 1, which is declared to never be null
 	} else {
 		tri->dupVerts = NULL;
 	}
+
+	Mem_Free16(remap);
+	Mem_Free16(tempDupVerts);
 }
 
 /*

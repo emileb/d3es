@@ -482,7 +482,7 @@ void R_InitOpenGL( void ) {
 			r_multiSamples.SetInteger( 0 );
 		}
 	}
-	gotContext = true;
+	//gotContext = true;
 
 // load qgl function pointers
 #define QGLPROC(name, rettype, args) \
