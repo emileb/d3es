@@ -551,12 +551,12 @@ void Android_GetMovement(int frameTime, int *forward, int *strafe, float *yaw, f
         // Add pitch
         *pitch += (-look_pitch_mouse * 300) * lookScale;
         look_pitch_mouse = 0;
-        *pitch += (look_pitch_joy * frameTime) * lookScale / 3;
+        *pitch += (look_pitch_joy * frameTime) * lookScale / 8.0;
 
         // Add yaw
         *yaw += (look_yaw_mouse * 1000) * lookScale;
         look_yaw_mouse = 0;
-        *yaw += (look_yaw_joy * frameTime) * lookScale / 2;
+        *yaw += (look_yaw_joy * frameTime) * lookScale / 5.5;
     }
 }
 
