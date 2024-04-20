@@ -28,17 +28,18 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
+
+
 #if defined( ID_ALLOW_TOOLS )
 #include "tools/edit_gui_common.h"
+#include "DebuggerServer.h"
 #include "DebuggerApp.h"
 #else
+#include "DebuggerServer.h"
 #include "debugger_common.h"
 // we need a lot to be able to list all threads in mars_city1
 const int MAX_MSGLEN = 8600;
 #endif
-
-
-#include "DebuggerServer.h"
 
 /*
 ================

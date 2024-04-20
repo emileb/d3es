@@ -53,6 +53,10 @@ If you have questions concerning this license or the applicable additional terms
 
 #include "Game_local.h"
 
+#ifndef GAME_DLL
+#include "tools/compilers/aas/AASFileManager.h"
+#endif
+
 const int NUM_RENDER_PORTAL_BITS	= idMath::BitsForInteger( PS_BLOCK_ALL );
 
 const float	DEFAULT_GRAVITY			= 1066.0f;
@@ -1114,7 +1118,7 @@ bool idGameLocal::NextMap( void ) {
 	int					i;
 
 	if ( !g_mapCycle.GetString()[0] ) {
-		Printf( common->GetLanguageDict()->GetString( "#str_04294" ) );
+		Printf( "%s", common->GetLanguageDict()->GetString( "#str_04294" ) );
 		return false;
 	}
 	if ( fileSystem->ReadFile( g_mapCycle.GetString(), NULL, NULL ) < 0 ) {
