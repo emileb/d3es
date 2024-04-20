@@ -7,6 +7,7 @@ GPL3
 
 
 idCVar r_framebufferFilter( "r_framebufferFilter", "0", CVAR_RENDERER | CVAR_BOOL, "Image filter when using the framebuffer. 0 = Nearest, 1 = Linear" );
+idCVar r_framebufferMaintAspect( "r_framebufferMaintAspect", "0", CVAR_RENDERER | CVAR_BOOL, "If rendering to a framebuffer and it's not the same aspect ratio as the window, maintain aspect" );
 
 static GLuint m_framebuffer = -1;
 static GLuint m_depthbuffer;
@@ -20,6 +21,8 @@ static GLuint m_texCoordLoc;
 static GLuint m_samplerLoc;
 
 static GLuint r_program;
+
+static bool m_maintainAspect = false;
 
 static int fixNpot(int v)
 {
@@ -95,7 +98,6 @@ int createProgram(const char * vertexSource, const char *  fragmentSource)
 			//glDeleteProgram(program);
 			program = 0;
 		}
-
 	}
 	else
 	{
@@ -237,68 +239,106 @@ void R_FrameBufferStart()
 
 void R_FrameBufferEnd()
 {
-	if(m_framebuffer == -1)
-		return;
 
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	glBindRenderbuffer(GL_RENDERBUFFER, 0);
+    if (m_framebuffer == -1)
+        return;
 
-	// Bind the texture
-	glBindTexture(GL_TEXTURE_2D, m_framebuffer_texture);
+    m_maintainAspect = r_framebufferMaintAspect.GetInteger();
 
-	// Unbind any VBOs
-	vertexCache.UnbindIndex();
-	vertexCache.UnbindVertex();
+    float aspectReal = (float)glConfig.vidWidthReal / (float)glConfig.vidHeightReal;
+    float aspectFb = (float)glConfig.vidWidth / (float)glConfig.vidHeight;
 
-	glUseProgram(r_program);
+    // Check if there is any need to correct aspect, disable is not needed as it reduces performance (glClear)
+    if(m_maintainAspect && fabs(aspectReal - aspectFb) < 0.01)
+    {
+        m_maintainAspect = false;
+    }
 
-	GLfloat vert[] =
-	{
-		-1.f, -1.f,  0.0f,  // 0. left-bottom
-		-1.f,  1.f,  0.0f,  // 1. left-top
-		1.f, 1.f,  0.0f,    // 2. right-top
-		1.f, -1.f,  0.0f,   // 3. right-bottom
-	};
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
-	GLfloat smax = 1;
-	GLfloat tmax = 1;
+    // Bind the texture
+    glBindTexture(GL_TEXTURE_2D, m_framebuffer_texture);
 
-	if (!glConfig.npotAvailable)
-	{
-		smax =  (float)glConfig.vidWidth / (float)m_framebuffer_width;
-		tmax =   (float)glConfig.vidHeight / (float)m_framebuffer_height;
-	}
+    // Unbind any VBOs
+    vertexCache.UnbindIndex();
+    vertexCache.UnbindVertex();
 
-	GLfloat texVert[] =
-	{
-		0.0f, 0.0f, // TexCoord 0
-		0.0f, tmax, // TexCoord 1
-		smax, tmax, // TexCoord 2
-		smax, 0.0f  // TexCoord 3
-	};
+    glUseProgram(r_program);
 
-	glVertexAttribPointer(m_positionLoc, 3, GL_FLOAT,
-				  false,
-				  3 * 4,
-				  vert);
+    float left = -1;
+    float right = 1;
+    float top = 1;
+    float bottom = -1;
 
-	glVertexAttribPointer(m_texCoordLoc, 2, GL_FLOAT,
-						  false,
-						  2 * 4,
-						  texVert);
+    if (m_maintainAspect) {
+        float realRatio = (float) glConfig.vidWidthReal / (float) glConfig.vidHeightReal;
+        float fbRatio = (float) glConfig.vidWidth / (float) glConfig.vidHeight;
 
-	glEnableVertexAttribArray(m_positionLoc);
-	glEnableVertexAttribArray(m_texCoordLoc);
+        float xScale = fbRatio / realRatio;
+        float yScale = realRatio / fbRatio;
 
+        if (xScale < 1) {
+            left = -xScale;
+            right = xScale;
+        } else {
+            top = yScale;
+            bottom = -yScale;
+        }
+    }
 
-	// Set the sampler texture unit to 0
-	glUniform1i(m_samplerLoc, 0);
+    GLfloat vert[] =
+            {
+                    left, bottom, 0.0f,  // 0. left-bottom
+                    left, top, 0.0f,    // 1. left-top
+                    right, top, 0.0f,    // 2. right-top
+                    right, bottom, 0.0f, // 3. right-bottom
+            };
 
-	glViewport (0, 0, glConfig.vidWidthReal, glConfig.vidHeightReal );
+    GLfloat smax = 1;
+    GLfloat tmax = 1;
 
-	glDisable(GL_BLEND);
-	glDisable(GL_SCISSOR_TEST);
-	glDisable(GL_DEPTH_TEST);
+    if (!glConfig.npotAvailable)
+    {
+        smax = (float) glConfig.vidWidth / (float) m_framebuffer_width;
+        tmax = (float) glConfig.vidHeight / (float) m_framebuffer_height;
+    }
+
+    GLfloat texVert[] =
+    {
+        0.0f, 0.0f, // TexCoord 0
+        0.0f, tmax, // TexCoord 1
+        smax, tmax, // TexCoord 2
+        smax, 0.0f  // TexCoord 3
+    };
+
+    glVertexAttribPointer(m_positionLoc, 3, GL_FLOAT,
+                          false,
+                          3 * 4,
+                          vert);
+
+    glVertexAttribPointer(m_texCoordLoc, 2, GL_FLOAT,
+                          false,
+                          2 * 4,
+                          texVert);
+
+    glEnableVertexAttribArray(m_positionLoc);
+    glEnableVertexAttribArray(m_texCoordLoc);
+
+    // Set the sampler texture unit to 0
+    glUniform1i(m_samplerLoc, 0);
+
+    glViewport(0, 0, glConfig.vidWidthReal, glConfig.vidHeightReal);
+
+    glDisable(GL_BLEND);
+    glDisable(GL_SCISSOR_TEST);
+    glDisable(GL_DEPTH_TEST);
+
+    if (m_maintainAspect)
+    {
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
+    }
 
 	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 }
