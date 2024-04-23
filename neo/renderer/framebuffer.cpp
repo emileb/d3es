@@ -239,7 +239,6 @@ void R_FrameBufferStart()
 
 void R_FrameBufferEnd()
 {
-
     if (m_framebuffer == -1)
         return;
 
@@ -271,7 +270,8 @@ void R_FrameBufferEnd()
     float top = 1;
     float bottom = -1;
 
-    if (m_maintainAspect) {
+    if (m_maintainAspect)
+	{
         float realRatio = (float) glConfig.vidWidthReal / (float) glConfig.vidHeightReal;
         float fbRatio = (float) glConfig.vidWidth / (float) glConfig.vidHeight;
 
@@ -288,12 +288,12 @@ void R_FrameBufferEnd()
     }
 
     GLfloat vert[] =
-            {
-                    left, bottom, 0.0f,  // 0. left-bottom
-                    left, top, 0.0f,    // 1. left-top
-                    right, top, 0.0f,    // 2. right-top
-                    right, bottom, 0.0f, // 3. right-bottom
-            };
+	{
+		left, bottom, 0.0f,  // 0. left-bottom
+		left, top, 0.0f,    // 1. left-top
+		right, top, 0.0f,    // 2. right-top
+		right, bottom, 0.0f, // 3. right-bottom
+	};
 
     GLfloat smax = 1;
     GLfloat tmax = 1;
