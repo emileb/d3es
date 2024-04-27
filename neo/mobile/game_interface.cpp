@@ -360,6 +360,22 @@ void PortableAction(int state, int action)
          	if (state)
 				PortableCommand("savegame quick");
             break;
+
+		case PORT_ACT_INVPREV:
+			if(gameMod == GAME_TYPE_DOOM3_EOC)
+				if(state)
+					SetImpuse(UB_IMPULSE41);
+			break;
+		case PORT_ACT_INVNEXT:
+			if(gameMod == GAME_TYPE_DOOM3_EOC)
+				if(state)
+					SetImpuse(UB_IMPULSE42);
+			break;
+		case PORT_ACT_INVUSE:
+			if(gameMod == GAME_TYPE_DOOM3_EOC)
+				if(state)
+					SetImpuse(UB_IMPULSE43);
+			break;
         case PORT_ACT_CONSOLE:
 			PortableKeyEvent(state, SDL_SCANCODE_GRAVE, 0);
             break;
