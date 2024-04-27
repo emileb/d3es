@@ -175,7 +175,6 @@ void* idVertexCache::Position(vertCache_t* buffer) {
 		common->FatalError("idVertexCache::Position: bad vertCache_t");
 	}
 
-
 	if( buffer->indexBuffer && (r_useIndexBuffers.GetBool() == false)  )
 	{
 		UnbindIndex();
@@ -195,7 +194,6 @@ void* idVertexCache::Position(vertCache_t* buffer) {
 		if(buffer->vbo > vboMax)
 			vboMax = buffer->vbo;
     }
-
 
 	// the ARB vertex object just uses an offset
 	if (r_showVertexCache.GetInteger() == 2) {
@@ -764,7 +762,6 @@ void idVertexCache::EndFrame() {
 
 	}
 #endif
-
 
 	currentFrame = tr.frameCount;
 

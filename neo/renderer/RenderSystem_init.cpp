@@ -254,6 +254,12 @@ static void R_CheckPortableExtensions( void ) {
 	glConfig.depthStencilAvailable = R_CheckExtension( "GL_OES_packed_depth_stencil" );
 	common->Printf(" depthStencilAvailable: %d\n", glConfig.npotAvailable);
 
+	glConfig.useShortIndexElements = false;
+
+	if(glConfig.useShortIndexElements)
+	{
+        // TODO Disable r_useIndexVBO incase it is set, will not work with shorts as I don't update the VBO data
+	}
 
 	if ( glConfig.anisotropicAvailable ) {
 		qglGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &glConfig.maxTextureAnisotropy);

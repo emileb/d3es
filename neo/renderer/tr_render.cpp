@@ -40,6 +40,48 @@ If you have questions concerning this license or the applicable additional terms
 
 float RB_overbright = 1;
 
+#include <arm_neon.h>
+
+const int MAXIMUM_SHORTS_RENDER_INDICES = 1024 * 64;
+
+static void RB_DrawElementsWithConversion( GLenum mode, GLsizei count, const int *indices ){
+
+	static short shorts[MAXIMUM_SHORTS_RENDER_INDICES];
+
+	GLenum type = GL_UNSIGNED_INT; // Default
+	void *indicesRender = (void *)indices;
+
+	if( glConfig.useShortIndexElements ){
+
+        if(count >= MAXIMUM_SHORTS_RENDER_INDICES) // Just skip whole render if too many..
+            return;
+
+		type = GL_UNSIGNED_SHORT;
+        indicesRender = shorts;
+
+        // NOTE! This does not check if the 32bit integer is out of range for a short, so if it is it will produce corrupt rendering
+#if 1
+		int i = 0;
+		for (; i < count - 3; i += 4) {
+			int32x4_t v1 = vld1q_s32(&indices[i]); // Load four 32-bit integers
+			int16x4_t v2 = vqmovn_s32(v1); // Narrow to four 16-bit integers
+			vst1_s16(&shorts[i], v2); // Store four 16-bit integers
+		}
+		// Handle remaining elements
+		for (; i < count; ++i) {
+			shorts[i] = (int16_t)indices[i];
+		}
+#else
+		for( int n = 0; n < count; n++) {
+			shorts[n] = indices[n];
+		}
+#endif
+	}
+
+    // Draw!!!
+	qglDrawElements( GL_TRIANGLES, count, type, indicesRender );
+}
+
 /*
 ================
 RB_DrawElementsWithCounters
@@ -50,7 +92,7 @@ void RB_DrawElementsWithCounters( const drawSurf_t *surf ) {
 	backEnd.pc.c_drawElements++;
 
 	if ( surf->indexCache ) {
-		qglDrawElements( GL_TRIANGLES, surf->numIndexes, GL_INDEX_TYPE, (int *)vertexCache.Position( surf->indexCache ) );
+		RB_DrawElementsWithConversion( GL_TRIANGLES, surf->numIndexes,  (int *)vertexCache.Position( surf->indexCache ) );
 		backEnd.pc.c_vboIndexes += surf->numIndexes;
 	} else {
 		static bool bOnce = true;
@@ -73,7 +115,7 @@ void RB_DrawShadowElementsWithCounters( const drawSurf_t *surf , int numIndexes 
 	backEnd.pc.c_shadowElements++;
 
 	if ( surf->indexCache ) {
-		qglDrawElements( GL_TRIANGLES, numIndexes, GL_INDEX_TYPE, (int *)vertexCache.Position( surf->indexCache ) );
+        RB_DrawElementsWithConversion( GL_TRIANGLES, numIndexes, (int *)vertexCache.Position( surf->indexCache ) );
 		backEnd.pc.c_vboIndexes += numIndexes;
 	} else {
 		static bool bOnce = true;
@@ -168,15 +210,15 @@ void RB_BeginDrawingView (void) {
 
 	// set the window clipping
 	qglViewport( tr.viewportOffset[0] + backEnd.viewDef->viewport.x1,
-	             tr.viewportOffset[1] + backEnd.viewDef->viewport.y1,
-	             backEnd.viewDef->viewport.x2 + 1 - backEnd.viewDef->viewport.x1,
-	             backEnd.viewDef->viewport.y2 + 1 - backEnd.viewDef->viewport.y1 );
+				 tr.viewportOffset[1] + backEnd.viewDef->viewport.y1,
+				 backEnd.viewDef->viewport.x2 + 1 - backEnd.viewDef->viewport.x1,
+				 backEnd.viewDef->viewport.y2 + 1 - backEnd.viewDef->viewport.y1 );
 
 	// the scissor may be smaller than the viewport for subviews
 	qglScissor( tr.viewportOffset[0] + backEnd.viewDef->viewport.x1 + backEnd.viewDef->scissor.x1,
-	            tr.viewportOffset[1] + backEnd.viewDef->viewport.y1 + backEnd.viewDef->scissor.y1,
-	            backEnd.viewDef->scissor.x2 + 1 - backEnd.viewDef->scissor.x1,
-	            backEnd.viewDef->scissor.y2 + 1 - backEnd.viewDef->scissor.y1 );
+				tr.viewportOffset[1] + backEnd.viewDef->viewport.y1 + backEnd.viewDef->scissor.y1,
+				backEnd.viewDef->scissor.x2 + 1 - backEnd.viewDef->scissor.x1,
+				backEnd.viewDef->scissor.y2 + 1 - backEnd.viewDef->scissor.y1 );
 	backEnd.currentScissor = backEnd.viewDef->scissor;
 
 	// ensures that depth writes are enabled for the depth clear
@@ -283,9 +325,9 @@ void RB_SubmittInteraction( drawInteraction_t *din, void (*DrawInteraction)(cons
 		din->specularColor[1] > 0 ||
 		din->specularColor[2] > 0 ) && din->specularImage != globalImages->blackImage ) ) {
 
-	            din->diffuseColor[0] *= RB_overbright;
-	            din->diffuseColor[1] *= RB_overbright;
-	            din->diffuseColor[2] *= RB_overbright;
+				din->diffuseColor[0] *= RB_overbright;
+				din->diffuseColor[1] *= RB_overbright;
+				din->diffuseColor[2] *= RB_overbright;
 		DrawInteraction( din );
 	}
 }

@@ -62,6 +62,8 @@ typedef struct glconfig_s {
 
 	bool				depthStencilAvailable;
 
+	bool				useShortIndexElements; // For very old GPU which don't work with GL_UNSIGNED_INT
+
 	int					vidWidth, vidHeight;	// passed to R_BeginFrame
 
 	int					vidWidthReal, vidHeightReal; // The real resolution of the screen, uses framebuffer if not the same as vidWidth
