@@ -157,11 +157,13 @@ bool R_CreateVertexProgramShadowCache(srfTriangles_t* tri) {
 	// If there is no shadow cache, let's compute it
 	else if ( !tri->shadowCache ) {
 		// Build the temporary precomputed shadow vertices
-		shadowCache_t* temp = (shadowCache_t*) _alloca16(tri->numVerts * 2 * sizeof(shadowCache_t));
+		shadowCache_t* temp = (shadowCache_t*) Mem_Alloc16(tri->numVerts * 2 * sizeof(shadowCache_t));
 		SIMDProcessor->CreateVertexProgramShadowCache(&temp->xyz, tri->verts, tri->numVerts);
 
 		// Build the shadow cache
 		vertexCache.Alloc(temp, tri->numVerts * 2 * sizeof(shadowCache_t), &tri->shadowCache, false);
+
+		Mem_Free16(temp);
 
 		// Check for errors
 		if ( !tri->shadowCache ) {
