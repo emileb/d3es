@@ -17,7 +17,6 @@ $(TOP_DIR)/Clibs_OpenTouch \
 $(TOP_DIR)/Clibs_OpenTouch/idtech1 \
 
 
-
 LOCAL_CPPFLAGS := -DUSE_GLES2 -DAIM_ASSIST -DD3_OSTYPE=\"ANDROID\" -DD3_ARCH=\"ARM\"
 
 ifeq ($(TARGET_ARCH_ABI),arm64-v8a)
@@ -31,7 +30,6 @@ endif
 LOCAL_CPPFLAGS += -std=gnu++11 -D__DOOM_DLL__ -frtti -fexceptions
 LOCAL_CPPFLAGS += -Wno-sign-compare  -Wno-switch  -Wno-format-security -Wunsupported-floating-point-opt  -Wno-error=format-security -fsigned-char
 
-
 LOCAL_CPPFLAGS += -DD3ES -DENGINE_NAME=\"d3es\"
 
 LOCAL_CPPFLAGS += -DNO_LIGHT
@@ -39,14 +37,9 @@ LOCAL_CPPFLAGS += -DNO_LIGHT
 # Not avaliable in Android until N
 LOCAL_CFLAGS := -DIOAPI_NO_64
 
-#LOCAL_CFLAGS += -fno-unsafe-math-optimizations -fno-strict-aliasing -fno-math-errno  -fsigned-char
-
-
-
 SRC_ANDROID = mobile/game_interface.cpp \
               ../../../Clibs_OpenTouch/idtech1/android_jni.cpp \
               ../../../Clibs_OpenTouch/idtech1/touch_interface.cpp \
-
 
 src_renderer = \
 	renderer/Cinematic.cpp \
@@ -328,8 +321,6 @@ LOCAL_SRC_FILES = $(SRC_ANDROID) \
                   $(src_sys_base) \
                   $(src_sys_core) \
                   renderer/framebuffer.cpp \
-
-
 
 
 LOCAL_SHARED_LIBRARIES := openal touchcontrols core_shared SDL2 libvorbis libogg saffal

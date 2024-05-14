@@ -174,7 +174,6 @@ typedef enum {
 
 static int cmdButtons[UB_MAX_BUTTONS];
 
-
 static void buttonChange(int state, int key )
 {
 	cmdButtons[key] = !!state;
@@ -183,6 +182,11 @@ static void buttonChange(int state, int key )
 static int getButton(int key)
 {
 	return cmdButtons[key];
+}
+
+bool Doom3IsRunning() // Used to change the sprint button graphic
+{
+    return getButton(UB_SPEED);
 }
 
 void PortableAction(int state, int action)
