@@ -50,6 +50,7 @@ typedef struct glconfig_s {
 	const char			*version_string;
 	const char			*extensions_string;
 
+	int					glesVersionMajor;
 	int					maxTextureSize;			// queried from GL
 	int					maxTextureUnits;
 	float				maxTextureAnisotropy;

@@ -254,7 +254,9 @@ static void R_CheckPortableExtensions( void ) {
 	glConfig.depthStencilAvailable = R_CheckExtension( "GL_OES_packed_depth_stencil" );
 	common->Printf(" depthStencilAvailable: %d\n", glConfig.npotAvailable);
 
-	glConfig.useShortIndexElements = false;
+	//int gl version =
+	glConfig.useShortIndexElements = (glConfig.glesVersionMajor < 3) && !R_CheckExtension( "GL_OES_element_index_uint" );
+	common->Printf(" useShortIndexElements: %d\n", glConfig.useShortIndexElements);
 
 	if(glConfig.useShortIndexElements)
 	{
@@ -528,6 +530,17 @@ void R_InitOpenGL( void ) {
 	common->Printf("OpenGL vendor: %s\n", glConfig.vendor_string );
 	common->Printf("OpenGL renderer: %s\n", glConfig.renderer_string );
 	common->Printf("OpenGL version: %s\n", glConfig.version_string );
+
+	int major = 2;
+	int minor = 0;
+	if (sscanf(glConfig.version_string, "OpenGL ES %d.%d", &major, &minor) == 2) {
+		common->Printf("OpenGL ES version: %d.%d\n", major, minor);
+	} else {
+		common->Printf("Unable to extract OpenGL ES version from GL_VERSION: %s\n", glConfig.version_string);
+	}
+
+	glConfig.glesVersionMajor = major;
+
 
 	// recheck all the extensions (FIXME: this might be dangerous)
 	R_CheckPortableExtensions();
