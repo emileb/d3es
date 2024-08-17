@@ -24,12 +24,8 @@ endif
 LOCAL_CPPFLAGS += -std=gnu++11 -D__DOOM_DLL__ -frtti -fexceptions
 LOCAL_CPPFLAGS += -Wno-sign-compare  -Wno-switch  -Wno-format-security -Wunsupported-floating-point-opt  -Wno-error=format-security -fsigned-char
 
-
 # Not avaliable in Android untill N
 LOCAL_CFLAGS := -DIOAPI_NO_64
-
-#LOCAL_CFLAGS += -fno-unsafe-math-optimizations -fno-strict-aliasing -fno-math-errno -fsigned-char
-
 
 src_idlib = \
 	idlib/bv/Bounds.cpp \
