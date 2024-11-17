@@ -2686,6 +2686,8 @@ void idCommonLocal::LoadGameDLL( void ) {
 		 strcpy(dll,"/libd3es_eoc.so");
 	else if(gameMod == GAME_TYPE_DOOM3_PERFECTED)
 		 strcpy(dll,"/libd3es_perfected.so");
+	else if(gameMod == GAME_TYPE_DOOM3_PHOBOS)
+		 strcpy(dll,"/libd3es_phobos.so");
 	else
 		common->Warning( "BAD GAME TYPE" );
 
