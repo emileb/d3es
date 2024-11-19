@@ -214,8 +214,9 @@ idCVar r_useStencilOpSeparate( "r_useStencilOpSeparate", "1", CVAR_RENDERER | CV
 idCVar r_multithread("r_multithread", "0", CVAR_RENDERER | CVAR_BOOL, "Multithread backend");
 
 idCVar r_noLight("r_noLight", "0", CVAR_RENDERER | CVAR_BOOL, "lighting disable hack");
-idCVar r_useETC1("r_useETC1", "0", CVAR_RENDERER | CVAR_BOOL, "use ETC1 compression");
-idCVar r_useETC1Cache("r_useETC1cache", "0", CVAR_RENDERER | CVAR_BOOL, "cache ETC1 data");
+idCVar r_useETC1("r_useETC1", "0", CVAR_RENDERER | CVAR_BOOL, "Use ETC1 compression");
+idCVar r_useETC1Cache("r_useETC1cache", "0", CVAR_RENDERER | CVAR_BOOL, "Cache ETC1 data");
+idCVar r_forceHighp("r_forceHighp", "0", CVAR_RENDERER | CVAR_BOOL, "Force high precision shaders");
 
 idCVar r_maxFps( "r_maxFps", "0", CVAR_RENDERER | CVAR_INTEGER, "Limit maximum FPS. 0 = unlimited" );
 

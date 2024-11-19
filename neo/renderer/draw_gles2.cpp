@@ -129,21 +129,31 @@ loads GLSL vertex or fragment shaders
 =================
 */
 static void R_LoadGLSLShader(const char* buffer, shaderProgram_t* shaderProgram, GLenum type) {
-	if ( !glConfig.isInitialized ) {
-		return;
+    if (!glConfig.isInitialized) {
+        return;
+    }
+
+	idStr bufferStr(buffer);
+
+	if (r_forceHighp.GetBool())
+	{
+		bufferStr.Replace(" mediump ", " highp ");
+		bufferStr.Replace(" lowp ", " highp ");
 	}
+
+    const char *prt = bufferStr.c_str();
 
 	switch ( type ) {
 	case GL_VERTEX_SHADER:
 		// create vertex shader
 		shaderProgram->vertexShader = qglCreateShader(GL_VERTEX_SHADER);
-		qglShaderSource(shaderProgram->vertexShader, 1, (const GLchar**) &buffer, 0);
+		qglShaderSource(shaderProgram->vertexShader, 1, &prt, 0);
 		qglCompileShader(shaderProgram->vertexShader);
 		break;
 	case GL_FRAGMENT_SHADER:
 		// create fragment shader
 		shaderProgram->fragmentShader = qglCreateShader(GL_FRAGMENT_SHADER);
-		qglShaderSource(shaderProgram->fragmentShader, 1, (const GLchar**) &buffer, 0);
+		qglShaderSource(shaderProgram->fragmentShader, 1, &prt, 0);
 		qglCompileShader(shaderProgram->fragmentShader);
 		break;
 	default:
